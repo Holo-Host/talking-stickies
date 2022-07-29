@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+name = "syn"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "syn"
+
+[dependencies]
+chrono = {version = "0.4", features = ["serde"]}
+derive_more = "0"
+serde = "1"
+
+hc_zome_syn = {git = "https://github.com/holochain/syn", rev = "for-hdk-v0.0.136"}
