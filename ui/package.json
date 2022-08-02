@@ -31,7 +31,9 @@
     "@tsconfig/svelte": "^1.0.0"
   },
   "dependencies": {
-    "@holochain/conductor-api": "0.0.1-dev.14",
+    "@holochain/client": "0.4.1",
+    "@holochain-open-dev/cell-client": "0.5.3",
+    "@holochain-syn/store": "0.0.4",
     "lodash": "^4.17.21",
     "sirv-cli": "^1.0.0",
     "svelte-fa": "^2.2.0",

@@ -4,87 +4,6 @@
   import Toolbar from './Toolbar.svelte'
   import { scribeStr } from './stores.js'
 
-  // definition of how to apply a delta to the content
-  // if the delta is destructive also returns what was
-  // destroyed for use by undo
-  function applyDelta(content, delta) {
-    switch(delta.type) {
-    case 'add-sticky':
-      {
-        const stickies = content.body.length === 0
-          ? []
-          : JSON.parse(content.body)
-        content.body = JSON.stringify([...stickies, delta.value])
-        return [content, {delta}]
-      }
-    case 'update-sticky':
-      {
-        const stickies = content.body.length === 0
-          ? []
-          : JSON.parse(content.body)
-        const updatedStickies = stickies.map(sticky => {
-          if (sticky.id === delta.value.id) {
-            return delta.value
-          } else {
-            return sticky
-          }
-        })
-        console.log('updated stickies', JSON.stringify(updatedStickies))
-        content.body = JSON.stringify(updatedStickies)
-        return [content, {delta, deleted: stickies.find(sticky => sticky.id === delta.value.id)}]
-      }
-    case 'delete-sticky':
-      {
-        const stickies = content.body.length === 0
-          ? []
-          : JSON.parse(content.body)
-        content.body = JSON.stringify(stickies.filter(sticky => sticky.id !== delta.value.id))
-        return [content, {delta, deleted: stickies.find(sticky => sticky.id === delta.value.id)}]
-      }
-    }
-  }
-
-  // definition of how to undo a change, returns a delta that will undo the change
-  function undo(change) {
-    const delta = change.delta
-    switch(delta.type) {
-    case 'Title':
-      return {type:'Title', value:change.deleted}
-      break
-    case 'Add':
-      const [loc, text] = delta.value
-      return {type:'Delete', value: [loc, loc+text.length]}
-      break
-    case 'Delete':
-      const [start, end] = delta.value
-      return {type:'Add', value:[start, change.deleted]}
-      break
-    case 'Meta':
-      return {type:'Meta', value:{setLoc: change.deleted}}
-    }
-  }
-
-  // definition of how to convert a change to text for the history renderer
-  function changeToText(change) {
-    let delta = change.delta
-    let detail
-    switch(delta.type) {
-    case 'Add':
-      detail = `${delta.value[1]}@${delta.value[0]}`
-      break
-    case 'Delete':
-      detail = `${change.deleted}@${delta.value[0]}`
-      break
-    case 'Title':
-      detail = `${change.deleted}->${delta.value}`
-      break
-    case 'Meta':
-      detail = ''
-    }
-    return `${delta.type}:\n${detail}`
-  }
-
-
   $: noscribe = $scribeStr === ''
   let syn
 
@@ -200,5 +119,5 @@
     on:requestChange={(event) => syn.requestChange(event.detail)}
     agentPubkey={agentPubkey}
     sortOption={sortOption} />
-  <Syn applyDeltaFn={applyDelta} undoFn={undo} bind:this={syn} setAgentPubkey={setAgentPubkey} />
+  <Syn bind:this={syn} setAgentPubkey={setAgentPubkey} />
 </div>

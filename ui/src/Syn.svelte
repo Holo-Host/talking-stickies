@@ -1,17 +1,16 @@
 <script lang="ts">
   import { connection, scribeStr, content, folks } from './stores.js'
   import { createEventDispatcher, onMount } from 'svelte'
-  import { Connection} from './syn.js'
   import { bufferToBase64, emptySession } from './utils.js'
-  import type { TalkingStickiesGrammar } from './grammar';
+  import { HolochainClient } from '@holochain-open-dev/cell-client';
+  import { AppWebsocket, InstalledCell } from '@holochain/client';
+  import { TalkingStickiesStore } from './talkingStickiesStore';
 
   let session
 
-  // this properties are the app-defined functions to apply and undo changes
-  export let applyDeltaFn
-  export let undoFn
-
   export let setAgentPubkey
+  let talkingStickiesStore
+
 
   // this is the list of sessions returned by the DNA
   let sessions
@@ -19,25 +18,37 @@
   export function requestChange(deltas) {
     $session.requestChange(deltas)
   }
-
+  const appId = 'talking_stickies'
+  
   onMount(async () => {
-    let g : TalkingStickiesGrammar = {test: "fish"};
-    console.log(g.test)
-    const urlParams = new URLSearchParams(window.location.search)
-    const appPort = urlParams.has('port') ? urlParams.get('port') : 8888
-    const appId = urlParams.has('id') ? urlParams.get('id') : 'syn'
+    console.log("HERE")
+    const appPort = process.env.HC_PORT ? process.env.HC_PORT : 8888
+    const url = `ws://localhost:${appPort}`;    
+    const appWebsocket = await AppWebsocket.connect(url);
+    const client = new HolochainClient(appWebsocket);
 
     console.log('Connecting with', appPort, appId)
+    const appInfo = await appWebsocket.appInfo({
+      installed_app_id: appId,
+    });
+    const installedCells = appInfo.cell_data;
+    const talkingStickiesCell = installedCells.find(
+      c => c.role_id === 'talking_stickies'
+    ) as InstalledCell;
+    talkingStickiesStore = new TalkingStickiesStore(
+      client,
+      talkingStickiesCell,
+    );
+    setAgentPubkey(talkingStickiesStore.myAgentPubKey())
 
-    $connection = new Connection(appPort, appId)
+ /*    $connection = new Connection(appPort, appId)
     await $connection.open({ ...emptySession }, applyDeltaFn)
 
-    setAgentPubkey(bufferToBase64($connection.getAgentPubkey()))
-    session = $connection.syn.session
+   session = $connection.syn.session
 
     console.log('joining session...')
     await $connection.joinSession()
-    sessions = $connection.sessions
+    sessions = $connection.sessions*/
   })
 
   // -----------------------------------------------------------------------
@@ -47,9 +58,10 @@
   let adminPort=1234
 
   let appPort=8888
-  let appId='syn'
   async function toggle() {
-    if (!$connection) {
+    console.log("NO TOGGLE")
+       /*
+   if (!$connection) {
       $connection = new Connection(appPort, appId)
       await $connection.open({ ...emptySession }, applyDeltaFn)
 
@@ -64,6 +76,7 @@
       sessions = undefined
       console.log('disconnected')
     }
+    */
   }
 
   async function commitChange() {
