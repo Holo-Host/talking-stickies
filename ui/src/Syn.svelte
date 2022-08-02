@@ -91,7 +91,6 @@
   }
   input {
     width: 4em;
-    //border: 2px solid red;
     border-radius: 4px;
   }
   .session {
