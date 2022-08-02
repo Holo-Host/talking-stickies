@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Syn from './Syn.svelte'
   import Board from './Board.svelte'
   import Toolbar from './Toolbar.svelte'

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import { connection, scribeStr, content, folks } from './stores.js'
   import { createEventDispatcher, onMount } from 'svelte'
   import { Connection} from './syn.js'
   import { bufferToBase64, emptySession } from './utils.js'
+  import type { TalkingStickiesGrammar } from './grammar';
 
   let session
 
@@ -20,7 +21,8 @@
   }
 
   onMount(async () => {
-
+    let g : TalkingStickiesGrammar = {test: "fish"};
+    console.log(g.test)
     const urlParams = new URLSearchParams(window.location.search)
     const appPort = urlParams.has('port') ? urlParams.get('port') : 8888
     const appId = urlParams.has('id') ? urlParams.get('id') : 'syn'
