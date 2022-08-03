@@ -50,5 +50,3 @@ export function encodeJson(obj) {
     return value
   })
 }
-
-export const emptySession = { title: '', body: '' }

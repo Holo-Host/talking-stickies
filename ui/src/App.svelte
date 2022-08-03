@@ -1,8 +1,11 @@
 <script lang="ts">
-  import Syn from './Syn.svelte'
   import Board from './Board.svelte'
   import Toolbar from './Toolbar.svelte'
   import { scribeStr } from './stores.js'
+  import { setContext } from 'svelte';
+  import { AppWebsocket, InstalledCell } from '@holochain/client';
+  import { TalkingStickiesStore } from './talkingStickiesStore';
+  import { HolochainClient } from '@holochain-open-dev/cell-client';
 
   $: noscribe = $scribeStr === ''
   let syn
@@ -75,6 +78,61 @@
     tabShown = false
   }
 
+  let synStore;
+  createStore().then(async store => {
+    const sessions = await store.synStore.getAllSessions();
+
+    if (Object.keys(sessions).length === 0) {
+      store.synStore.newSession().then(() => {
+        synStore = store.synStore;
+      });
+    } else {
+      for (const session of Object.keys(sessions)) {
+        try {
+          await store.synStore.joinSession(Object.keys(sessions)[0]);
+
+          synStore = store.synStore;
+          return;
+        } catch (e) {}
+      }
+      store.synStore.newSession().then(() => {
+        synStore = store.synStore;
+      });
+    }
+  });
+  $: synStore;
+
+  setContext('store', {
+    getStore: () => synStore,
+  });
+
+  const appId = 'talking-stickies'
+
+  async function createStore() : Promise<TalkingStickiesStore> {
+    const appPort = process.env.HC_PORT ? process.env.HC_PORT : 8888
+    const url = `ws://localhost:${appPort}`;
+    const appWebsocket = await AppWebsocket.connect(url);
+    const client = new HolochainClient(appWebsocket);
+
+    console.log("CLIENT: ", client);
+
+    console.log('Connecting with', appPort, appId)
+    const appInfo = await client.appWebsocket.appInfo({
+      installed_app_id: appId,
+    });
+
+    console.log("APP INFO: ");
+    const installedCells = appInfo.cell_data;
+    const talkingStickiesCell = installedCells.find(
+      c => c.role_id === 'talking-stickies'
+    ) as InstalledCell;
+    const store = new TalkingStickiesStore(
+      client,
+      talkingStickiesCell,
+    );
+    return store
+  }
+
 </script>
 
 <style>
@@ -115,7 +173,6 @@
 
 <div class='app'>
   <Toolbar setSortOption={setSortOption} sortOption={sortOption} />
-  <Syn bind:this={syn} setAgentPubkey={setAgentPubkey} />
   <Board
     on:requestChange={(event) => syn.requestChange(event.detail)}
     agentPubkey={agentPubkey}

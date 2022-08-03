@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, getContext } from 'svelte'
   import { get } from 'svelte/store'
-  import { store } from './stores.js'
   import StickyEditor from './StickyEditor.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
   import SpeakingIcon from './icons/SpeakingIcon.svelte'
@@ -10,18 +9,20 @@
   import { v1 as uuidv1 } from 'uuid';
   import { sortBy } from 'lodash/fp'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
+  import type { TalkingStickiesState, TalkingStickiesGrammar } from './grammar'
+  import { unnest, SynStore } from '@holochain-syn/store';
 
   export let agentPubkey
   export let sortOption
-  let y
-
-  function x() { $store.synStore.activeSession.subscribe(value => {
-		y = value;
-	});
-  console.log("FISH", y ); return []}
+ 
   const dispatch = createEventDispatcher()
-  $: stickies = $store ? x() :[]
-  //$: stickies = $content.body.length === 0 ? [] : JSON.parse($content.body)
+ 
+  const { getStore } = getContext('store');
+
+  const store:SynStore<TalkingStickiesGrammar> = getStore();
+
+  $: state = unnest(store.activeSession, s => s.state);
+  $: stickies = $state.stickies
 
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
