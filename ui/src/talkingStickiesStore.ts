@@ -2,10 +2,8 @@ import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type {
     InstalledCell,
   } from '@holochain/client';
-import {
-    AgentPubKeyB64,
-    serializeHash,
-  } from '@holochain-open-dev/core-types';
+import type { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
+import { serializeHash } from '@holochain-open-dev/utils';
 import { SynStore } from '@holochain-syn/store';
 import { TalkingStickiesGrammar, talkingStickiesGrammar } from './grammar';
 
@@ -27,7 +25,7 @@ export class TalkingStickiesStore {
     myAgentPubKey(): AgentPubKeyB64 {
         return serializeHash(this.talkingStickiesCell.cell_id[1]);
     }
-    
+
     constructor(
         protected client: HolochainClient,
         protected talkingStickiesCell: InstalledCell,
@@ -40,5 +38,5 @@ export class TalkingStickiesStore {
         );
         // @ts-ignore
         this.synStore = new SynStore(this.cellClient, talkingStickiesGrammar)
-    } 
+    }
 }

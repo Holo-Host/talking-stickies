@@ -18,22 +18,26 @@
   export function requestChange(deltas) {
     $session.requestChange(deltas)
   }
-  const appId = 'talking_stickies'
-  
+  const appId = 'talking-stickies'
+
   onMount(async () => {
     console.log("HERE")
     const appPort = process.env.HC_PORT ? process.env.HC_PORT : 8888
-    const url = `ws://localhost:${appPort}`;    
+    const url = `ws://localhost:${appPort}`;
     const appWebsocket = await AppWebsocket.connect(url);
     const client = new HolochainClient(appWebsocket);
 
+    console.log("CLIENT: ", client);
+
     console.log('Connecting with', appPort, appId)
-    const appInfo = await appWebsocket.appInfo({
+    const appInfo = await client.appWebsocket.appInfo({
       installed_app_id: appId,
     });
+
+    console.log("APP INFO: ");
     const installedCells = appInfo.cell_data;
     const talkingStickiesCell = installedCells.find(
-      c => c.role_id === 'talking_stickies'
+      c => c.role_id === 'talking-stickies'
     ) as InstalledCell;
     talkingStickiesStore = new TalkingStickiesStore(
       client,
