@@ -11,6 +11,7 @@
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import type { TalkingStickiesState, TalkingStickiesGrammar } from './grammar'
   import { unnest, SynStore } from '@holochain-syn/store';
+  import { textEditorGrammar } from '@holochain-syn/text-editor';
 
   export let agentPubkey
   export let sortOption
@@ -52,7 +53,7 @@
     dispatch('requestChange', [
       {type: 'add-sticky', value: {
         id: uuidv1(),
-        text,
+        text: textEditorGrammar.initialState,
         votes: {
           talk: {}, star: {}, question: {}
         }
