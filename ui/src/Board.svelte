@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { content } from './stores.js'
+  import { get } from 'svelte/store'
+  import { store } from './stores.js'
   import StickyEditor from './StickyEditor.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
   import SpeakingIcon from './icons/SpeakingIcon.svelte'
@@ -8,13 +9,19 @@
   import StarIcon from './icons/StarIcon.svelte'
   import { v1 as uuidv1 } from 'uuid';
   import { sortBy } from 'lodash/fp'
+  import type { TalkingStickiesStore } from './talkingStickiesStore';
 
   export let agentPubkey
   export let sortOption
+  let y
 
+  function x() { $store.synStore.activeSession.subscribe(value => {
+		y = value;
+	});
+  console.log("FISH", y ); return []}
   const dispatch = createEventDispatcher()
-
-  $: stickies = $content.body.length === 0 ? [] : JSON.parse($content.body)
+  $: stickies = $store ? x() :[]
+  //$: stickies = $content.body.length === 0 ? [] : JSON.parse($content.body)
 
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)

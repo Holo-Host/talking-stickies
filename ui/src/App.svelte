@@ -115,9 +115,9 @@
 
 <div class='app'>
   <Toolbar setSortOption={setSortOption} sortOption={sortOption} />
+  <Syn bind:this={syn} setAgentPubkey={setAgentPubkey} />
   <Board
     on:requestChange={(event) => syn.requestChange(event.detail)}
     agentPubkey={agentPubkey}
-    sortOption={sortOption} />
-  <Syn bind:this={syn} setAgentPubkey={setAgentPubkey} />
+    sortOption={sortOption}/>
 </div>

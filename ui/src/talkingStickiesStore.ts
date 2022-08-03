@@ -6,6 +6,7 @@ import type { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
 import { serializeHash } from '@holochain-open-dev/utils';
 import { SynStore } from '@holochain-syn/store';
 import { TalkingStickiesGrammar, talkingStickiesGrammar } from './grammar';
+import { get } from "svelte/store";
 
 const ZOME_NAME = 'talking_stickies'
 
@@ -38,5 +39,10 @@ export class TalkingStickiesStore {
         );
         // @ts-ignore
         this.synStore = new SynStore(this.cellClient, talkingStickiesGrammar)
+    }
+
+    async requestChange(deltas) {
+        console.log("REQUESTING CHANGES: ", deltas)
+        get (this.synStore.activeSession!).requestChanges(deltas)
     }
 }

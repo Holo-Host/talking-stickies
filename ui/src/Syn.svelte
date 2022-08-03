@@ -1,27 +1,26 @@
 <script lang="ts">
-  import { connection, scribeStr, content, folks } from './stores.js'
+  import { store, scribeStr, session, folks } from './stores.js'
   import { createEventDispatcher, onMount } from 'svelte'
-  import { bufferToBase64, emptySession } from './utils.js'
+  import { bufferToBase64 } from './utils.js'
   import { HolochainClient } from '@holochain-open-dev/cell-client';
+  import { deserializeHash } from '@holochain-open-dev/utils';
   import { AppWebsocket, InstalledCell } from '@holochain/client';
   import { TalkingStickiesStore } from './talkingStickiesStore';
-
-  let session
+  import { get } from "svelte/store";
 
   export let setAgentPubkey
-  let talkingStickiesStore
+  let talkingStickiesStore: TalkingStickiesStore
 
 
   // this is the list of sessions returned by the DNA
-  let sessions
+//  let sessions
 
   export function requestChange(deltas) {
-    $session.requestChange(deltas)
+    $store.requestChange(deltas)
   }
   const appId = 'talking-stickies'
 
   onMount(async () => {
-    console.log("HERE")
     const appPort = process.env.HC_PORT ? process.env.HC_PORT : 8888
     const url = `ws://localhost:${appPort}`;
     const appWebsocket = await AppWebsocket.connect(url);
@@ -39,12 +38,23 @@
     const talkingStickiesCell = installedCells.find(
       c => c.role_id === 'talking-stickies'
     ) as InstalledCell;
-    talkingStickiesStore = new TalkingStickiesStore(
+    $store = new TalkingStickiesStore(
       client,
       talkingStickiesCell,
     );
-    setAgentPubkey(talkingStickiesStore.myAgentPubKey())
-
+    setAgentPubkey($store.myAgentPubKey())
+    const sessions = await $store.synStore.getAllSessions()
+    console.log("SESSIONS:", sessions)
+    const sessionKeys = Object.keys(sessions)
+    let sessionHash
+    if (sessionKeys.length > 0) {
+      sessionHash = sessionKeys[0]
+    } {
+      const sessionInfo = await $store.synStore.newSession();
+      console.log("SESSION:", sessionInfo)
+      sessionHash = sessionInfo.sessionHash
+    }
+    await $store.synStore.joinSession(sessionHash)
  /*    $connection = new Connection(appPort, appId)
     await $connection.open({ ...emptySession }, applyDeltaFn)
 
@@ -84,7 +94,8 @@
   }
 
   async function commitChange() {
-    $session.commitChange()
+    console.log("not implemented")
+//    get (talkingStickiesStore.synStore.activeSession!).commitChange()
   }
 
   $: noscribe = $scribeStr === ''
