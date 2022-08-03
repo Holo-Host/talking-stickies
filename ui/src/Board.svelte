@@ -23,12 +23,13 @@
 
   $: state = unnest(store.activeSession, s => s.state);
   $: stickies = $state.stickies
-
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
     : stickies => stickies
 
   $: sortedStickies = sortStickies(stickies)
+
+  $: console.log(stickies)
 
   let creating = false
 
