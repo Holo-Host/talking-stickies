@@ -8,7 +8,6 @@
   import { HolochainClient } from '@holochain-open-dev/cell-client';
 
   $: noscribe = $scribeStr === ''
-  let syn
 
   $: agentPubkey = ''
 
@@ -79,24 +78,30 @@
   }
 
   let synStore;
+  let tsStore: TalkingStickiesStore;
   createStore().then(async store => {
     const sessions = await store.synStore.getAllSessions();
-
+    console.log("HERE")
     if (Object.keys(sessions).length === 0) {
       store.synStore.newSession().then(() => {
+        tsStore = store
         synStore = store.synStore;
+        console.log("SESSION", synStore )
+
       });
     } else {
       for (const session of Object.keys(sessions)) {
         try {
           await store.synStore.joinSession(Object.keys(sessions)[0]);
-
+          tsStore = store
           synStore = store.synStore;
           return;
         } catch (e) {}
       }
       store.synStore.newSession().then(() => {
+        tsStore = store
         synStore = store.synStore;
+        console.log("SESSION", synStore )
       });
     }
   });
@@ -172,9 +177,13 @@
 </svelte:head>
 
 <div class='app'>
-  <Toolbar setSortOption={setSortOption} sortOption={sortOption} />
-  <Board
-    on:requestChange={(event) => syn.requestChange(event.detail)}
-    agentPubkey={agentPubkey}
-    sortOption={sortOption}/>
+  {#if tsStore}
+    <Toolbar setSortOption={setSortOption} sortOption={sortOption} />
+    <Board
+      on:requestChange={(event) => {tsStore.requestChange(event.detail)}}
+      agentPubkey={agentPubkey}
+      sortOption={sortOption}/>
+  {:else}
+  Loading
+  {/if}
 </div>
