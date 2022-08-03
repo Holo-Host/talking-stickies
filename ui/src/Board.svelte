@@ -20,7 +20,7 @@
   const { getStore } = getContext('store');
 
   const store:SynStore<TalkingStickiesGrammar> = getStore();
-
+  $: session = store.activeSession;
   $: state = unnest(store.activeSession, s => s.state);
   $: stickies = $state.stickies
   $: sortStickies = sortOption
@@ -76,10 +76,9 @@
     }
 
     dispatch('requestChange', [
-      {type: 'update-sticky', value: {
-        ...sticky,
-        text
-      }}
+      {type: 'update-sticky-text', stickyId: sticky.id,
+        textEditorDelta: {}
+    }
     ])
     editingStickyId = null
   }
@@ -104,7 +103,7 @@
     console.log('votes after', votes)
 
     dispatch('requestChange', [
-      {type: 'update-sticky', value: {
+      {type: 'update-sticky-votes', value: {
         ...sticky,
         votes
       }}
@@ -217,8 +216,12 @@
       {#if editingStickyId === id}
         <StickyEditor handleSave={updateSticky(id)} handleDelete={deleteSticky(id)} {cancelEdit} {text} />
       {:else}
-        <div class='sticky' on:click={editSticky(id)}>
-          {text}
+        <div class='sticky'>
+          <syn-text-editor
+           style="height: 300px; width: 100%"
+           content-path="text"
+           on:change-requested={e => $session.requestChanges([e.detail.delta])}
+          />
           <div class='votes'>
             {#each ['talk', 'star', 'question'] as type }
               <div

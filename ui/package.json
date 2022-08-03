@@ -36,6 +36,7 @@
     "@holochain-open-dev/core-types": "0.4.0",
     "@holochain-open-dev/utils": "0.2.4",
     "@holochain-syn/store": "0.0.4",
+    "@holochain-syn/text-editor": "0.0.10",
     "lodash": "^4.17.21",
     "sirv-cli": "^1.0.0",
     "svelte-fa": "^2.2.0",

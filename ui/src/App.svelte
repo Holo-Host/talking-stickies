@@ -6,6 +6,7 @@
   import { AppWebsocket, InstalledCell } from '@holochain/client';
   import { TalkingStickiesStore } from './talkingStickiesStore';
   import { HolochainClient } from '@holochain-open-dev/cell-client';
+  import { SynTextEditor } from '@holochain-syn/text-editor';
 
   $: noscribe = $scribeStr === ''
 
@@ -117,6 +118,7 @@
     const appPort = process.env.HC_PORT ? process.env.HC_PORT : 8888
     const url = `ws://localhost:${appPort}`;
     const appWebsocket = await AppWebsocket.connect(url);
+    // @ts-ignore
     const client = new HolochainClient(appWebsocket);
 
     console.log("CLIENT: ", client);
@@ -137,6 +139,7 @@
     );
     return store
   }
+  customElements.define('syn-text-editor', SynTextEditor);
 
 </script>
 
