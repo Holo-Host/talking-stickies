@@ -9,7 +9,6 @@
   console.log('sort selecotr sort option', sortOption)
 
   const handleClick = option => () => {
-    console.log('BANG!', option)
     if (option === sortOption) {
       setSortOption(null)
     } else {

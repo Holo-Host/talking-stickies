@@ -81,7 +81,6 @@
   let tsStore: TalkingStickiesStore;
   createStore().then(async store => {
     const sessions = await store.synStore.getAllSessions();
-    console.log("HERE")
     if (Object.keys(sessions).length === 0) {
       store.synStore.newSession().then(() => {
         tsStore = store

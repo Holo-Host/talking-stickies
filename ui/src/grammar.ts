@@ -23,7 +23,7 @@ type TalkingStickiesDelta =
     }
   | {
       type: "delete-sticky";
-      value: Sticky;
+      id: string;
     };
 
 export type TalkingStickiesGrammar = SynGrammar<
@@ -55,7 +55,7 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
         return { stickies: updatedStickies };
       }
       case "delete-sticky": {
-        const updatedStickies = state.stickies.filter((sticky) => sticky => sticky.id !== delta.value.id)
+        const updatedStickies = state.stickies.filter((sticky) => sticky.id !== delta.id)
         return { stickies: updatedStickies };
       }
     }

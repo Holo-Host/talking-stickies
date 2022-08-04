@@ -9,7 +9,7 @@
   import { v1 as uuidv1 } from 'uuid';
   import { sortBy } from 'lodash/fp'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
-  import type { TalkingStickiesState, TalkingStickiesGrammar } from './grammar'
+  import type { TalkingStickiesGrammar } from './grammar'
   import { unnest, SynStore } from '@holochain-syn/store';
 
   export let agentPubkey
@@ -29,23 +29,28 @@
 
   $: sortedStickies = sortStickies(stickies)
 
-  $: console.log(stickies)
-
   let creating = false
 
   const newSticky = () => {
     creating = true
   }
 
-  let editingStickyId
+  const clearEdit = () => {
+    editingStickyId = null
+    editText = ''
+  }
 
-  const editSticky = id => () => {
+  let editingStickyId
+  let editText = ''
+
+  const editSticky = (id, text) => () => {
     editingStickyId = id
+    editText = text
   }
 
   const cancelEdit = () => {
     creating = false
-    editingStickyId = null
+    clearEdit()
   }
 
   const addSticky = text => {
@@ -63,9 +68,9 @@
 
   const deleteSticky = id => () => {
     dispatch('requestChange', [
-      {type: 'delete-sticky', value: {id}}
+      {type: 'delete-sticky', id}
     ])
-    editingStickyId = null
+    clearEdit()
   }
 
   const updateSticky = id => text => {
@@ -81,7 +86,7 @@
         text
       }}
     ])
-    editingStickyId = null
+    clearEdit()
   }
 
   const voteOnSticky = (id, type) => {
@@ -215,9 +220,9 @@
   <div class='stickies'>
     {#each sortedStickies as { id, text, votes } (id)}
       {#if editingStickyId === id}
-        <StickyEditor handleSave={updateSticky(id)} handleDelete={deleteSticky(id)} {cancelEdit} {text} />
+        <StickyEditor handleSave={updateSticky(id)} handleDelete={deleteSticky(id)} {cancelEdit} text={editText} />
       {:else}
-        <div class='sticky' on:click={editSticky(id)}>
+        <div class='sticky' on:click={editSticky(id, text)}>
           {text}
           <div class='votes'>
             {#each ['talk', 'star', 'question'] as type }
