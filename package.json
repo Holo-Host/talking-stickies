@@ -5,15 +5,17 @@
     "ui"
   ],
   "scripts": {
-    "start": "npm run build:happ && npm run start:agent",
-    "start:agent": "cross-env HC_PORT=8888 ADMIN_PORT=$(port) concurrently \"npm run start:ui\" \"npm run start:happ\" \"sleep 5 && npm run start:ui\"",
+    "start": "npm run build:happ && HC_ID=0 npm run start:agent",
+    "start:agent": "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:ui\" \"npm run start:happ\" \"sleep 5 && npm run start:ui:watch\"",
     "start:ui": "npm run build:ui && npm run dev -w talking-stickies-app",
-    "start:happ": "RUST_LOG=warn hc s -f=$ADMIN_PORT generate ./dna/workdir/happ/talking-stickies.happ --run=$HC_PORT -a talking-stickies network mdns",
+    "start:ui:watch": "npm run build:ui && npm run dev:watch -w talking-stickies-app",
+    "start:happ": "echo \"starting hc instance: $HC_ID\" && RUST_LOG=warn hc s -f=$ADMIN_PORT generate ./dna/workdir/happ/talking-stickies.happ --run=$HC_PORT -a talking-stickies$HC_ID network mdns",
     "build:happ": "npm run build:dna && hc app pack ./dna/workdir/happ",
     "build:dna": "npm run build:zome && hc dna pack ./dna/workdir/dna",
     "build:zome": "CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown",
     "build:ui": "npm run build -w talking-stickies-app",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check-env": "node -e 'console.log(process.env)' | grep npm"
   },
   "devDependencies": {
     "@holochain-playground/cli": "^0.0.8",

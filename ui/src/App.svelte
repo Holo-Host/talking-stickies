@@ -110,10 +110,10 @@
     getStore: () => synStore,
   });
 
-  const appId = 'talking-stickies'
-
   async function createStore() : Promise<TalkingStickiesStore> {
-    const appPort = process.env.HC_PORT ? process.env.HC_PORT : 8888
+    const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'talking-stickies'
+
+    const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
     const url = `ws://localhost:${appPort}`;
     const appWebsocket = await AppWebsocket.connect(url);
     const client = new HolochainClient(appWebsocket);
