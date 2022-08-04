@@ -18,8 +18,14 @@ type TalkingStickiesDelta =
       value: Sticky;
     }
   | {
-      type: "update-sticky";
-      value: Sticky;
+      type: "update-sticky-text";
+      id: string;
+      text: string;
+    }
+  | {
+      type: "update-sticky-votes";
+      id: string;
+      votes: Object;
     }
   | {
       type: "delete-sticky";
@@ -44,13 +50,21 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
       case "add-sticky": {
         return { stickies: [...state.stickies, delta.value] };
       }
-      case "update-sticky": {
+      case "update-sticky-text": {
         const updatedStickies = state.stickies.map((sticky) => {
-          if (sticky.id === delta.value.id) {
-            return delta.value;
-          } else {
-            return sticky;
+          if (sticky.id === delta.id) {
+            sticky.text = delta.text;
           }
+          return sticky
+        });
+        return { stickies: updatedStickies };
+      }
+      case "update-sticky-votes": {
+        const updatedStickies = state.stickies.map((sticky) => {
+          if (sticky.id === delta.id) {
+            sticky.votes = delta.votes;
+          }
+          return sticky
         });
         return { stickies: updatedStickies };
       }

@@ -42,6 +42,7 @@
 
   let editingStickyId
   let editText = ''
+  const getEditText = () => {return editText}
 
   const editSticky = (id, text) => () => {
     editingStickyId = id
@@ -81,10 +82,10 @@
     }
 
     dispatch('requestChange', [
-      {type: 'update-sticky', value: {
-        ...sticky,
-        text
-      }}
+      {type: 'update-sticky-text',
+       id: sticky.id,
+       text: text
+      }
     ])
     clearEdit()
   }
@@ -109,10 +110,10 @@
     console.log('votes after', votes)
 
     dispatch('requestChange', [
-      {type: 'update-sticky', value: {
-        ...sticky,
-        votes
-      }}
+      {type: 'update-sticky-votes', 
+      id: sticky.id,
+      votes
+      }
     ])
   }
 

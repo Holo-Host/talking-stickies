@@ -6,8 +6,6 @@
   export let setSortOption
   export let sortOption
 
-  console.log('sort selecotr sort option', sortOption)
-
   const handleClick = option => () => {
     if (option === sortOption) {
       setSortOption(null)
