@@ -47,7 +47,8 @@ export class TalkingStickiesStore {
 
     async requestChange(deltas) {
         console.log("REQUESTING CHANGES: ", deltas)
-        get (this.synStore.activeSession!).requestChanges(deltas)
+        const board = this.getActiveBoard()
+        board.session.requestChanges(deltas)
     }
     getActiveBoard() : Board | undefined {
         return get (this.activeBoard)
@@ -62,8 +63,8 @@ export class TalkingStickiesStore {
         }
     }
     makeBoard() {
-        this.synStore.newSession().then(() =>{
-            this.newBoard(`Board ${get(this.boards).length}`, get(this.synStore.activeSession))
+        this.synStore.newSession().then((session) =>{
+            this.newBoard(`Board ${get(this.boards).length}`, session)
         })
     }
     newBoard(name: string, session: SessionStore<TalkingStickiesGrammar>) {
