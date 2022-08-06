@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte'
-  import { get } from 'svelte/store'
   import StickyEditor from './StickyEditor.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
   import SpeakingIcon from './icons/SpeakingIcon.svelte'
@@ -9,19 +8,19 @@
   import { v1 as uuidv1 } from 'uuid';
   import { sortBy } from 'lodash/fp'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
-  import type { TalkingStickiesGrammar } from './grammar'
-  import { unnest, SynStore } from '@holochain-syn/store';
+  import { SynStore, unnest } from '@holochain-syn/store';
+  import { get, Readable, writable, Writable } from "svelte/store";
+
 
   export let agentPubkey
   export let sortOption
  
   const dispatch = createEventDispatcher()
  
-  const { getStore } = getContext('store');
+  const { getStore } = getContext('tsStore');
+  let tsStore: TalkingStickiesStore = getStore()
 
-  const store:SynStore<TalkingStickiesGrammar> = getStore();
-
-  $: state = unnest(store.activeSession, s => s.state);
+  $: state = unnest(tsStore.activeBoard, s=>s.session.state)
   $: stickies = $state.stickies
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
@@ -145,6 +144,7 @@
     border-radius: 3px;
     flex: 1;
   }
+
   .stickies {
     display: flex;
     flex-wrap: wrap;
@@ -251,4 +251,5 @@
       </div>
     {/if}
   </div>
+
 </div>

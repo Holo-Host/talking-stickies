@@ -1,11 +1,15 @@
 <script lang="ts">
-  import Board from './Board.svelte'
+  import BoardPane from './BoardPane.svelte'
+  import Boards from './Boards.svelte'
   import Toolbar from './Toolbar.svelte'
   import { scribeStr } from './stores.js'
   import { setContext } from 'svelte';
   import { AppWebsocket, InstalledCell } from '@holochain/client';
   import { TalkingStickiesStore } from './talkingStickiesStore';
   import { HolochainClient } from '@holochain-open-dev/cell-client';
+  import type { SynStore, unnest } from '@holochain-syn/store';
+  import type { TalkingStickiesGrammar } from './grammar';
+  import { get, Readable, writable, Writable } from "svelte/store";
 
   $: noscribe = $scribeStr === ''
 
@@ -77,37 +81,40 @@
     tabShown = false
   }
 
-  let synStore;
+  let synStore: SynStore<TalkingStickiesGrammar>;
   let tsStore: TalkingStickiesStore;
+    
   createStore().then(async store => {
+    synStore = store.synStore;
+    tsStore = store
+
     const sessions = await store.synStore.getAllSessions();
     if (Object.keys(sessions).length === 0) {
-      store.synStore.newSession().then(() => {
-        tsStore = store
-        synStore = store.synStore;
-        console.log("SESSION", synStore )
+      console.log("No sessions found, making one:", synStore )
+      tsStore.makeBoard()
+    } else {        
+      console.log(`ATTEMPTING TO JOIN ${Object.keys(sessions).length} SESSIONS`)
+      console.log(`Active ${JSON.stringify(store.synStore.activeSession)} SESSIONS`)
 
-      });
-    } else {
       for (const session of Object.keys(sessions)) {
+        console.log("JOIN SESSION:", session )
         try {
           await store.synStore.joinSession(Object.keys(sessions)[0]);
-          tsStore = store
-          synStore = store.synStore;
+          tsStore.newBoard("fish", get(synStore.activeSession))
           return;
-        } catch (e) {}
+        } catch (e) { console.log("unable to join session:", e)}
       }
-      store.synStore.newSession().then(() => {
-        tsStore = store
-        synStore = store.synStore;
-        console.log("SESSION", synStore )
-      });
+      console.log("NEW SESSION AFTER UNABLE TO JOIN", synStore )
+      tsStore.makeBoard()
     }
   });
-  $: synStore;
-
-  setContext('store', {
+  $: activeBoard = tsStore ? tsStore.activeBoard : undefined
+  setContext('synStore', {
     getStore: () => synStore,
+  });
+
+  setContext('tsStore', {
+    getStore: () => tsStore,
   });
 
   async function createStore() : Promise<TalkingStickiesStore> {
@@ -145,27 +152,13 @@
     flex-direction: column;
     height: 1000px;
   }
-	main {
-		padding: 1em;
-    background: hsla(100, 20%, 50%, .2);
-    grid-column: 1 / 2;
-	}
-
   :global(:root) {
     --resizeable-height: 200px;
     --tab-width: 60px;
   }
 
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
-    margin: auto;
-  }
-
   @media (min-width: 640px) {
-    main {
+    .app {
       max-width: none;
     }
   }
@@ -178,11 +171,14 @@
 <div class='app'>
   {#if tsStore}
     <Toolbar setSortOption={setSortOption} sortOption={sortOption} />
-    <Board
-      on:requestChange={(event) => {tsStore.requestChange(event.detail)}}
-      agentPubkey={agentPubkey}
-      sortOption={sortOption}/>
+    <Boards />
+    {#if $activeBoard}
+      <BoardPane
+        on:requestChange={(event) => {tsStore.requestChange(event.detail)}}
+        agentPubkey={agentPubkey}
+        sortOption={sortOption}/>
+    {/if}
   {:else}
-  Loading
+    Loading
   {/if}
 </div>

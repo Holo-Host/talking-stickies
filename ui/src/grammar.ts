@@ -8,7 +8,7 @@ type Sticky = {
   votes: Object;
 };
 
-interface TalkingStickiesState {
+export interface TalkingStickiesState {
   stickies: Sticky[];
 }
 
