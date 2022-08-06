@@ -20,13 +20,7 @@
     agentPubkey = newAgentPubkey
   }
 
-  $: sortOption = null
-
-  function setSortOption (newSortOption) {
-    console.log('setting sort option', newSortOption)
-    sortOption = newSortOption
-  }
-
+ 
   // The debug drawer's ability to resized and hidden
   let resizeable
   let resizeHandle
@@ -170,13 +164,12 @@
 
 <div class='app'>
   {#if tsStore}
-    <Toolbar setSortOption={setSortOption} sortOption={sortOption} />
+    <Toolbar />
     <Boards />
     {#if $activeBoard}
       <BoardPane
         on:requestChange={(event) => {tsStore.requestChange(event.detail)}}
-        agentPubkey={agentPubkey}
-        sortOption={sortOption}/>
+        agentPubkey={agentPubkey}/>
     {/if}
   {:else}
     Loading

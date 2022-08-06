@@ -8,13 +8,18 @@
   import { v1 as uuidv1 } from 'uuid';
   import { sortBy } from 'lodash/fp'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
-  import { SynStore, unnest } from '@holochain-syn/store';
-  import { get, Readable, writable, Writable } from "svelte/store";
-
+  import { unnest } from '@holochain-syn/store';
+  import SortSelector from './SortSelector.svelte'
 
   export let agentPubkey
-  export let sortOption
  
+  $: sortOption = null
+
+  function setSortOption (newSortOption) {
+    console.log('setting sort option', newSortOption)
+    sortOption = newSortOption
+  }
+
   const dispatch = createEventDispatcher()
  
   const { getStore } = getContext('tsStore');
@@ -144,6 +149,11 @@
     border-radius: 3px;
     flex: 1;
   }
+  .top-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 
   .stickies {
     display: flex;
@@ -215,9 +225,13 @@
 </style>
 
 <div class='board'>
-  <div class='add-sticky' on:click={newSticky}>
-    <PlusIcon  />Add Sticky
+  <div class='top-bar'>
+    <div class='add-sticky' on:click={newSticky}>
+      <PlusIcon  />Add Sticky
+    </div>
+    <SortSelector setSortOption={setSortOption} sortOption={sortOption} />
   </div>
+
   <div class='stickies'>
     {#each sortedStickies as { id, text, votes } (id)}
       {#if editingStickyId === id}

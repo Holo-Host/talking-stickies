@@ -1,8 +1,4 @@
 <script>
-  import SortSelector from './SortSelector.svelte'
-
-  export let setSortOption
-  export let sortOption
 
 </script>
 
@@ -15,5 +11,4 @@
 
 <div class='toolbar'>
   <h1>Talking Stickies</h1>
-  <SortSelector setSortOption={setSortOption} sortOption={sortOption} />
 </div>

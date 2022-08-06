@@ -24,6 +24,7 @@ export class TalkingStickiesStore {
     service: TalkingStickiesService;
     boards: Writable<Array<Board>> = writable([]);
     activeBoard: Writable<Board|undefined> = writable(undefined);
+    activeBoardIndex: Writable<number|undefined> = writable(undefined)
 
     synStore: SynStore<TalkingStickiesGrammar>;
     cellClient: CellClient;
@@ -56,10 +57,13 @@ export class TalkingStickiesStore {
     setActiveBoard(index: number) {
         const board = get(this.boards)[index]
         if (board) {
+            this.activeBoardIndex.update((n) => {return index} )
             this.activeBoard.update((b) => {
                 console.log("Activating board: ", board.name, JSON.stringify(board.session))
                 return board
             })
+        } else {
+            this.activeBoardIndex.update((n) => {return undefined} )
         }
     }
     makeBoard() {
@@ -72,6 +76,7 @@ export class TalkingStickiesStore {
             const board = {name,commit:"", session}
             boards.push(board)
             this.activeBoard.update((b) => {return board})
+            this.activeBoardIndex.update((n) => {return boards.length-1} )
             return boards
         })
     }
