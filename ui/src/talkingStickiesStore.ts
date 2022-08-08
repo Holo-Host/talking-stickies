@@ -79,8 +79,18 @@ export class TalkingStickiesStore {
         }        
     }
     makeBoard() {
-        this.synStore.newSession().then((session) =>{
-            this.newBoard(`Board ${get(this.boards).length}`, session)
+        this.synStore.fetchCommitHistory().then(() => {
+            let latest = 0
+            let latestHash = undefined
+            const commits = Object.entries(get(this.synStore.allCommits))
+            commits.forEach(([hash, commit]) => {
+                if (commit.createdAt > latest) {latest = commit.createdAt; latestHash = hash}
+            })
+  
+            this.synStore.newSession(latestHash).then((session) =>{
+                this.newBoard(`Board ${get(this.boards).length}`, session)
+            })
+    
         })
     }
     newBoard(name: string, session: SessionStore<TalkingStickiesGrammar>) {

@@ -81,7 +81,6 @@
   createStore().then(async store => {
     synStore = store.synStore;
     tsStore = store
-    console.log("COMMITS:", get(synStore.allCommits)) 
     const sessions = await store.synStore.getAllSessions();
     if (Object.keys(sessions).length === 0) {
       console.log("No sessions found, making one:", synStore )
