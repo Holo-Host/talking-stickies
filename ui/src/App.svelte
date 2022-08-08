@@ -81,7 +81,7 @@
   createStore().then(async store => {
     synStore = store.synStore;
     tsStore = store
-
+    console.log("COMMITS:", get(synStore.allCommits)) 
     const sessions = await store.synStore.getAllSessions();
     if (Object.keys(sessions).length === 0) {
       console.log("No sessions found, making one:", synStore )
@@ -89,6 +89,7 @@
     } else {        
       console.log(`ATTEMPTING TO JOIN ${Object.keys(sessions).length} SESSIONS`)
       console.log(`Active ${JSON.stringify(store.synStore.activeSession)} SESSIONS`)
+      console.log('SESSIONS', sessions)
 
       for (const session of Object.keys(sessions)) {
         console.log("JOIN SESSION:", session )

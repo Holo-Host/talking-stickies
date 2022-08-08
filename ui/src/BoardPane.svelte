@@ -2,6 +2,7 @@
   import { createEventDispatcher, getContext } from 'svelte'
   import StickyEditor from './StickyEditor.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
+  import ExIcon from './icons/ExIcon.svelte'
   import SpeakingIcon from './icons/SpeakingIcon.svelte'
   import QuestionIcon from './icons/QuestionIcon.svelte'
   import StarIcon from './icons/StarIcon.svelte'
@@ -25,8 +26,8 @@
   const { getStore } = getContext('tsStore');
   let tsStore: TalkingStickiesStore = getStore()
 
-  $: state = unnest(tsStore.activeBoard, s=>s.session.state)
-  $: stickies = $state.stickies
+  $: state = unnest(tsStore.activeBoard, s=> s ? s.session.state: undefined)
+  $: stickies = $state ? $state.stickies : undefined
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
     : stickies => stickies
@@ -136,6 +137,9 @@
     question: QuestionIcon
   }
 
+  const closeBoard = () => {
+    tsStore.closeActiveBoard()
+  }
 </script>
 
 <style>
@@ -154,7 +158,11 @@
     flex-direction: row;
     align-items: center;
   }
-
+  .close-board {
+    position: absolute;
+    right: 45px;
+    margin-top: -18px;
+    }
   .stickies {
     display: flex;
     flex-wrap: wrap;
@@ -225,13 +233,16 @@
 </style>
 
 <div class='board'>
+  <div class='close-board' on:click={closeBoard}>
+    <ExIcon  />
+  </div>
   <div class='top-bar'>
     <div class='add-sticky' on:click={newSticky}>
       <PlusIcon  />Add Sticky
     </div>
     <SortSelector setSortOption={setSortOption} sortOption={sortOption} />
   </div>
-
+  {#if $state}
   <div class='stickies'>
     {#each sortedStickies as { id, text, votes } (id)}
       {#if editingStickyId === id}
@@ -265,5 +276,5 @@
       </div>
     {/if}
   </div>
-
+  {/if}
 </div>

@@ -63,8 +63,20 @@ export class TalkingStickiesStore {
                 return board
             })
         } else {
+            this.activeBoard.update(() => {return undefined})
             this.activeBoardIndex.update((n) => {return undefined} )
         }
+    }
+    closeActiveBoard() {
+        const board = this.getActiveBoard()
+        if (board) {
+            board.session.leave()
+            this.boards.update((boards)=> {
+                boards.splice(get(this.activeBoardIndex),1)
+                return boards
+            })
+            this.setActiveBoard(-1)
+        }        
     }
     makeBoard() {
         this.synStore.newSession().then((session) =>{
