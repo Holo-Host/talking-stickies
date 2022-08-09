@@ -2,7 +2,7 @@ import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type {
     InstalledCell,
   } from '@holochain/client';
-import type { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
+import type { AgentPubKeyB64, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash } from '@holochain-open-dev/utils';
 import { SessionStore, SynStore, unnest } from '@holochain-syn/store';
 import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
@@ -88,37 +88,41 @@ export class TalkingStickiesStore {
     closeActiveBoard() {
         this.deleteBoard(get(this.activeBoardIndex))
     }
-    async makeBoard(name: string) {
+    async latestCommit() : Promise<EntryHashB64|undefined> {
         await this.synStore.fetchCommitHistory()
         let latest = 0
         let latestHash = undefined
         const commits = Object.entries(get(this.synStore.allCommits))
-        commits.forEach(([hash, commit]) => {
+        commits.forEach(async ([hash, commit]) => {
             console.log("COMMIT", commit)
-            const state = this.synStore.fetchSnapshot(commit.newContentHash)
+            await this.synStore.fetchSnapshot(commit.newContentHash)
             console.log("CONTENT STATE:", get(this.synStore.snapshots)[commit.newContentHash])
             if (commit.createdAt > latest) {
                 latest = commit.createdAt; latestHash = hash    
             }
         })
-
-        const session = await this.synStore.newSession(latestHash)
-        session.requestChanges([{
-            type: "set-name",
-            name
-          }])
-
-        this.newBoard(session)
-    
+        return latestHash
     }
-    newBoard(session: SessionStore<TalkingStickiesGrammar>) {
+    async makeBoard(name: string|undefined, fromHash?: EntryHashB64) {
+        const session = await this.synStore.newSession(fromHash)
+        if (name !== undefined) {
+            session.requestChanges([{
+                type: "set-name",
+                name
+            }])
+        }
+
+        const board = this.newBoard(session)
+        this.activeBoard.update((b) => {return board})
+        this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
+    }
+    newBoard(session: SessionStore<TalkingStickiesGrammar>) : Board {
+        const board = new Board(session)
         this.boards.update((boards)=> {
-            const board = new Board(session)
             boards.push(board)
-            this.activeBoard.update((b) => {return board})
-            this.activeBoardIndex.update((n) => {return boards.length-1} )
             return boards
         })
+        return board
     }
 
 }

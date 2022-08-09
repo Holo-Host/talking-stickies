@@ -82,24 +82,46 @@
     synStore = store.synStore;
     tsStore = store
     const sessions = await store.synStore.getAllSessions();
-    if (Object.keys(sessions).length === 0) {
-      console.log("No sessions found, making one:", synStore )
-      tsStore.makeBoard("New Board")
-    } else {        
-      console.log(`ATTEMPTING TO JOIN ${Object.keys(sessions).length} SESSIONS`)
-      console.log(`Active ${JSON.stringify(store.synStore.activeSession)} SESSIONS`)
-      console.log('SESSIONS', sessions)
+    
+    console.log(`ATTEMPTING TO JOIN ${Object.keys(sessions).length} SESSIONS`)
+    console.log('SESSIONS', sessions)
 
-      for (const session of Object.keys(sessions)) {
-        console.log("JOIN SESSION:", session )
+    await synStore.fetchCommitHistory()
+    const allCommits = get(synStore.allCommits)
+    let tips = Object.keys(allCommits).filter((commitHash) => {
+      for (const commit of Object.values(allCommits)) {
+        if (commit.previousCommitHashes.includes(commitHash)) {
+          return false
+        }
+      }
+      return true
+    })     
+    console.log("TIPS", tips)
+
+    // Try and join other people's sessions
+    for (const [sessionHash, session] of Object.entries(sessions)) {
+      if (session.scribe !== store.myAgentPubKey()) {
         try {
-          await store.synStore.joinSession(Object.keys(sessions)[0]);
-          tsStore.newBoard(get(synStore.activeSession))
+          const sessionStore = await store.synStore.joinSession(Object.keys(sessions)[0]);
+          tsStore.newBoard(sessionStore)
           return;
         } catch (e) { console.log("unable to join session:", e)}
+      } else {
+        if (tips.includes(session.initialCommitHash)) {
+          // this session of mine appears to be a tip, so recreate the Session because in
+          // the current version we can't re-join a session
+          await tsStore.makeBoard(undefined, session.initialCommitHash)
+          tips = tips.filter((hash) => hash != session.initialCommitHash)
+        }
       }
-      console.log("NEW SESSION AFTER UNABLE TO JOIN", synStore )
-      await tsStore.makeBoard("FISH")
+    }
+    // instatiate all uncreated tips so far
+    for (const hash of tips) {
+      await tsStore.makeBoard(undefined, hash)
+    }
+    if (get(tsStore.boards).length == 0) {
+       console.log("NEW SESSION AFTER UNABLE TO JOIN OR FIND EXISTING", synStore )
+      await tsStore.makeBoard("New Board", await store.latestCommit())
     }
   });
   $: activeBoard = tsStore ? tsStore.activeBoard : undefined
