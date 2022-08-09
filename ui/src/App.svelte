@@ -84,7 +84,7 @@
     const sessions = await store.synStore.getAllSessions();
     if (Object.keys(sessions).length === 0) {
       console.log("No sessions found, making one:", synStore )
-      tsStore.makeBoard()
+      tsStore.makeBoard("New Board")
     } else {        
       console.log(`ATTEMPTING TO JOIN ${Object.keys(sessions).length} SESSIONS`)
       console.log(`Active ${JSON.stringify(store.synStore.activeSession)} SESSIONS`)
@@ -94,12 +94,12 @@
         console.log("JOIN SESSION:", session )
         try {
           await store.synStore.joinSession(Object.keys(sessions)[0]);
-          tsStore.newBoard("fish", get(synStore.activeSession))
+          tsStore.newBoard(get(synStore.activeSession))
           return;
         } catch (e) { console.log("unable to join session:", e)}
       }
       console.log("NEW SESSION AFTER UNABLE TO JOIN", synStore )
-      tsStore.makeBoard()
+      await tsStore.makeBoard("FISH")
     }
   });
   $: activeBoard = tsStore ? tsStore.activeBoard : undefined

@@ -9,6 +9,7 @@ type Sticky = {
 };
 
 export interface TalkingStickiesState {
+  name: string,
   stickies: Sticky[];
 }
 
@@ -18,6 +19,10 @@ type TalkingStickiesDelta =
       value: Sticky;
     }
   | {
+      type: "set-name";
+      name: string;
+    }
+| {
       type: "update-sticky-text";
       id: string;
       text: string;
@@ -39,6 +44,7 @@ export type TalkingStickiesGrammar = SynGrammar<
 
 export const talkingStickiesGrammar: TalkingStickiesGrammar = {
   initialState: {
+    name: "untitled",
     stickies: [],
   },
   applyDelta(
@@ -47,8 +53,11 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
     _author: AgentPubKeyB64
   ): TalkingStickiesState {
     switch (delta.type) {
+      case "set-name": {
+        return { name: delta.name, stickies: state.stickies };
+      }
       case "add-sticky": {
-        return { stickies: [...state.stickies, delta.value] };
+        return { name: state.name, stickies: [...state.stickies, delta.value] };
       }
       case "update-sticky-text": {
         const updatedStickies = state.stickies.map((sticky) => {
@@ -57,7 +66,7 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
           }
           return sticky
         });
-        return { stickies: updatedStickies };
+        return { name: state.name, stickies: updatedStickies };
       }
       case "update-sticky-votes": {
         const updatedStickies = state.stickies.map((sticky) => {
@@ -66,11 +75,11 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
           }
           return sticky
         });
-        return { stickies: updatedStickies };
+        return { name: state.name, stickies: updatedStickies };
       }
       case "delete-sticky": {
         const updatedStickies = state.stickies.filter((sticky) => sticky.id !== delta.id)
-        return { stickies: updatedStickies };
+        return { name: state.name, stickies: updatedStickies };
       }
     }
   },

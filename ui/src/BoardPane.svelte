@@ -47,7 +47,6 @@
 
   let editingStickyId
   let editText = ''
-  const getEditText = () => {return editText}
 
   const editSticky = (id, text) => () => {
     editingStickyId = id
@@ -237,6 +236,7 @@
     <ExIcon  />
   </div>
   <div class='top-bar'>
+    <h1>{$state.name}</h1>
     <div class='add-sticky' on:click={newSticky}>
       <PlusIcon  />Add Sticky
     </div>

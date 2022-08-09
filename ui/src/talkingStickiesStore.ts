@@ -6,8 +6,8 @@ import type { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
 import { serializeHash } from '@holochain-open-dev/utils';
 import { SessionStore, SynStore, unnest } from '@holochain-syn/store';
 import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
-import { get, Readable, writable, Writable } from "svelte/store";
-import type { Board } from './board';
+import { get, writable, Writable } from "svelte/store";
+import { Board } from './board';
 
 const ZOME_NAME = 'talking_stickies'
 
@@ -46,10 +46,16 @@ export class TalkingStickiesStore {
         this.synStore = new SynStore(this.cellClient, talkingStickiesGrammar)
     }
 
-    async requestChange(deltas) {
+    async requestBoardChanges(index, deltas) {
         console.log("REQUESTING CHANGES: ", deltas)
-        const board = this.getActiveBoard()
-        board.session.requestChanges(deltas)
+        const board = get(this.boards)[index]
+        if (board) {
+            board.requestChanges(deltas)
+        }
+    }
+
+    async requestChange(deltas) {
+        this.requestBoardChanges(get(this.activeBoardIndex), deltas)
     }
     getActiveBoard() : Board | undefined {
         return get (this.activeBoard)
@@ -67,35 +73,47 @@ export class TalkingStickiesStore {
             this.activeBoardIndex.update((n) => {return undefined} )
         }
     }
-    closeActiveBoard() {
-        const board = this.getActiveBoard()
+
+    deleteBoard(index: number) {
+        const board = get(this.boards)[index]
         if (board) {
-            board.session.leave()
+            board.close()
             this.boards.update((boards)=> {
-                boards.splice(get(this.activeBoardIndex),1)
+                boards.splice(index,1)
                 return boards
             })
             this.setActiveBoard(-1)
-        }        
+        }
     }
-    makeBoard() {
-        this.synStore.fetchCommitHistory().then(() => {
-            let latest = 0
-            let latestHash = undefined
-            const commits = Object.entries(get(this.synStore.allCommits))
-            commits.forEach(([hash, commit]) => {
-                if (commit.createdAt > latest) {latest = commit.createdAt; latestHash = hash}
-            })
-  
-            this.synStore.newSession(latestHash).then((session) =>{
-                this.newBoard(`Board ${get(this.boards).length}`, session)
-            })
-    
+    closeActiveBoard() {
+        this.deleteBoard(get(this.activeBoardIndex))
+    }
+    async makeBoard(name: string) {
+        await this.synStore.fetchCommitHistory()
+        let latest = 0
+        let latestHash = undefined
+        const commits = Object.entries(get(this.synStore.allCommits))
+        commits.forEach(([hash, commit]) => {
+            console.log("COMMIT", commit)
+            const state = this.synStore.fetchSnapshot(commit.newContentHash)
+            console.log("CONTENT STATE:", get(this.synStore.snapshots)[commit.newContentHash])
+            if (commit.createdAt > latest) {
+                latest = commit.createdAt; latestHash = hash    
+            }
         })
+
+        const session = await this.synStore.newSession(latestHash)
+        session.requestChanges([{
+            type: "set-name",
+            name
+          }])
+
+        this.newBoard(session)
+    
     }
-    newBoard(name: string, session: SessionStore<TalkingStickiesGrammar>) {
+    newBoard(session: SessionStore<TalkingStickiesGrammar>) {
         this.boards.update((boards)=> {
-            const board = {name,commit:"", session}
+            const board = new Board(session)
             boards.push(board)
             this.activeBoard.update((b) => {return board})
             this.activeBoardIndex.update((n) => {return boards.length-1} )
