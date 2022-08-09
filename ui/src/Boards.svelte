@@ -3,6 +3,7 @@
   import { get } from 'svelte/store';
   import PlusIcon from './icons/PlusIcon.svelte'
   import PencilIcon from './icons/PencilIcon.svelte'
+  import ReloadIcon from './icons/ReloadIcon.svelte'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import BoardEditor from './BoardEditor.svelte'
 
@@ -59,6 +60,10 @@
     creating = false
   }
 
+  const reloadBoards = () => {
+    store.joinExistingSessions()
+  }
+
 </script>
 
 <style>
@@ -94,11 +99,19 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     flex-shrink: 1;
-
   }
+  .relcoad-boards {
+    position: absolute;
+    right: 45px;
+    margin-top: -18px;
+    }
+
 </style>
 
 <div class='boards'>
+    <div class='relcoad-boards' on:click={reloadBoards}>
+      <ReloadIcon  />
+    </div>
     <div class='top-bar'>
         <div class='add-board' on:click={newBoard}>
             <PlusIcon  />Add Board

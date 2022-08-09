@@ -124,5 +124,29 @@ export class TalkingStickiesStore {
         })
         return board
     }
-
+    async joinExistingSessions() : Promise<any> {
+        const sessions = await this.synStore.getAllSessions();
+        const allreadyJoined = get(this.synStore.joinedSessions)
+    
+        console.log(`ALL SESSIONS (${Object.keys(sessions).length})`, sessions)
+        // Try and join other people's sessions
+        let promises = []
+    
+        for (const [sessionHash, session] of Object.entries(sessions)) {
+          if (session.scribe !== this.myAgentPubKey() && !allreadyJoined.includes(sessionHash) ) {
+            console.log(`ATTEMPTING TO JOIN ${sessionHash}`)
+            promises.push(this.synStore.joinSession(Object.keys(sessions)[0]))
+          }
+        }
+        await Promise.allSettled(promises).
+          then((results) => results.forEach((result) => {
+            if (result.status === "rejected") {
+              console.log("unable to join session:", result.reason)
+            } else if (result.status === "fulfilled") {
+              console.log("joined session:", result.value)
+              this.newBoard(result.value)
+            }
+          }));
+        return sessions
+      }
 }

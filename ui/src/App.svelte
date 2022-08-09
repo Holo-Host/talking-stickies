@@ -8,8 +8,10 @@
   import { TalkingStickiesStore } from './talkingStickiesStore';
   import { HolochainClient } from '@holochain-open-dev/cell-client';
   import type { SynStore, unnest } from '@holochain-syn/store';
+  import type { Session } from '@holochain-syn/client';
   import type { TalkingStickiesGrammar } from './grammar';
   import { get, Readable, writable, Writable } from "svelte/store";
+import type { Dictionary } from '@holochain-open-dev/core-types';
 
   $: noscribe = $scribeStr === ''
 
@@ -77,14 +79,14 @@
 
   let synStore: SynStore<TalkingStickiesGrammar>;
   let tsStore: TalkingStickiesStore;
-    
+  
+
+
   createStore().then(async store => {
     synStore = store.synStore;
     tsStore = store
-    const sessions = await store.synStore.getAllSessions();
     
-    console.log(`ATTEMPTING TO JOIN ${Object.keys(sessions).length} SESSIONS`)
-    console.log('SESSIONS', sessions)
+    const sessions:Dictionary<Session> = await tsStore.joinExistingSessions()
 
     await synStore.fetchCommitHistory()
     const allCommits = get(synStore.allCommits)
@@ -98,15 +100,8 @@
     })     
     console.log("TIPS", tips)
 
-    // Try and join other people's sessions
     for (const [sessionHash, session] of Object.entries(sessions)) {
-      if (session.scribe !== store.myAgentPubKey()) {
-        try {
-          const sessionStore = await store.synStore.joinSession(Object.keys(sessions)[0]);
-          tsStore.newBoard(sessionStore)
-          return;
-        } catch (e) { console.log("unable to join session:", e)}
-      } else {
+      if (session.scribe == store.myAgentPubKey()) {
         if (tips.includes(session.initialCommitHash)) {
           // this session of mine appears to be a tip, so recreate the Session because in
           // the current version we can't re-join a session
@@ -115,14 +110,17 @@
         }
       }
     }
+
+    
+
     // instatiate all uncreated tips so far
     for (const hash of tips) {
       await tsStore.makeBoard(undefined, hash)
     }
-    if (get(tsStore.boards).length == 0) {
+/*    if (get(tsStore.boards).length == 0) {
        console.log("NEW SESSION AFTER UNABLE TO JOIN OR FIND EXISTING", synStore )
       await tsStore.makeBoard("New Board", await store.latestCommit())
-    }
+    }*/
   });
   $: activeBoard = tsStore ? tsStore.activeBoard : undefined
   setContext('synStore', {
