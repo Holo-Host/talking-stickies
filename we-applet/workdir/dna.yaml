@@ -1,0 +1,7 @@
+---
+manifest_version: "1"
+name: talking_stickies
+uid: 00000000-0000-0000-0000-000000000000
+zomes:
+  - name: talking_stickies
+    bundled: ../../target/wasm32-unknown-unknown/release/syn.wasm

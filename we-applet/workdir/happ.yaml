@@ -1,0 +1,15 @@
+---
+manifest_version: "1"
+name: talking_stickies-applet
+description: ~
+roles:
+  - id: talking_stickies
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: "./talking_stickies.dna"
+      properties: ~
+      uuid: ~
+      version: ~
+      clone_limit: 100
