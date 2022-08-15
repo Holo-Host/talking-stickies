@@ -43,6 +43,7 @@ export class TalkingStickiesStore {
           this.cellClient,
           zomeName
         );
+        //@ts-ignore
         this.synStore = new SynStore(new SynClient(this.cellClient))
     }
 
