@@ -5,6 +5,7 @@ import type {
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
 import { WorkspaceStore, SynStore, unnest} from '@holochain-syn/store';
+import { SynClient } from '@holochain-syn/client';
 import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
 import { get, Readable, writable, Writable } from "svelte/store";
 import { Board } from './board';
@@ -42,8 +43,7 @@ export class TalkingStickiesStore {
           this.cellClient,
           zomeName
         );
-        // @ts-ignore
-        this.synStore = new SynStore(this.cellClient, talkingStickiesGrammar)
+        this.synStore = new SynStore(new SynClient(this.cellClient))
     }
 
     async requestBoardChanges(index, deltas) {
