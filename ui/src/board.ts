@@ -1,16 +1,16 @@
-import type { SessionStore } from "@holochain-syn/store";
-import type { TalkingStickiesGrammar } from "./grammar";
+import type { WorkspaceStore } from "@holochain-syn/store";
+import type { TalkingStickiesDelta, TalkingStickiesGrammar } from "./grammar";
 import { Readable, derived } from "svelte/store";
 
 export class Board {
     name: Readable<string>
-    constructor(public session: SessionStore<TalkingStickiesGrammar>) {
-        this.name = derived(session.state, state => state.name)
+    constructor(public workspace: WorkspaceStore<TalkingStickiesGrammar>) {
+        this.name = derived(workspace.state, state => state.name)
     }
     close() {
-        this.session.leave()
+        this.workspace.leaveWorkspace()
     }
-    requestChanges(deltas) {
-        this.session.requestChanges(deltas)
+    requestChanges(deltas: Array<TalkingStickiesDelta>) {
+        this.workspace.requestChanges(deltas)
     }
 }

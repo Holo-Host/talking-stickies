@@ -7,11 +7,11 @@
   import { AppWebsocket, InstalledCell } from '@holochain/client';
   import { TalkingStickiesStore } from './talkingStickiesStore';
   import { HolochainClient } from '@holochain-open-dev/cell-client';
+ // import type { Workspace } from '@holochain-syn/client'
+ // import type { serializeHash, deserializeHash, EntryHashMap } from '@holochain-open-dev/utils';
   import type { SynStore, unnest } from '@holochain-syn/store';
-  import type { Session } from '@holochain-syn/client';
   import type { TalkingStickiesGrammar } from './grammar';
   import { get, Readable, writable, Writable } from "svelte/store";
-import type { Dictionary } from '@holochain-open-dev/core-types';
 
   $: noscribe = $scribeStr === ''
 
@@ -85,9 +85,11 @@ import type { Dictionary } from '@holochain-open-dev/core-types';
   createStore().then(async store => {
     synStore = store.synStore;
     tsStore = store
-    
-    const sessions:Dictionary<Session> = await tsStore.joinExistingSessions()
+    console.log("Store Created")
+     /*
+    const workspaces:EntryHashMap<Workspace> = await tsStore.joinExistingWorkspaces()
 
+     
     await synStore.fetchCommitHistory()
     const allCommits = get(synStore.allCommits)
     let tips = Object.keys(allCommits).filter((commitHash) => {
@@ -100,13 +102,13 @@ import type { Dictionary } from '@holochain-open-dev/core-types';
     })     
     console.log("TIPS", tips)
 
-    for (const [sessionHash, session] of Object.entries(sessions)) {
-      if (session.scribe == store.myAgentPubKey()) {
-        if (tips.includes(session.initialCommitHash)) {
-          // this session of mine appears to be a tip, so recreate the Session because in
-          // the current version we can't re-join a session
-          await tsStore.makeBoard(undefined, session.initialCommitHash)
-          tips = tips.filter((hash) => hash != session.initialCommitHash)
+    for (const [workspaceHash, workspace] of Object.entries(workspaces)) {
+      if (workspace.scribe == store.myAgentPubKey()) {
+        if (tips.includes(workspace.initialCommitHash)) {
+          // this workspace of mine appears to be a tip, so recreate the workspace because in
+          // the current version we can't re-join a workspace
+          await tsStore.makeBoard(undefined, workspace.initialCommitHash)
+          tips = tips.filter((hash) => hash != workspace.initialCommitHash)
         }
       }
     }
@@ -116,9 +118,9 @@ import type { Dictionary } from '@holochain-open-dev/core-types';
     // instatiate all uncreated tips so far
     for (const hash of tips) {
       await tsStore.makeBoard(undefined, hash)
-    }
+    }*/
 /*    if (get(tsStore.boards).length == 0) {
-       console.log("NEW SESSION AFTER UNABLE TO JOIN OR FIND EXISTING", synStore )
+       console.log("NEW workspace AFTER UNABLE TO JOIN OR FIND EXISTING", synStore )
       await tsStore.makeBoard("New Board", await store.latestCommit())
     }*/
   });

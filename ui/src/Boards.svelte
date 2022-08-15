@@ -61,7 +61,7 @@
   }
 
   const reloadBoards = () => {
-    store.joinExistingSessions()
+    store.joinExistingWorkspaces()
   }
 
 </script>

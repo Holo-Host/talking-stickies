@@ -13,7 +13,7 @@ export interface TalkingStickiesState {
   stickies: Sticky[];
 }
 
-type TalkingStickiesDelta =
+export type TalkingStickiesDelta =
   | {
       type: "add-sticky";
       value: Sticky;
@@ -38,18 +38,18 @@ type TalkingStickiesDelta =
     };
 
 export type TalkingStickiesGrammar = SynGrammar<
-  TalkingStickiesState,
-  TalkingStickiesDelta
+TalkingStickiesDelta,
+TalkingStickiesState
 >;
 
 export const talkingStickiesGrammar: TalkingStickiesGrammar = {
-  initialState: {
-    name: "untitled",
-    stickies: [],
+  initState(state)  {
+    state.name = "untitles"
+    state.stickies = []
   },
-  applyDelta(
-    state: TalkingStickiesState,
+  applyDelta( 
     delta: TalkingStickiesDelta,
+    state: TalkingStickiesState,
     _author: AgentPubKeyB64
   ): TalkingStickiesState {
     switch (delta.type) {

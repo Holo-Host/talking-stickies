@@ -11,6 +11,8 @@
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import { unnest } from '@holochain-syn/store';
   import SortSelector from './SortSelector.svelte'
+import type { TalkingStickiesState } from './grammar';
+import type { Readable } from 'svelte/store';
 
   export let agentPubkey
  
@@ -26,7 +28,7 @@
   const { getStore } = getContext('tsStore');
   let tsStore: TalkingStickiesStore = getStore()
 
-  $: state = unnest(tsStore.activeBoard, s=> s ? s.session.state: undefined)
+  $: state = unnest(tsStore.activeBoard, s=> s ? (s.workspace.state as Readable<TalkingStickiesState>) : undefined)
   $: stickies = $state ? $state.stickies : undefined
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
