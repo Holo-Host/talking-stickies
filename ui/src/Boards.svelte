@@ -100,7 +100,7 @@
     justify-content: flex-start;
     flex-shrink: 1;
   }
-  .relcoad-boards {
+  .reload-boards {
     position: absolute;
     right: 45px;
     margin-top: -18px;
@@ -109,7 +109,7 @@
 </style>
 
 <div class='boards'>
-    <div class='relcoad-boards' on:click={reloadBoards}>
+    <div class='reload-boards' on:click={reloadBoards}>
       <ReloadIcon  />
     </div>
     <div class='top-bar'>
@@ -122,7 +122,9 @@
           {#if editingBoardId === i}
             <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} />
           {:else}
-            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name))}><PencilIcon  /></div></div>
+            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name))}><PencilIcon  /></div>
+            {JSON.stringify(get(board.workspace.state))}
+          </div>
             
           {/if}
         {/each}

@@ -86,6 +86,8 @@
     synStore = store.synStore;
     tsStore = store
     console.log("Store Created")
+    tsStore.joinExistingWorkspaces()
+
      /*
     const workspaces:EntryHashMap<Workspace> = await tsStore.joinExistingWorkspaces()
 

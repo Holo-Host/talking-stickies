@@ -9,6 +9,7 @@ import { SynClient } from '@holochain-syn/client';
 import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
 import { get, Readable, writable, Writable } from "svelte/store";
 import { Board } from './board';
+import {isEqual} from "lodash"
 
 const ZOME_NAME = 'talking_stickies'
 
@@ -48,7 +49,6 @@ export class TalkingStickiesStore {
     }
 
     async requestBoardChanges(index, deltas) {
-        console.log("REQUESTING CHANGES: ", deltas)
         const board = get(this.boards)[index]
         if (board) {
             board.requestChanges(deltas)
@@ -114,14 +114,14 @@ export class TalkingStickiesStore {
          }
         const workspaceHash = await this.synStore.createWorkspace({name:"fish", meta: undefined}, hash)
         const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar);
+
+        const board = this.newBoard(workspaceStore)
         if (name !== undefined) {
-            workspaceStore.requestChanges([{
+            board.requestChanges([{
                 type: "set-name",
                 name
             }])
         }
-
-        const board = this.newBoard(workspaceStore)
         this.activeBoard.update((b) => {return board})
         this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
     }
@@ -134,25 +134,27 @@ export class TalkingStickiesStore {
         return board
     }
     async joinExistingWorkspaces() : Promise<any> {
-        const workspaces = await this.synStore.fetchAllWorkspaces();
+        const workspaces = get(await this.synStore.fetchAllWorkspaces());
     
         console.log(`ALL WORKSPACES (${Object.keys(workspaces).length})`, workspaces)
         // Try and join other people's workspace
         let promises = []
     
-        for (const [workspaceHash, workspace] of Object.entries(workspaces)) {
-       //   if (workspace.scribe !== this.myAgentPubKey() && !allreadyJoined.includes(workspaceHash) ) {
-            console.log(`ATTEMPTING TO JOIN ${workspaceHash}`)
-            promises.push(this.synStore.joinWorkspace(deserializeHash(Object.keys(workspace)[0]), talkingStickiesGrammar))
-        //  }
+        for (const [workspaceHash, workspace] of workspaces.entries()) {
+//          if (workspace.scribe !== this.myAgentPubKey() && !allreadyJoined.includes(workspaceHash) ) {
+            console.log(`ATTEMPTING TO JOIN ${serializeHash(workspaceHash)}`)
+            promises.push(this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar))
+  //        }
         }
         await Promise.allSettled(promises).
           then((results) => results.forEach((result) => {
             if (result.status === "rejected") {
               console.log("unable to join workspace:", result.reason)
             } else if (result.status === "fulfilled") {
-              console.log("joined workspace:", result.value)
-              this.newBoard(result.value)
+              if (!get(this.boards).find((board) => isEqual(board.workspace.workspaceHash,result.value.workspaceHash) ) {
+                  console.log("joined workspace:", result.value)
+                  this.newBoard(result.value)
+              }
             }
           }));
         return workspaces
