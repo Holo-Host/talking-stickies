@@ -105,7 +105,13 @@ export class TalkingStickiesStore {
         return latestHash
     }
     async makeBoard(name: string|undefined, fromHash?: EntryHashB64) {
-        const hash = fromHash ? deserializeHash(fromHash) : undefined
+        let hash 
+        if (fromHash) {
+            hash = deserializeHash(fromHash)
+         } else {
+            const root = await this.synStore.createRoot(talkingStickiesGrammar)
+            hash = root.initialCommitHash
+         }
         const workspaceHash = await this.synStore.createWorkspace({name:"fish", meta: undefined}, hash)
         const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar);
         if (name !== undefined) {

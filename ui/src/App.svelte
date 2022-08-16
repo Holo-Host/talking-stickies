@@ -164,10 +164,9 @@
 
 <style>
   .app {
-    display: flex;
-    flex-direction: column;
-    height: 1000px;
-  }
+    grid-column: 1/3;
+    grid-row: 1/2;
+    }
   :global(:root) {
     --resizeable-height: 200px;
     --tab-width: 60px;
