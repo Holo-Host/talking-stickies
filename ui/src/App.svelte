@@ -7,21 +7,10 @@
   import { AppWebsocket, InstalledCell } from '@holochain/client';
   import { TalkingStickiesStore } from './talkingStickiesStore';
   import { HolochainClient } from '@holochain-open-dev/cell-client';
- // import type { Workspace } from '@holochain-syn/client'
- // import type { serializeHash, deserializeHash, EntryHashMap } from '@holochain-open-dev/utils';
   import type { SynStore, unnest } from '@holochain-syn/store';
   import type { TalkingStickiesGrammar } from './grammar';
-  import { get, Readable, writable, Writable } from "svelte/store";
 
   $: noscribe = $scribeStr === ''
-
-  $: agentPubkey = ''
-
-  function setAgentPubkey (newAgentPubkey) {
-    console.log('setting agent pubkey', newAgentPubkey)
-    agentPubkey = newAgentPubkey
-  }
-
  
   // The debug drawer's ability to resized and hidden
   let resizeable
@@ -126,7 +115,7 @@
       await tsStore.makeBoard("New Board", await store.latestCommit())
     }*/
   });
-  $: activeBoard = tsStore ? tsStore.activeBoard : undefined
+  $: activeBoardIndex = tsStore ? tsStore.activeBoardIndex : undefined
   setContext('synStore', {
     getStore: () => synStore,
   });
@@ -189,10 +178,9 @@
   {#if tsStore}
     <Toolbar />
     <Boards />
-    {#if $activeBoard}
+    {#if $activeBoardIndex !== undefined}
       <BoardPane
-        on:requestChange={(event) => {tsStore.requestChange(event.detail)}}
-        agentPubkey={agentPubkey}/>
+        on:requestChange={(event) => {tsStore.requestChange(event.detail)}}/>
     {/if}
   {:else}
     Loading

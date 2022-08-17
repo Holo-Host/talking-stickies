@@ -25,7 +25,6 @@ export class TalkingStickiesService {
 export class TalkingStickiesStore {
     service: TalkingStickiesService;
     boards: Writable<Array<Board>> = writable([]);
-    activeBoard: Writable<Board|undefined> = writable(undefined);
     activeBoardIndex: Writable<number|undefined> = writable(undefined)
 
     synStore: SynStore;
@@ -58,19 +57,15 @@ export class TalkingStickiesStore {
     async requestChange(deltas) {
         this.requestBoardChanges(get(this.activeBoardIndex), deltas)
     }
-    getActiveBoard() : Board | undefined {
-        return get (this.activeBoard)
+    getBoardState(index: number | undefined) : Readable<TalkingStickiesState> | undefined {
+        if (index == undefined) return undefined
+        return get(this.boards)[index].workspace.state
     }
     setActiveBoard(index: number) {
         const board = get(this.boards)[index]
         if (board) {
             this.activeBoardIndex.update((n) => {return index} )
-            this.activeBoard.update((b) => {
-                console.log("Activating board: ", board.name, JSON.stringify(board.workspace))
-                return board
-            })
         } else {
-            this.activeBoard.update(() => {return undefined})
             this.activeBoardIndex.update((n) => {return undefined} )
         }
     }
@@ -112,7 +107,7 @@ export class TalkingStickiesStore {
             const root = await this.synStore.createRoot(talkingStickiesGrammar)
             hash = root.initialCommitHash
          }
-        const workspaceHash = await this.synStore.createWorkspace({name:"fish", meta: undefined}, hash)
+        const workspaceHash = await this.synStore.createWorkspace({name:`${Date.now()}`, meta: undefined}, hash)
         const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar);
 
         const board = this.newBoard(workspaceStore)
@@ -122,7 +117,6 @@ export class TalkingStickiesStore {
                 name
             }])
         }
-        this.activeBoard.update((b) => {return board})
         this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
     }
     newBoard(workspace: WorkspaceStore<TalkingStickiesGrammar>) : Board {
@@ -136,27 +130,16 @@ export class TalkingStickiesStore {
     async joinExistingWorkspaces() : Promise<any> {
         const workspaces = get(await this.synStore.fetchAllWorkspaces());
     
-        console.log(`ALL WORKSPACES (${Object.keys(workspaces).length})`, workspaces)
-        // Try and join other people's workspace
-        let promises = []
-    
+        console.log(`${workspaces.keys().length} WORKSPACES FOUND`, workspaces)    
         for (const [workspaceHash, workspace] of workspaces.entries()) {
-//          if (workspace.scribe !== this.myAgentPubKey() && !allreadyJoined.includes(workspaceHash) ) {
             console.log(`ATTEMPTING TO JOIN ${serializeHash(workspaceHash)}`)
-            promises.push(this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar))
-  //        }
-        }
-        await Promise.allSettled(promises).
-          then((results) => results.forEach((result) => {
-            if (result.status === "rejected") {
-              console.log("unable to join workspace:", result.reason)
-            } else if (result.status === "fulfilled") {
-              if (!get(this.boards).find((board) => isEqual(board.workspace.workspaceHash,result.value.workspaceHash) ) {
-                  console.log("joined workspace:", result.value)
-                  this.newBoard(result.value)
-              }
+            const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
+            console.log("joined workspace:", workspaceStore)
+            const board = get(this.boards).find((board) => isEqual(board.workspace.workspaceHash, workspaceHash))
+            if (!board) {
+                this.newBoard(workspaceStore)
             }
-          }));
+        }
         return workspaces
       }
 }

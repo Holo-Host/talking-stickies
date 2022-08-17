@@ -123,7 +123,6 @@
             <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} />
           {:else}
             <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name))}><PencilIcon  /></div>
-            {JSON.stringify(get(board.workspace.state))}
           </div>
             
           {/if}

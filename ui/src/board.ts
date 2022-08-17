@@ -4,11 +4,8 @@ import { Readable, derived } from "svelte/store";
 
 export class Board {
     name: Readable<string>
-    workspace: WorkspaceStore<TalkingStickiesGrammar>
-    constructor(workspace: WorkspaceStore<TalkingStickiesGrammar>) {
-        console.log("FISH", workspace.state)
+    constructor(public workspace: WorkspaceStore<TalkingStickiesGrammar>) {
         this.name = derived(workspace.state, state => state.name)
-        this.workspace = workspace
     }
     close() {
         this.workspace.leaveWorkspace()

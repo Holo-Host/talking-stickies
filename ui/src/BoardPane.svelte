@@ -13,8 +13,6 @@
   import SortSelector from './SortSelector.svelte'
 import type { TalkingStickiesState } from './grammar';
 import { get, Readable } from 'svelte/store';
-
-  export let agentPubkey
  
   $: sortOption = null
 
@@ -28,7 +26,8 @@ import { get, Readable } from 'svelte/store';
   const { getStore } = getContext('tsStore');
   let tsStore: TalkingStickiesStore = getStore()
 
-  $: state = tsStore.activeBoard ? get(tsStore.activeBoard).workspace.state : undefined
+  $: index = tsStore.activeBoardIndex
+  $: state = tsStore.getBoardState($index)
   $: stickies = $state ? $state.stickies : undefined
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
@@ -102,23 +101,25 @@ import { get, Readable } from 'svelte/store';
       console.error("Failed to find sticky with id", id)
       return
     }
-
+    const agent = tsStore.myAgentPubKey()
     const votes = {
       ...sticky.votes,
       [type]: {
         ...sticky.votes[type],
-        [agentPubkey]: ((sticky.votes[type][agentPubkey] || 0) + 1) % 4
+        [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4
       }
     }
 
-    console.log('VOTING', agentPubkey)
+    console.log('VOTING', agent)
     console.log('votes before', sticky.votes)
     console.log('votes after', votes)
 
     dispatch('requestChange', [
       {type: 'update-sticky-votes', 
       id: sticky.id,
-      votes
+      voteType: type,
+      voter: agent,
+      count: votes[type][agent]
       }
     ])
   }
@@ -129,7 +130,7 @@ import { get, Readable } from 'svelte/store';
   }
 
   const myVotes = (votes, type) => {
-    return votes[type][agentPubkey] || 0
+    return votes[type][tsStore.myAgentPubKey()] || 0
   }
 
   const VOTE_TYPE_TO_COMPONENT = {
@@ -234,7 +235,6 @@ import { get, Readable } from 'svelte/store';
 </style>
 
 <div class='board'>
-  STATE: {JSON.stringify($state)}
   <div class='close-board' on:click={closeBoard}>
     <ExIcon  />
   </div>
