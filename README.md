@@ -1,8 +1,6 @@
-# TalkingSticies
+# TalkingStickies
 
-A [syn](https://github.com/holochain/syn) sample app for collaborative sticky-notes!
-
-This is UI is built using [Svelte](https://svelte.dev) from the [standard template for Svelte apps](https://github.com/sveltejs/template).
+A holochain hApp for collaborative sticky-note boards, based on [syn](https://github.com/holochain/syn)!
 
 ## Environment Setup
 
@@ -30,3 +28,11 @@ npm install
   ```
 
 2. Navigate to [localhost:5000](http://localhost:5000) in your browser. You should see the UI running.
+
+
+## Releasing (manual)
+
+### For Launcher
+
+`npm run package`
+the `*.webhapp` file will be available in the `/workdir` folder.
