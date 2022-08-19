@@ -9,11 +9,9 @@
   import { v1 as uuidv1 } from 'uuid';
   import { sortBy } from 'lodash/fp'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
-  import { unnest } from '@holochain-syn/store';
   import SortSelector from './SortSelector.svelte'
-import type { TalkingStickiesState } from './grammar';
-import { get, Readable } from 'svelte/store';
- 
+  import {Marked} from "@ts-stack/markdown";
+
   $: sortOption = null
 
   function setSortOption (newSortOption) {
@@ -179,7 +177,6 @@ import { get, Readable } from 'svelte/store';
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
     font-size: 12px;
     line-height: 16px;
-    text-align: center;
     color: #000000;
     display: flex;
     flex-direction: column;
@@ -252,7 +249,7 @@ import { get, Readable } from 'svelte/store';
         <StickyEditor handleSave={updateSticky(id)} handleDelete={deleteSticky(id)} {cancelEdit} text={editText} />
       {:else}
         <div class='sticky' on:click={editSticky(id, text)}>
-          {text}
+          {@html Marked.parse(text)}
           <div class='votes'>
             {#each ['talk', 'star', 'question'] as type }
               <div
