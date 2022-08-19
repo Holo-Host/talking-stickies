@@ -1,6 +1,8 @@
 # TalkingStickies
 
-A holochain hApp for collaborative sticky-note boards, based on [syn](https://github.com/holochain/syn)!
+A holochain hApp for collaborative sticky-note boards.  Use to run your retrospectives or group brainstorming sessions! 
+
+Real-time colloaboration delivered by [syn](https://github.com/holochain/syn).  Inspired by [Ideaboards](https://ideaboardz.com)
 
 ## Environment Setup
 
