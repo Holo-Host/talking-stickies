@@ -1,10 +1,17 @@
 # TalkingStickies
 
-A holochain hApp for collaborative sticky-note boards.  Use to run your retrospectives or group brainstorming sessions! 
+A holochain hApp for collaborative sticky-note boards.  Use it to run your retrospectives or group brainstorming sessions! 
 
 Real-time colloaboration delivered by [syn](https://github.com/holochain/syn).  Inspired by [Ideaboards](https://ideaboardz.com)
 
-## Environment Setup
+## Install
+
+1. Install and run the [Holochain Launcher](https://github.com/holochain/launcher/releases)
+2. Go to [https://github.com/Holo-Host/talking-stickies/releases] and download the *webapp* file under assets
+3. In the Holochain Launcher click *Install New App* and *Select From Filesystem* and then choose the *webapp* file you downloaded.
+4. Enjoy!
+
+## Dev Environment Setup
 
 1. Install the holochain dev environment (only nix-shell is required): https://developer.holochain.org/docs/install/
 2. Enable Holochain cachix with:
