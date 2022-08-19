@@ -2,12 +2,14 @@ import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type {
     InstalledCell,
   } from '@holochain/client';
-import type { AgentPubKeyB64, EntryHashB64 } from '@holochain-open-dev/core-types';
-import { serializeHash } from '@holochain-open-dev/utils';
-import { SessionStore, SynStore, unnest } from '@holochain-syn/store';
+import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
+import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
+import { WorkspaceStore, SynStore, unnest} from '@holochain-syn/store';
+import { SynClient } from '@holochain-syn/client';
 import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
-import { get, writable, Writable } from "svelte/store";
+import { get, Readable, writable, Writable } from "svelte/store";
 import { Board } from './board';
+import {isEqual} from "lodash"
 
 const ZOME_NAME = 'talking_stickies'
 
@@ -23,10 +25,9 @@ export class TalkingStickiesService {
 export class TalkingStickiesStore {
     service: TalkingStickiesService;
     boards: Writable<Array<Board>> = writable([]);
-    activeBoard: Writable<Board|undefined> = writable(undefined);
     activeBoardIndex: Writable<number|undefined> = writable(undefined)
 
-    synStore: SynStore<TalkingStickiesGrammar>;
+    synStore: SynStore;
     cellClient: CellClient;
     myAgentPubKey(): AgentPubKeyB64 {
         return serializeHash(this.talkingStickiesCell.cell_id[1]);
@@ -42,12 +43,11 @@ export class TalkingStickiesStore {
           this.cellClient,
           zomeName
         );
-        // @ts-ignore
-        this.synStore = new SynStore(this.cellClient, talkingStickiesGrammar)
+        //@ts-ignore
+        this.synStore = new SynStore(new SynClient(this.cellClient))
     }
 
     async requestBoardChanges(index, deltas) {
-        console.log("REQUESTING CHANGES: ", deltas)
         const board = get(this.boards)[index]
         if (board) {
             board.requestChanges(deltas)
@@ -57,19 +57,15 @@ export class TalkingStickiesStore {
     async requestChange(deltas) {
         this.requestBoardChanges(get(this.activeBoardIndex), deltas)
     }
-    getActiveBoard() : Board | undefined {
-        return get (this.activeBoard)
+    getBoardState(index: number | undefined) : Readable<TalkingStickiesState> | undefined {
+        if (index == undefined) return undefined
+        return get(this.boards)[index].workspace.state
     }
     setActiveBoard(index: number) {
         const board = get(this.boards)[index]
         if (board) {
             this.activeBoardIndex.update((n) => {return index} )
-            this.activeBoard.update((b) => {
-                console.log("Activating board: ", board.name, JSON.stringify(board.session))
-                return board
-            })
         } else {
-            this.activeBoard.update(() => {return undefined})
             this.activeBoardIndex.update((n) => {return undefined} )
         }
     }
@@ -89,14 +85,14 @@ export class TalkingStickiesStore {
         this.deleteBoard(get(this.activeBoardIndex))
     }
     async latestCommit() : Promise<EntryHashB64|undefined> {
-        await this.synStore.fetchCommitHistory()
+        await this.synStore.fetchAllCommits()
         let latest = 0
         let latestHash = undefined
-        const commits = Object.entries(get(this.synStore.allCommits))
+        const commits = Object.entries(get(this.synStore.knownCommits))
         commits.forEach(async ([hash, commit]) => {
             console.log("COMMIT", commit)
-            await this.synStore.fetchSnapshot(commit.newContentHash)
-            console.log("CONTENT STATE:", get(this.synStore.snapshots)[commit.newContentHash])
+            //await this.synStore.fetchSnapshot(commit.newContentHash)
+            //console.log("CONTENT STATE:", get(this.synStore.snapshots)[commit.newContentHash])
             if (commit.createdAt > latest) {
                 latest = commit.createdAt; latestHash = hash    
             }
@@ -104,49 +100,46 @@ export class TalkingStickiesStore {
         return latestHash
     }
     async makeBoard(name: string|undefined, fromHash?: EntryHashB64) {
-        const session = await this.synStore.newSession(fromHash)
+        let hash 
+        if (fromHash) {
+            hash = deserializeHash(fromHash)
+         } else {
+            const root = await this.synStore.createRoot(talkingStickiesGrammar)
+            hash = root.initialCommitHash
+         }
+        const workspaceHash = await this.synStore.createWorkspace({name:`${Date.now()}`, meta: undefined}, hash)
+        const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar);
+
+        const board = this.newBoard(workspaceStore)
         if (name !== undefined) {
-            session.requestChanges([{
+            board.requestChanges([{
                 type: "set-name",
                 name
             }])
         }
-
-        const board = this.newBoard(session)
-        this.activeBoard.update((b) => {return board})
         this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
     }
-    newBoard(session: SessionStore<TalkingStickiesGrammar>) : Board {
-        const board = new Board(session)
+    newBoard(workspace: WorkspaceStore<TalkingStickiesGrammar>) : Board {
+        const board = new Board(workspace)
         this.boards.update((boards)=> {
             boards.push(board)
             return boards
         })
         return board
     }
-    async joinExistingSessions() : Promise<any> {
-        const sessions = await this.synStore.getAllSessions();
-        const allreadyJoined = get(this.synStore.joinedSessions)
+    async joinExistingWorkspaces() : Promise<any> {
+        const workspaces = get(await this.synStore.fetchAllWorkspaces());
     
-        console.log(`ALL SESSIONS (${Object.keys(sessions).length})`, sessions)
-        // Try and join other people's sessions
-        let promises = []
-    
-        for (const [sessionHash, session] of Object.entries(sessions)) {
-          if (session.scribe !== this.myAgentPubKey() && !allreadyJoined.includes(sessionHash) ) {
-            console.log(`ATTEMPTING TO JOIN ${sessionHash}`)
-            promises.push(this.synStore.joinSession(Object.keys(sessions)[0]))
-          }
-        }
-        await Promise.allSettled(promises).
-          then((results) => results.forEach((result) => {
-            if (result.status === "rejected") {
-              console.log("unable to join session:", result.reason)
-            } else if (result.status === "fulfilled") {
-              console.log("joined session:", result.value)
-              this.newBoard(result.value)
+        console.log(`${workspaces.keys().length} WORKSPACES FOUND`, workspaces)    
+        for (const [workspaceHash, workspace] of workspaces.entries()) {
+            console.log(`ATTEMPTING TO JOIN ${serializeHash(workspaceHash)}`)
+            const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
+            console.log("joined workspace:", workspaceStore)
+            const board = get(this.boards).find((board) => isEqual(board.workspace.workspaceHash, workspaceHash))
+            if (!board) {
+                this.newBoard(workspaceStore)
             }
-          }));
-        return sessions
+        }
+        return workspaces
       }
 }

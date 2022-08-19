@@ -1,8 +1,17 @@
 ---
 manifest_version: "1"
 name: talking-stickies
-uid: 00000000-0000-0000-0000-000000000002
-properties: ~
-zomes: 
-  - name: syn
-    bundled: ../../../target/wasm32-unknown-unknown/release/syn.wasm
+
+integrity:
+  uid: 00000000-0000-0000-0000-000000000000
+  properties: ~
+  zomes:
+    - name: syn_integrity
+      bundled: ../../../target/wasm32-unknown-unknown/release/syn_integrity.wasm
+
+coordinator:
+  zomes:
+    - name: syn
+      bundled: ../../../target/wasm32-unknown-unknown/release/syn.wasm
+      dependencies:
+        - name: syn_integrity

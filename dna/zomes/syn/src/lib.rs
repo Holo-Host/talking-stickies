@@ -1,1 +1,1 @@
-extern crate hc_zome_syn;
+extern crate hc_zome_syn_coordinator;

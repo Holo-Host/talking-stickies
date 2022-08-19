@@ -11,8 +11,8 @@
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import { unnest } from '@holochain-syn/store';
   import SortSelector from './SortSelector.svelte'
-
-  export let agentPubkey
+import type { TalkingStickiesState } from './grammar';
+import { get, Readable } from 'svelte/store';
  
   $: sortOption = null
 
@@ -26,7 +26,8 @@
   const { getStore } = getContext('tsStore');
   let tsStore: TalkingStickiesStore = getStore()
 
-  $: state = unnest(tsStore.activeBoard, s=> s ? s.session.state: undefined)
+  $: index = tsStore.activeBoardIndex
+  $: state = tsStore.getBoardState($index)
   $: stickies = $state ? $state.stickies : undefined
   $: sortStickies = sortOption
     ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
@@ -100,23 +101,25 @@
       console.error("Failed to find sticky with id", id)
       return
     }
-
+    const agent = tsStore.myAgentPubKey()
     const votes = {
       ...sticky.votes,
       [type]: {
         ...sticky.votes[type],
-        [agentPubkey]: ((sticky.votes[type][agentPubkey] || 0) + 1) % 4
+        [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4
       }
     }
 
-    console.log('VOTING', agentPubkey)
+    console.log('VOTING', agent)
     console.log('votes before', sticky.votes)
     console.log('votes after', votes)
 
     dispatch('requestChange', [
       {type: 'update-sticky-votes', 
       id: sticky.id,
-      votes
+      voteType: type,
+      voter: agent,
+      count: votes[type][agent]
       }
     ])
   }
@@ -127,7 +130,7 @@
   }
 
   const myVotes = (votes, type) => {
-    return votes[type][agentPubkey] || 0
+    return votes[type][tsStore.myAgentPubKey()] || 0
   }
 
   const VOTE_TYPE_TO_COMPONENT = {

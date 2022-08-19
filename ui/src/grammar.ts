@@ -1,6 +1,6 @@
 import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
-
 import type { SynGrammar } from "@holochain-syn/store";
+import type { AgentPubKey } from "@holochain/client";
 
 type Sticky = {
   id: string;
@@ -13,7 +13,7 @@ export interface TalkingStickiesState {
   stickies: Sticky[];
 }
 
-type TalkingStickiesDelta =
+export type TalkingStickiesDelta =
   | {
       type: "add-sticky";
       value: Sticky;
@@ -30,7 +30,9 @@ type TalkingStickiesDelta =
   | {
       type: "update-sticky-votes";
       id: string;
-      votes: Object;
+      voteType: string;
+      voter: AgentPubKeyB64;
+      count: number
     }
   | {
       type: "delete-sticky";
@@ -38,49 +40,47 @@ type TalkingStickiesDelta =
     };
 
 export type TalkingStickiesGrammar = SynGrammar<
-  TalkingStickiesState,
-  TalkingStickiesDelta
+TalkingStickiesDelta,
+TalkingStickiesState
 >;
 
 export const talkingStickiesGrammar: TalkingStickiesGrammar = {
-  initialState: {
-    name: "untitled",
-    stickies: [],
+  initState(state)  {
+    state.name = "untitles"
+    state.stickies = []
   },
-  applyDelta(
-    state: TalkingStickiesState,
+  applyDelta( 
     delta: TalkingStickiesDelta,
-    _author: AgentPubKeyB64
-  ): TalkingStickiesState {
-    switch (delta.type) {
-      case "set-name": {
-        return { name: delta.name, stickies: state.stickies };
-      }
-      case "add-sticky": {
-        return { name: state.name, stickies: [...state.stickies, delta.value] };
-      }
-      case "update-sticky-text": {
-        const updatedStickies = state.stickies.map((sticky) => {
-          if (sticky.id === delta.id) {
-            sticky.text = delta.text;
+    state: TalkingStickiesState,
+    _ephemeralState: any,
+    _author: AgentPubKey
+  ) {
+    if (delta.type == "set-name") {
+      state.name = delta.name
+    }
+    else if (delta.type == "add-sticky") {
+      state.stickies.push(delta.value)
+    }
+    else if (delta.type == "update-sticky-text") {
+      state.stickies.forEach((sticky, i) => {
+        if (sticky.id === delta.id) {
+          state.stickies[i].text = delta.text;
+        }
+      });
+    }
+    else if (delta.type == "update-sticky-votes") {
+      state.stickies.forEach((sticky, i) => {
+        if (sticky.id === delta.id) {
+          if (!state.stickies[i].votes[delta.voteType]) {
+            state.stickies[i].votes[delta.voteType] = {}
           }
-          return sticky
-        });
-        return { name: state.name, stickies: updatedStickies };
-      }
-      case "update-sticky-votes": {
-        const updatedStickies = state.stickies.map((sticky) => {
-          if (sticky.id === delta.id) {
-            sticky.votes = delta.votes;
-          }
-          return sticky
-        });
-        return { name: state.name, stickies: updatedStickies };
-      }
-      case "delete-sticky": {
-        const updatedStickies = state.stickies.filter((sticky) => sticky.id !== delta.id)
-        return { name: state.name, stickies: updatedStickies };
-      }
+          state.stickies[i].votes[delta.voteType][delta.voter] = delta.count;
+        }
+      });
+    }
+    else if (delta.type == "delete-sticky") {
+      const index = state.stickies.findIndex((sticky) => sticky.id === delta.id)
+      state.stickies.splice(index,1)
     }
   },
 };
