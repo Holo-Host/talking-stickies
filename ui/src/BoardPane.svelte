@@ -137,6 +137,12 @@
     question: QuestionIcon
   }
 
+  const VOTE_TYPE_TO_TOOLTIP_TEXT = {
+    talk: "I want to talk about this one.",
+    star: "Interesting!",
+    question: "I have questions about this one."
+  }
+
   const closeBoard = () => {
     tsStore.closeActiveBoard()
   }
@@ -253,7 +259,7 @@
           <div class='votes'>
             {#each ['talk', 'star', 'question'] as type }
               <div
-                class="vote"
+                class="vote" title="{VOTE_TYPE_TO_TOOLTIP_TEXT[type]}"
                 class:voted={myVotes(votes, type) > 0}
                 on:click|stopPropagation={() => voteOnSticky(id, type)}>
                 <svelte:component this={VOTE_TYPE_TO_COMPONENT[type]} /> {countVotes(votes, type)}
