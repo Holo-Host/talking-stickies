@@ -475,7 +475,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_syn_coordinator"
 version = "0.0.1"
-source = "git+https://github.com/holochain/syn?branch=for-hdk-v0.0.146#fc907c8f22759b1817150fdbe0232975ffe95426"
+source = "git+https://github.com/holochain/syn?branch=for-hdk-v0.0.147#5b49a0637081892d64c82fb2c83cce0980300195"
 dependencies = [
  "derive_more",
  "hc_zome_syn_integrity",
@@ -486,7 +486,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_syn_integrity"
 version = "0.0.1"
-source = "git+https://github.com/holochain/syn?branch=for-hdk-v0.0.146#fc907c8f22759b1817150fdbe0232975ffe95426"
+source = "git+https://github.com/holochain/syn?branch=for-hdk-v0.0.147#5b49a0637081892d64c82fb2c83cce0980300195"
 dependencies = [
  "derive_more",
  "hdi",
@@ -495,9 +495,9 @@ dependencies = [
 
 [[package]]
 name = "hdi"
-version = "0.0.18"
+version = "0.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "714d7bfdc54cf61217e5613ba21331be6c5bedb5e451769745ba6b80b5ec3bc1"
+checksum = "ba6f257e179e61f9721300b6b1424e53fdb861c2da66500b99c7c3874f68c082"
 dependencies = [
  "hdk_derive",
  "holo_hash",
@@ -512,9 +512,9 @@ dependencies = [
 
 [[package]]
 name = "hdk"
-version = "0.0.146"
+version = "0.0.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d56b1f88d9f700257d9f76a970f3c89e965185f57a97dad8d4f20cbe7d01ea09"
+checksum = "7d34bee935da779878b4ca292ca24430f473dc7bb42d672a418490b2a4b41363"
 dependencies = [
  "getrandom",
  "hdi",
@@ -532,9 +532,9 @@ dependencies = [
 
 [[package]]
 name = "hdk_derive"
-version = "0.0.44"
+version = "0.0.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ff5aa4866dfa62057ed48d3b687ec8b6204f012e8798fb809cb39be05ec1008"
+checksum = "2a75448ccacc03fb68df73cb7cb62f3210c5229a8a64f91d48031765a783411d"
 dependencies = [
  "darling 0.14.1",
  "heck",
