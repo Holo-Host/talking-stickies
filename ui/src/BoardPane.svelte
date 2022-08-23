@@ -1,152 +1,265 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte'
-  import StickyEditor from './StickyEditor.svelte'
-  import PlusIcon from './icons/PlusIcon.svelte'
-  import ExIcon from './icons/ExIcon.svelte'
-  import SpeakingIcon from './icons/SpeakingIcon.svelte'
-  import QuestionIcon from './icons/QuestionIcon.svelte'
-  import StarIcon from './icons/StarIcon.svelte'
-  import { v1 as uuidv1 } from 'uuid';
-  import { sortBy } from 'lodash/fp'
-  import type { TalkingStickiesStore } from './talkingStickiesStore';
-  import SortSelector from './SortSelector.svelte'
-  import {Marked} from "@ts-stack/markdown";
+  import { createEventDispatcher, getContext } from "svelte";
+  import StickyEditor from "./StickyEditor.svelte";
+  import PlusIcon from "./icons/PlusIcon.svelte";
+  import ExIcon from "./icons/ExIcon.svelte";
+  import SpeakingIcon from "./icons/SpeakingIcon.svelte";
+  import QuestionIcon from "./icons/QuestionIcon.svelte";
+  import StarIcon from "./icons/StarIcon.svelte";
+  import { v1 as uuidv1 } from "uuid";
+  import { sortBy } from "lodash/fp";
+  import type { TalkingStickiesStore } from "./talkingStickiesStore";
+  import SortSelector from "./SortSelector.svelte";
+  import { Marked } from "@ts-stack/markdown";
+  import { cloneDeep, isEqual } from "lodash";
 
-  $: sortOption = null
+  $: sortOption = null;
 
-  function setSortOption (newSortOption) {
-    console.log('setting sort option', newSortOption)
-    sortOption = newSortOption
+  function setSortOption(newSortOption) {
+    console.log("setting sort option", newSortOption);
+    sortOption = newSortOption;
   }
 
-  const dispatch = createEventDispatcher()
- 
-  const { getStore } = getContext('tsStore');
-  let tsStore: TalkingStickiesStore = getStore()
+  const dispatch = createEventDispatcher();
 
-  $: index = tsStore.activeBoardIndex
-  $: state = tsStore.getBoardState($index)
-  $: stickies = $state ? $state.stickies : undefined
+  const { getStore } = getContext("tsStore");
+  let tsStore: TalkingStickiesStore = getStore();
+
+  $: index = tsStore.activeBoardIndex;
+  $: state = tsStore.getBoardState($index);
+  $: stickies = $state ? $state.stickies : undefined;
   $: sortStickies = sortOption
-    ? sortBy(sticky => countVotes(sticky.votes, sortOption) * -1)
-    : stickies => stickies
+    ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)
+    : (stickies) => stickies;
 
-  $: sortedStickies = sortStickies(stickies)
+  $: sortedStickies = sortStickies(stickies);
+  $: groupedStickies = groupStickies(sortedStickies);
 
-  let creating = false
+  let creatingInGroup: number | undefined = undefined;
+  let groupIds = []
+  let groups = []
+  let ungroupedStickies = 0
 
-  const newSticky = () => {
-    creating = true
-  }
+  const groupStickies = (stickies) => {
+    ungroupedStickies = 0
+    if ($state) {
+      groups = cloneDeep($state.groups);
+      groupIds = groups.map(c => c.id)
+      console.log("groupIds", JSON.stringify(groupIds))
+
+      stickies.forEach((stickie) => {
+        console.log("stickie.group.id", stickie.group)
+        if (!groupIds.includes(stickie.group)) ungroupedStickies += 1
+      });
+      groups.unshift({id: 0, name:""})
+    }
+  };
+
+  const newSticky = (group) => () => {
+    creatingInGroup = group;
+  };
 
   const clearEdit = () => {
-    editingStickyId = null
-    editText = ''
-  }
+    editingStickyId = null;
+    editText = "";
+  };
 
-  let editingStickyId
-  let editText = ''
+  let editingStickyId;
+  let editText = "";
 
   const editSticky = (id, text) => () => {
-    editingStickyId = id
-    editText = text
-  }
+    editingStickyId = id;
+    editText = text;
+  };
 
   const cancelEdit = () => {
-    creating = false
-    clearEdit()
-  }
+    creatingInGroup = undefined;
+    clearEdit();
+  };
 
-  const addSticky = text => {
-    dispatch('requestChange', [
-      {type: 'add-sticky', value: {
-        id: uuidv1(),
-        text,
-        votes: {
-          talk: {}, star: {}, question: {}
-        }
-      }}
-    ])
-    creating = false
-  }
+  const addSticky = (text) => {
+    const stickie = {
+      id: uuidv1(),
+      text,
+      group: creatingInGroup,
+      props: {color:"#D4F3EE"},
+      votes: {
+        talk: {},
+        star: {},
+        question: {},
+      },
+    };
+    dispatch("requestChange", [{ type: "add-sticky", value: stickie }]);
+    creatingInGroup = undefined;
+  };
 
-  const deleteSticky = id => () => {
-    dispatch('requestChange', [
-      {type: 'delete-sticky', id}
-    ])
-    clearEdit()
-  }
+  const deleteSticky = (id) => () => {
+    dispatch("requestChange", [{ type: "delete-sticky", id }]);
+    clearEdit();
+  };
 
-  const updateSticky = id => text => {
-    const sticky = stickies.find(sticky => sticky.id === id)
+  const updateSticky = (id) => (text, groupId, props) => {
+    const sticky = stickies.find((sticky) => sticky.id === id);
     if (!sticky) {
-      console.error("Failed to find sticky with id", id)
-      return
+      console.error("Failed to find sticky with id", id);
+      return;
     }
-
-    dispatch('requestChange', [
-      {type: 'update-sticky-text',
-       id: sticky.id,
-       text: text
-      }
-    ])
-    clearEdit()
-  }
+    let changes = []
+    if (sticky.text != "text") {
+      changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
+    }
+    const newGroupId = parseInt(groupId)
+    if (sticky.group != newGroupId) {
+      changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
+    }
+    if (!isEqual(sticky.props, props)) {
+      changes.push({ type: "update-sticky-props", id: sticky.id, props})
+    }
+    if (changes.length > 0) {
+      dispatch("requestChange", changes);
+    }
+    clearEdit();
+  };
 
   const voteOnSticky = (id, type) => {
-    const sticky = stickies.find(sticky => sticky.id === id)
+    const sticky = stickies.find((sticky) => sticky.id === id);
     if (!sticky) {
-      console.error("Failed to find sticky with id", id)
-      return
+      console.error("Failed to find sticky with id", id);
+      return;
     }
-    const agent = tsStore.myAgentPubKey()
+    const agent = tsStore.myAgentPubKey();
     const votes = {
       ...sticky.votes,
       [type]: {
         ...sticky.votes[type],
-        [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4
-      }
-    }
+        [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4,
+      },
+    };
 
-    console.log('VOTING', agent)
-    console.log('votes before', sticky.votes)
-    console.log('votes after', votes)
+    console.log("VOTING", agent);
+    console.log("votes before", sticky.votes);
+    console.log("votes after", votes);
 
-    dispatch('requestChange', [
-      {type: 'update-sticky-votes', 
-      id: sticky.id,
-      voteType: type,
-      voter: agent,
-      count: votes[type][agent]
-      }
-    ])
-  }
+    dispatch("requestChange", [
+      {
+        type: "update-sticky-votes",
+        id: sticky.id,
+        voteType: type,
+        voter: agent,
+        count: votes[type][agent],
+      },
+    ]);
+  };
 
   const countVotes = (votes, type) => {
-    const agentKeys = Object.keys(votes[type])
-    return agentKeys.reduce((total, agentKey) => total + (votes[type][agentKey] || 0), 0)
-  }
+    const agentKeys = Object.keys(votes[type]);
+    return agentKeys.reduce(
+      (total, agentKey) => total + (votes[type][agentKey] || 0),
+      0
+    );
+  };
 
   const myVotes = (votes, type) => {
-    return votes[type][tsStore.myAgentPubKey()] || 0
-  }
+    return votes[type][tsStore.myAgentPubKey()] || 0;
+  };
 
   const VOTE_TYPE_TO_COMPONENT = {
     talk: SpeakingIcon,
     star: StarIcon,
-    question: QuestionIcon
-  }
+    question: QuestionIcon,
+  };
 
   const VOTE_TYPE_TO_TOOLTIP_TEXT = {
     talk: "I want to talk about this one.",
     star: "Interesting!",
-    question: "I have questions about this one."
-  }
+    question: "I have questions about this one.",
+  };
 
   const closeBoard = () => {
-    tsStore.closeActiveBoard()
+    tsStore.closeActiveBoard();
+  };
+
+  const inGroup = (curGroupId, groupId) => {
+    return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
   }
 </script>
+
+<div class="board">
+  <div class="close-board" on:click={closeBoard}>
+    <ExIcon />
+  </div>
+  <div class="top-bar">
+    <h1>{$state.name}</h1>
+    {#if $state.groups.length == 0}
+      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px">
+        <PlusIcon />Add Sticky
+      </div>
+    {/if}
+    <SortSelector {setSortOption} {sortOption} />
+  </div>
+  {#if $state}
+    <div class="groups">
+      {#each groups as curGroup}
+        {#if (curGroup.id !== 0 || ungroupedStickies > 0)}
+        <div class="group">
+          {#if $state.groups.length > 0}
+          <div class="group-title">
+            <h2>{#if curGroup.id === 0}Ungrouped{:else}{curGroup.name}{/if}</h2>
+              <div class="add-sticky" on:click={newSticky(curGroup.id)}>
+                <PlusIcon />
+              </div>
+          </div>
+          {/if}
+          <div class="stickies">
+          {#each sortedStickies as { id, text, votes, group, props } (id)}
+            {#if editingStickyId === id && inGroup(curGroup.id, group)}
+              <StickyEditor
+                handleSave={updateSticky(id)}
+                handleDelete={deleteSticky(id)}
+                {cancelEdit}
+                text={editText}
+                groupId={group}
+                groups={groups}
+                props={props}
+              />
+            {:else if  inGroup(curGroup.id, group)}
+              <div class="sticky" on:click={editSticky(id, text)} 
+                style:background-color={props && props.color ? props.color : "#d4f3ee"}
+                >
+                {@html Marked.parse(text)}
+                <div class="votes">
+                  {#each ["talk", "star", "question"] as type}
+                    <div
+                      class="vote"
+                      title={VOTE_TYPE_TO_TOOLTIP_TEXT[type]}
+                      class:voted={myVotes(votes, type) > 0}
+                      on:click|stopPropagation={() => voteOnSticky(id, type)}
+                    >
+                      <svelte:component this={VOTE_TYPE_TO_COMPONENT[type]} />
+                      {countVotes(votes, type)}
+                      <div class="vote-counts">
+                        {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}
+                          <div class="vote-count" />
+                        {/each}
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+          {/each}
+          </div>
+            {#if creatingInGroup !==undefined && inGroup(curGroup.id, creatingInGroup)}
+            <StickyEditor handleSave={addSticky} {cancelEdit} groups={groups} />
+          {/if}
+        </div>
+        {:else if groups.length===1 && creatingInGroup !==undefined}
+        <StickyEditor handleSave={addSticky} {cancelEdit} groups={groups} />
+        {/if}
+      {/each}
+    </div>
+  {/if}
+</div>
 
 <style>
   .board {
@@ -168,18 +281,29 @@
     position: absolute;
     right: 45px;
     margin-top: -18px;
-    }
+  }
+  .add-sticky, h2 {
+    display: inline-block;
+  }
+  .groups {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .group {
+    display: block;
+    flex-basis: 33%;
+  }
   .stickies {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
   }
   .sticky {
-    background-color: #D4F3EE;
-    flex-basis: 212px;
+    background-color: #d4f3ee;
+    flex-basis: 200px;
     min-height: 100px;
-    margin: 25px;
-    padding: 20px;
+    min-width: 200px;
+    margin: 10px;
+    padding: 10px;
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
     font-size: 12px;
     line-height: 16px;
@@ -187,14 +311,10 @@
     display: flex;
     flex-direction: column;
   }
-  .add-sticky {
-    display: flex;
-    align-items: center;
-    max-height: 30px;
-    margin-left: 25px;
-  }
   .add-sticky :global(svg) {
     margin-right: 6px;
+    height: 30px;
+    width: 30px;
   }
   .votes {
     display: flex;
@@ -236,51 +356,3 @@
     margin-bottom: 2px;
   }
 </style>
-
-<div class='board'>
-  <div class='close-board' on:click={closeBoard}>
-    <ExIcon  />
-  </div>
-  <div class='top-bar'>
-    <h1>{$state.name}</h1>
-    <div class='add-sticky' on:click={newSticky}>
-      <PlusIcon  />Add Sticky
-    </div>
-    <SortSelector setSortOption={setSortOption} sortOption={sortOption} />
-  </div>
-  {#if $state}
-  <div class='stickies'>
-    {#each sortedStickies as { id, text, votes } (id)}
-      {#if editingStickyId === id}
-        <StickyEditor handleSave={updateSticky(id)} handleDelete={deleteSticky(id)} {cancelEdit} text={editText} />
-      {:else}
-        <div class='sticky' on:click={editSticky(id, text)}>
-          {@html Marked.parse(text)}
-          <div class='votes'>
-            {#each ['talk', 'star', 'question'] as type }
-              <div
-                class="vote" title="{VOTE_TYPE_TO_TOOLTIP_TEXT[type]}"
-                class:voted={myVotes(votes, type) > 0}
-                on:click|stopPropagation={() => voteOnSticky(id, type)}>
-                <svelte:component this={VOTE_TYPE_TO_COMPONENT[type]} /> {countVotes(votes, type)}
-                <div class='vote-counts'>
-                {#each new Array(myVotes(votes, type)).map((_, i) => i) as index }
-                  <div class='vote-count' />
-                {/each}
-                </div>
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/if}
-    {/each}
-    {#if creating}
-      <StickyEditor handleSave={addSticky} {cancelEdit} />
-    {:else if stickies.length > 0}
-      <div on:click={newSticky}>
-        <PlusIcon  />
-      </div>
-    {/if}
-  </div>
-  {/if}
-</div>

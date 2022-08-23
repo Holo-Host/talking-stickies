@@ -99,7 +99,7 @@ export class TalkingStickiesStore {
         })
         return latestHash
     }
-    async makeBoard(name: string|undefined, fromHash?: EntryHashB64) {
+    async makeBoard(options: any, fromHash?: EntryHashB64) {
         let hash 
         if (fromHash) {
             hash = deserializeHash(fromHash)
@@ -111,11 +111,22 @@ export class TalkingStickiesStore {
         const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar);
 
         const board = this.newBoard(workspaceStore)
-        if (name !== undefined) {
-            board.requestChanges([{
-                type: "set-name",
-                name
-            }])
+        if (options !== undefined) {
+            let changes = []
+            if (options.name) {
+                changes.push({
+                    type: "set-name",
+                    name: options.name
+                })
+            }
+            if (options.groups) {
+                changes.push({
+                    type: "set-groups",
+                    groups: options.groups
+                })
+            }
+            if (changes.length > 0)
+                board.requestChanges(changes)
         }
         this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
     }
@@ -134,7 +145,7 @@ export class TalkingStickiesStore {
         for (const [workspaceHash, workspace] of workspaces.entries()) {
             console.log(`ATTEMPTING TO JOIN ${serializeHash(workspaceHash)}`)
             const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
-            console.log("joined workspace:", workspaceStore)
+            console.log("joined workspace:", workspaceStore, get(workspaceStore.state))
             const board = get(this.boards).find((board) => isEqual(board.workspace.workspaceHash, workspaceHash))
             if (!board) {
                 this.newBoard(workspaceStore)

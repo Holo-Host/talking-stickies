@@ -66,7 +66,7 @@
     tabShown = false
   }
 
-  let synStore: SynStore<TalkingStickiesGrammar>;
+  let synStore: SynStore;
   let tsStore: TalkingStickiesStore;
   
 
