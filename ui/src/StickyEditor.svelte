@@ -102,7 +102,7 @@
       <CheckIcon />
     </div>
     {#if handleDelete}
-      <div on:click={handleDelete}>
+      <div on:click={handleDelete} style="width:20px">
         <TrashIcon />
       </div>
     {/if}

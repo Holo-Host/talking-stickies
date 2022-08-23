@@ -3,6 +3,8 @@
     import TrashIcon from './icons/TrashIcon.svelte'
     import CheckIcon from './icons/CheckIcon.svelte'
     import PlusIcon from './icons/PlusIcon.svelte'
+    import UpIcon from './icons/UpIcon.svelte'
+    import DownIcon from './icons/DownIcon.svelte'
     import { Group } from './board';
   
     export let handleSave
@@ -17,6 +19,18 @@
     }
     const deleteGroup = (index) => () => {
       groups.splice(index, 1)
+      groups = groups
+    }
+    const moveGroupUp = (index) => () => {
+      const g = groups[index] 
+      groups.splice(index, 1)
+      groups.splice(index-1,0,g)
+      groups = groups
+    }
+    const moveGroupDown = (index) => () => {
+      const g = groups[index] 
+      groups.splice(index, 1)
+      groups.splice(index+1,0,g)
       groups = groups
     }
     // let text = textA
@@ -72,7 +86,7 @@
         <CheckIcon />
       </div>
       {#if handleDelete}
-        <div on:click={handleDelete}>
+        <div on:click={handleDelete} style="width:20px">
           <TrashIcon />
         </div>
       {/if}
@@ -89,7 +103,17 @@
       {#each groups as group, i}
       <div class="group">
         <input class='textarea' bind:value={group.name} />
-        <div on:click={deleteGroup(i)} style="margin-left:5px">
+        {#if i > 0}
+        <div on:click={moveGroupUp(i)} style="margin-left:5px;width:30px">
+          <UpIcon />
+        </div>
+        {/if}
+        {#if i < groups.length-1}
+        <div on:click={moveGroupDown(i)} style="margin-left:5px;width:30px">
+          <DownIcon />
+        </div>
+        {/if}
+        <div on:click={deleteGroup(i)} style="margin-left:5px;width:24px">
           <TrashIcon />
         </div>
       </div>

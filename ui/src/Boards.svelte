@@ -69,7 +69,7 @@ import type { Group } from './board';
     }
     cancelEdit()
   }
-
+	
   const cancelEdit = () => {
     editingBoardId = null
     editName = ""
@@ -121,6 +121,8 @@ import type { Group } from './board';
     position: absolute;
     right: 45px;
     margin-top: -18px;
+    width: 20px;
+    height: 20px;
   }
   .add-board {
     display: inline-block;
