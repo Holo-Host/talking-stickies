@@ -10,6 +10,7 @@
     export let cancelEdit
     export let text = ''
     export let groups = []
+
     const addGroup = () => {
       groups.push(new Group(`group ${groups.length+1}`))
       groups = groups

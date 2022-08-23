@@ -8,6 +8,7 @@ type Sticky = {
   text: string;
   group: number;
   votes: Object;
+  props: Object;
 };
 
 export interface TalkingStickiesState {
@@ -46,6 +47,11 @@ export type TalkingStickiesDelta =
       type: "update-sticky-group";
       id: string;
       group: number;
+    }
+    | {
+      type: "update-sticky-props";
+      id: string;
+      props: Object;
     }
  | {
       type: "update-sticky-text";
@@ -121,6 +127,13 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
       state.stickies.forEach((sticky, i) => {
         if (sticky.id === delta.id) {
           state.stickies[i].group = delta.group;
+        }
+      });
+    }
+    else if (delta.type == "update-sticky-props") {
+      state.stickies.forEach((sticky, i) => {
+        if (sticky.id === delta.id) {
+          state.stickies[i].props = delta.props;
         }
       });
     }

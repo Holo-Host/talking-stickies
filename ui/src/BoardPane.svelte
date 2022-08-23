@@ -11,7 +11,7 @@
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
   import { Marked } from "@ts-stack/markdown";
-  import { cloneDeep } from "lodash";
+  import { cloneDeep, isEqual } from "lodash";
 
   $: sortOption = null;
 
@@ -82,6 +82,7 @@
       id: uuidv1(),
       text,
       group: creatingInGroup,
+      props: {color:"#D4F3EE"},
       votes: {
         talk: {},
         star: {},
@@ -97,17 +98,26 @@
     clearEdit();
   };
 
-  const updateSticky = (id) => (text, groupId) => {
+  const updateSticky = (id) => (text, groupId, props) => {
     const sticky = stickies.find((sticky) => sticky.id === id);
     if (!sticky) {
       console.error("Failed to find sticky with id", id);
       return;
     }
-
-    dispatch("requestChange", [
-      { type: "update-sticky-text", id: sticky.id, text: text },
-      { type: "update-sticky-group", id: sticky.id, group: parseInt(groupId) },
-    ]);
+    let changes = []
+    if (sticky.text != "text") {
+      changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
+    }
+    const newGroupId = parseInt(groupId)
+    if (sticky.group != newGroupId) {
+      changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
+    }
+    if (!isEqual(sticky.props, props)) {
+      changes.push({ type: "update-sticky-props", id: sticky.id, props})
+    }
+    if (changes.length > 0) {
+      dispatch("requestChange", changes);
+    }
     clearEdit();
   };
 
@@ -201,7 +211,7 @@
           </div>
           {/if}
           <div class="stickies">
-          {#each sortedStickies as { id, text, votes, group } (id)}
+          {#each sortedStickies as { id, text, votes, group, props } (id)}
             {#if editingStickyId === id && inGroup(curGroup.id, group)}
               <StickyEditor
                 handleSave={updateSticky(id)}
@@ -210,9 +220,12 @@
                 text={editText}
                 groupId={group}
                 groups={groups}
+                props={props}
               />
             {:else if  inGroup(curGroup.id, group)}
-              <div class="sticky" on:click={editSticky(id, text)}>
+              <div class="sticky" on:click={editSticky(id, text)} 
+                style:background-color={props && props.color ? props.color : "#d4f3ee"}
+                >
                 {@html Marked.parse(text)}
                 <div class="votes">
                   {#each ["talk", "star", "question"] as type}
