@@ -7,6 +7,8 @@
   export let handleDelete = undefined
   export let cancelEdit
   export let text = ''
+  export let groupId = undefined
+  export let groups = []
 
   // let text = textA
 </script>
@@ -25,6 +27,12 @@
     font-size: 12px;
     line-height: 16px;
     color: #000000;
+    justify-content: space-between;
+  }
+  .sticky-elements {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
   }
   .textarea {
     background-color: rgba(255, 255, 255, 0.72);
@@ -45,12 +53,23 @@
 </style>
 
 <div class='sticky-editor'>
+  <div class="sticky-elements">
   <textarea class='textarea' bind:value={text} />
+  {#if groups.length > 1 && groupId !== undefined}
+    <select bind:value={groupId}>
+      {#each groups as group}
+        <option value={group.id}>
+          {group.name}
+        </option>
+      {/each}
+    </select>
+  {/if}
+  </div>
   <div class='controls'>
     <div on:click={cancelEdit}>
       <ExIcon />
     </div>
-    <div on:click={() => handleSave(text)}>
+    <div on:click={() => handleSave(text, groupId)}>
       <CheckIcon />
     </div>
     {#if handleDelete}

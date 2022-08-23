@@ -1,7 +1,7 @@
 <style>
   .plus-icon {
-    width: 30px;
-    height: 30px;
+    width: inherit;
+    height: inherit;
   }
 </style>
 

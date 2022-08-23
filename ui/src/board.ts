@@ -15,3 +15,10 @@ export class Board {
         this.workspace.requestChanges(deltas)
     }
 }
+
+export class Group {
+    id: number
+    constructor(public name: string) {
+        this.id = Date.now()
+    }
+}

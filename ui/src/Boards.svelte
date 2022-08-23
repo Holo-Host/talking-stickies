@@ -6,6 +6,9 @@
   import ReloadIcon from './icons/ReloadIcon.svelte'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import BoardEditor from './BoardEditor.svelte'
+  import { isEqual } from 'lodash'
+  import { cloneDeep } from "lodash";
+import type { Group } from './board';
 
   const dispatch = createEventDispatcher()
  
@@ -17,14 +20,15 @@
 
   let editingBoardId
   let editName = ''
+  let editGroups = []
   let creating = false
 
   const newBoard = () => {
     creating = true
   }
 
-  const addBoard = async (name: string) => {
-    await store.makeBoard(name)
+  const addBoard = async (name: string, groups: Group[]) => {
+    await store.makeBoard({name, groups})
     creating = false
   }
 
@@ -38,25 +42,38 @@
       store.setActiveBoard(index)
   }
 
-  const editBoard = (i, name) => () => {
+  const editBoard = (i, name, groups) => () => {
     editingBoardId = i
     editName = name
+    editGroups = cloneDeep(groups)
   }
 
-
-  const updateBoard = i => async name => {
-    await store.requestBoardChanges(i,
-    [
-      {type: 'set-name',
-       name: name
-      }
-    ])
+  const updateBoard = i => async (name, groups) => {
+    let changes = []
+    if (get($boards[i].name) != name) {
+      console.log("updating board name to ",name)
+      changes.push(
+        {
+          type: 'set-name',
+          name: name
+        })
+    }
+    if (!isEqual(groups, get($boards[i].workspace.state).groups)) {
+      console.log("with groups:", groups)
+      changes.push({type: 'set-groups',
+         groups: groups
+        })
+    }
+    if (changes.length > 0) {
+      await store.requestBoardChanges(i,changes)
+    }
     cancelEdit()
   }
 
   const cancelEdit = () => {
     editingBoardId = null
     editName = ""
+    editGroups = []
     creating = false
   }
 
@@ -97,14 +114,19 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    align-items: flex-start;
     flex-shrink: 1;
   }
   .reload-boards {
     position: absolute;
     right: 45px;
     margin-top: -18px;
-    }
+  }
+  .add-board {
+    display: inline-block;
+    height: 30px;
+    margin-bottom: 10px;
+  }
 
 </style>
 
@@ -120,9 +142,12 @@
     <div class='board-list'>
         {#each $boards as board, i }
           {#if editingBoardId === i}
-            <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} />
+            <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} groups={editGroups} />
           {:else}
-            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name))}><PencilIcon  /></div>
+            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups)}><PencilIcon  />
+            </div>
+           
+
           </div>
             
           {/if}
