@@ -181,7 +181,7 @@
   <div class="top-bar">
     <h1>{$state.name}</h1>
     {#if $state.groups.length == 0}
-      <div class="add-sticky" on:click={newSticky(0)}>
+      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px">
         <PlusIcon />Add Sticky
       </div>
     {/if}

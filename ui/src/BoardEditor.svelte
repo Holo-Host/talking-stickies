@@ -43,7 +43,6 @@
       box-sizing: border-box;
       border-radius: 3px;
       width: 100%;
-      height: 100%;
     }
     .controls {
       display: flex;
@@ -78,7 +77,7 @@
       {/if}
     </div>
     <div class="edit-title">
-      Title: <textarea class='textarea' bind:value={text} />
+      Title: <input class='textarea' bind:value={text} />
     </div>
     <div class="edit-groups">
       Groups:
@@ -88,8 +87,8 @@
 
       {#each groups as group, i}
       <div class="group">
-        <textarea class='textarea' bind:value={group.name} />
-        <div on:click={deleteGroup(i)}>
+        <input class='textarea' bind:value={group.name} />
+        <div on:click={deleteGroup(i)} style="margin-left:5px">
           <TrashIcon />
         </div>
       </div>

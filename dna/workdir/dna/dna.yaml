@@ -3,7 +3,7 @@ manifest_version: "1"
 name: talking-stickies
 
 integrity:
-  uid: 00000000-0000-0000-0000-000000000000
+  uid: 00000000-0000-0000-0000-000000000001
   properties: ~
   zomes:
     - name: syn_integrity
