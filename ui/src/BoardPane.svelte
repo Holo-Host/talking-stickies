@@ -45,11 +45,9 @@
     if ($state) {
       groups = cloneDeep($state.groups);
       groupIds = groups.map(c => c.id)
-      console.log("groupIds", JSON.stringify(groupIds))
 
-      stickies.forEach((stickie) => {
-        console.log("stickie.group.id", stickie.group)
-        if (!groupIds.includes(stickie.group)) ungroupedStickies += 1
+      stickies.forEach((sticky) => {
+        if (!groupIds.includes(sticky.group)) ungroupedStickies += 1
       });
       groups.unshift({id: 0, name:""})
     }
@@ -78,7 +76,7 @@
   };
 
   const addSticky = (text) => {
-    const stickie = {
+    const sticky = {
       id: uuidv1(),
       text,
       group: creatingInGroup,
@@ -89,7 +87,7 @@
         question: {},
       },
     };
-    dispatch("requestChange", [{ type: "add-sticky", value: stickie }]);
+    dispatch("requestChange", [{ type: "add-sticky", value: sticky }]);
     creatingInGroup = undefined;
   };
 
