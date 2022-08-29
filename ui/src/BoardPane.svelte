@@ -22,7 +22,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const { getStore } = getContext("tsStore");
+  const { getStore } :any = getContext("tsStore");
   let tsStore: TalkingStickiesStore = getStore();
 
   $: index = tsStore.activeBoardIndex;
@@ -75,12 +75,12 @@
     clearEdit();
   };
 
-  const addSticky = (text) => {
+  const addSticky = (text, _groupId, props) => {
     const sticky = {
       id: uuidv1(),
       text,
       group: creatingInGroup,
-      props: {color:"#D4F3EE"},
+      props,
       votes: {
         talk: {},
         star: {},
@@ -103,15 +103,16 @@
       return;
     }
     let changes = []
-    if (sticky.text != "text") {
+    if (sticky.text != text) {
       changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
     }
     const newGroupId = parseInt(groupId)
     if (sticky.group != newGroupId) {
       changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
     }
+    console.log("sticky.props", sticky.props, "props", props)
     if (!isEqual(sticky.props, props)) {
-      changes.push({ type: "update-sticky-props", id: sticky.id, props})
+      changes.push({ type: "update-sticky-props", id: sticky.id, props: cloneDeep(props)})
     }
     if (changes.length > 0) {
       dispatch("requestChange", changes);

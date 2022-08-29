@@ -12,7 +12,7 @@ import type { Group } from './board';
 
   const dispatch = createEventDispatcher()
  
-  const { getStore } = getContext('tsStore');
+  const { getStore } :any = getContext('tsStore');
 
   const store:TalkingStickiesStore = getStore();
   $: boards = store.boards;

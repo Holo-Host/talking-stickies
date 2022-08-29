@@ -2,6 +2,7 @@
   import ExIcon from './icons/ExIcon.svelte'
   import TrashIcon from './icons/TrashIcon.svelte'
   import CheckIcon from './icons/CheckIcon.svelte'
+  import cloneDeep from "lodash"
 
   export let handleSave
   export let handleDelete = undefined
@@ -14,7 +15,7 @@
   const setColor = (color) => {
     console.log("setting color to ", color)
     props.color = color
-    props = props
+    props = cloneDeep(props)
   }
   // let text = textA
 </script>
