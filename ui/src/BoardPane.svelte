@@ -5,7 +5,7 @@
   import ExIcon from "./icons/ExIcon.svelte";
   import SpeakingIcon from "./icons/SpeakingIcon.svelte";
   import QuestionIcon from "./icons/QuestionIcon.svelte";
-  import StarIcon from "./icons/StarIcon.svelte";
+  import EmojiIcon from "./icons/EmojiIcon.svelte";
   import { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
@@ -162,10 +162,10 @@
     return votes[type][tsStore.myAgentPubKey()] || 0;
   };
 
-  const VOTE_TYPE_TO_COMPONENT = {
-    talk: SpeakingIcon,
-    star: StarIcon,
-    question: QuestionIcon,
+  const VOTE_TYPE_TO_EMOJI = {
+    talk: "🗨",
+    star: "⭐",
+    question: "❓",
   };
 
   const VOTE_TYPE_TO_TOOLTIP_TEXT = {
@@ -234,7 +234,7 @@
                       class:voted={myVotes(votes, type) > 0}
                       on:click|stopPropagation={() => voteOnSticky(id, type)}
                     >
-                      <svelte:component this={VOTE_TYPE_TO_COMPONENT[type]} />
+                      <EmojiIcon emoji={VOTE_TYPE_TO_EMOJI[type]} />
                       {countVotes(votes, type)}
                       <div class="vote-counts">
                         {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}

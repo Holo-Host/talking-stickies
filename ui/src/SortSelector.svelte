@@ -1,7 +1,5 @@
 <script>
-  import SpeakingIcon from './icons/SpeakingIcon.svelte'
-  import QuestionIcon from './icons/QuestionIcon.svelte'
-  import StarIcon from './icons/StarIcon.svelte'
+  import EmojiIcon from './icons/EmojiIcon.svelte'
 
   export let setSortOption
   export let sortOption
@@ -39,12 +37,12 @@
 
 <div class='sort-options'>
   <div on:click={handleClick('talk')} class='wrapper' class:selected={sortOption === 'talk'} title="Sort by 'talk' votes">
-    <SpeakingIcon  />
+    <EmojiIcon emoji="🗨" on:click={handleClick('talk')}/>
   </div>
   <div on:click={handleClick('star')} class='wrapper' class:selected={sortOption === 'star'} title="Sort by 'star' votes">
-    <StarIcon on:click={handleClick('star')} />
+    <EmojiIcon emoji="⭐" on:click={handleClick('star')} />
   </div>
   <div on:click={handleClick('question')} class='wrapper' class:selected={sortOption === 'question'} title="Sort by 'question' votes">
-    <QuestionIcon on:click={handleClick('question')} />
+    <EmojiIcon emoji="❓" on:click={handleClick('question')} />
   </div>
 </div>
