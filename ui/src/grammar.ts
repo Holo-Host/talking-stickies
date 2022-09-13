@@ -1,7 +1,7 @@
 import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
 import type { SynGrammar } from "@holochain-syn/store";
 import type { AgentPubKey } from "@holochain/client";
-import type { Group, VoteType } from "./board";
+import { Group, VoteType, DEFAULT_VOTE_TYPES } from "./board";
 
 type Sticky = {
   id: string;
@@ -79,12 +79,6 @@ export type TalkingStickiesGrammar = SynGrammar<
 TalkingStickiesDelta,
 TalkingStickiesState
 >;
-
-const DEFAULT_VOTE_TYPES = [
-    {type: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
-    {type: "⭐", toolTip: "Interesting!", maxVotes: 1},
-    {type: "❓", toolTip: "I have questions about this topic.", maxVotes: 1},
-]
 
 export const talkingStickiesGrammar: TalkingStickiesGrammar = {
   initState(state)  {

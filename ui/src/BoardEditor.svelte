@@ -15,7 +15,7 @@
     export let voteTypes = []
 
     const addVoteType = () => {
-      voteTypes.push(new VoteType(``, `tool tip for voteTypes ${voteTypes.length+1}`, 1))
+      voteTypes.push(new VoteType(``, `description for vote type ${voteTypes.length+1}`, 1))
       voteTypes = voteTypes
     }
     const deleteVoteType = (index) => () => {
@@ -158,9 +158,9 @@
       </div>
       {#each voteTypes as voteType, i}
       <div class="vote-type">
-        <input class='textarea emoji-input' bind:value={voteType.type} />
-        <input class='textarea num-input' bind:value={voteType.maxVotes} />
-        <input class='textarea' bind:value={voteType.toolTip} />
+        <input class='textarea emoji-input' bind:value={voteType.type} title="emoji"/>
+        <input class='textarea num-input' bind:value={voteType.maxVotes} title="max votes" />
+        <input class='textarea' bind:value={voteType.toolTip} title="description"/>
         {#if i > 0}
         <div on:click={moveVoteTypeUp(i)} style="margin-left:5px;width:30px">
           <UpIcon />

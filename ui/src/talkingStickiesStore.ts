@@ -125,6 +125,12 @@ export class TalkingStickiesStore {
                     groups: options.groups
                 })
             }
+            if (options.voteTypes) {
+                changes.push({
+                    type: "set-vote-types",
+                    voteTypes: options.voteTypes
+                })
+            }
             if (changes.length > 0)
                 board.requestChanges(changes)
         }

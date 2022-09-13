@@ -8,9 +8,7 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import type { Group, VoteType } from './board';
-
-  const dispatch = createEventDispatcher()
+  import { Group, VoteType, DEFAULT_VOTE_TYPES } from './board';
  
   const { getStore } :any = getContext('tsStore');
 
@@ -25,6 +23,7 @@
   let creating = false
 
   const newBoard = () => {
+    editVoteTypes = cloneDeep(DEFAULT_VOTE_TYPES)
     creating = true
   }
 
@@ -161,7 +160,7 @@
           {/if}
         {/each}
         {#if creating}
-        <BoardEditor handleSave={addBoard} {cancelEdit} />
+        <BoardEditor handleSave={addBoard} {cancelEdit} voteTypes={editVoteTypes} />
         {/if}
     </div>
 </div>
