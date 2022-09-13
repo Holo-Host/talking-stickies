@@ -3,8 +3,6 @@
   import StickyEditor from "./StickyEditor.svelte";
   import PlusIcon from "./icons/PlusIcon.svelte";
   import ExIcon from "./icons/ExIcon.svelte";
-  import SpeakingIcon from "./icons/SpeakingIcon.svelte";
-  import QuestionIcon from "./icons/QuestionIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
   import { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
@@ -82,9 +80,6 @@
       group: creatingInGroup,
       props,
       votes: {
-        talk: {},
-        star: {},
-        question: {},
       },
     };
     dispatch("requestChange", [{ type: "add-sticky", value: sticky }]);
@@ -127,14 +122,21 @@
       return;
     }
     const agent = tsStore.myAgentPubKey();
-    const votes = {
+    let votes = {
       ...sticky.votes,
-      [type]: {
-        ...sticky.votes[type],
-        [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4,
-      },
-    };
-
+    }
+    if (typeof votes[type] === 'undefined') {
+      votes[type] = {}
+      votes[type][agent] = 1
+    } else {
+      votes = {
+        ...sticky.votes,
+        [type]: {
+          ...sticky.votes[type],
+          [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4,
+        },
+      }
+    }
     console.log("VOTING", agent);
     console.log("votes before", sticky.votes);
     console.log("votes after", votes);
@@ -151,6 +153,9 @@
   };
 
   const countVotes = (votes, type) => {
+    if (typeof votes[type] === 'undefined') {
+      return []
+    }
     const agentKeys = Object.keys(votes[type]);
     return agentKeys.reduce(
       (total, agentKey) => total + (votes[type][agentKey] || 0),
@@ -159,19 +164,10 @@
   };
 
   const myVotes = (votes, type) => {
+    if (typeof votes[type] === 'undefined') {
+      return 0
+    }
     return votes[type][tsStore.myAgentPubKey()] || 0;
-  };
-
-  const VOTE_TYPE_TO_EMOJI = {
-    talk: "🗨",
-    star: "⭐",
-    question: "❓",
-  };
-
-  const VOTE_TYPE_TO_TOOLTIP_TEXT = {
-    talk: "I want to talk about this one.",
-    star: "Interesting!",
-    question: "I have questions about this one.",
   };
 
   const closeBoard = () => {
@@ -227,14 +223,14 @@
                 >
                 {@html Marked.parse(text)}
                 <div class="votes">
-                  {#each ["talk", "star", "question"] as type}
+                  {#each $state.voteTypes as {type, toolTip}}
                     <div
                       class="vote"
-                      title={VOTE_TYPE_TO_TOOLTIP_TEXT[type]}
+                      title={toolTip}
                       class:voted={myVotes(votes, type) > 0}
                       on:click|stopPropagation={() => voteOnSticky(id, type)}
                     >
-                      <EmojiIcon emoji={VOTE_TYPE_TO_EMOJI[type]} />
+                      <EmojiIcon emoji={type} class="vote-icon" />
                       {countVotes(votes, type)}
                       <div class="vote-counts">
                         {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}
@@ -333,8 +329,8 @@
     position: relative;
     cursor: pointer;
   }
-  .vote :global(svg) {
-    margin-right: auto;
+  .vote-icon {
+    margin-right: 20px;
   }
   .voted {
     border-color: black;

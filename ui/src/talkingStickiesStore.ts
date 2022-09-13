@@ -2,7 +2,7 @@ import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type {
     InstalledCell,
   } from '@holochain/client';
-import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
+import type { AgentPubKeyB64, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
 import { WorkspaceStore, SynStore, unnest} from '@holochain-syn/store';
 import { SynClient } from '@holochain-syn/client';

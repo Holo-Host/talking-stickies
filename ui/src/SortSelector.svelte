@@ -1,5 +1,7 @@
-<script>
+<script lang="ts">
   import EmojiIcon from './icons/EmojiIcon.svelte'
+  import { getContext } from "svelte";
+  import type { TalkingStickiesStore } from "./talkingStickiesStore";
 
   export let setSortOption
   export let sortOption
@@ -11,6 +13,11 @@
       setSortOption(option)
     }
   }
+  const { getStore } :any = getContext("tsStore");
+  let tsStore: TalkingStickiesStore = getStore();
+
+  $: index = tsStore.activeBoardIndex;
+  $: state = tsStore.getBoardState($index);
 
 </script>
 
@@ -36,13 +43,9 @@
 </style>
 
 <div class='sort-options'>
-  <div on:click={handleClick('talk')} class='wrapper' class:selected={sortOption === 'talk'} title="Sort by 'talk' votes">
-    <EmojiIcon emoji="🗨" on:click={handleClick('talk')}/>
+  {#each $state.voteTypes as {type, toolTip}}
+  <div on:click={handleClick(type)} class='wrapper' class:selected={sortOption === type} title="Sort by '{type}' votes">
+    <EmojiIcon emoji="{type}" on:click={handleClick(type)}/>
   </div>
-  <div on:click={handleClick('star')} class='wrapper' class:selected={sortOption === 'star'} title="Sort by 'star' votes">
-    <EmojiIcon emoji="⭐" on:click={handleClick('star')} />
-  </div>
-  <div on:click={handleClick('question')} class='wrapper' class:selected={sortOption === 'question'} title="Sort by 'question' votes">
-    <EmojiIcon emoji="❓" on:click={handleClick('question')} />
-  </div>
+  {/each}
 </div>
