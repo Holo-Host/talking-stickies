@@ -329,9 +329,6 @@
     position: relative;
     cursor: pointer;
   }
-  .vote-icon {
-    margin-right: 20px;
-  }
   .voted {
     border-color: black;
   }
