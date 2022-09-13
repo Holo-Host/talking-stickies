@@ -32,6 +32,10 @@ export type TalkingStickiesDelta =
       groups: Group[];
     }
   | {
+      type: "set-vote-types";
+      voteTypes: VoteType[];
+    }
+  | {
       type: "add-group";
       group: Group;
     }
@@ -77,9 +81,9 @@ TalkingStickiesState
 >;
 
 const DEFAULT_VOTE_TYPES = [
-    {type: "🗨", toolTip: "I want to talk about this one."},
-    {type: "⭐", toolTip: "Interesting!"},
-    {type: "❓", toolTip: "I have questions about this topic."},
+    {type: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
+    {type: "⭐", toolTip: "Interesting!", maxVotes: 1},
+    {type: "❓", toolTip: "I have questions about this topic.", maxVotes: 1},
 ]
 
 export const talkingStickiesGrammar: TalkingStickiesGrammar = {
@@ -120,6 +124,10 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
         state.groups.splice(index,1)
         state.groups.splice(index, 0, c)
       }
+    }
+    if (delta.type == "set-vote-types") {
+      state.voteTypes = delta.voteTypes
+        console.log("setting", delta.voteTypes)
     }
     else if (delta.type == "add-sticky") {
       state.stickies.push(delta.value)

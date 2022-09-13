@@ -8,7 +8,7 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-import type { Group } from './board';
+  import type { Group, VoteType } from './board';
 
   const dispatch = createEventDispatcher()
  
@@ -21,14 +21,15 @@ import type { Group } from './board';
   let editingBoardId
   let editName = ''
   let editGroups = []
+  let editVoteTypes = []
   let creating = false
 
   const newBoard = () => {
     creating = true
   }
 
-  const addBoard = async (name: string, groups: Group[]) => {
-    await store.makeBoard({name, groups})
+  const addBoard = async (name: string, groups: Group[], voteTypes: VoteType[]) => {
+    await store.makeBoard({name, groups, voteTypes})
     creating = false
   }
 
@@ -42,13 +43,14 @@ import type { Group } from './board';
       store.setActiveBoard(index)
   }
 
-  const editBoard = (i, name, groups) => () => {
+  const editBoard = (i, name: string, groups: Group[], voteTypes: VoteType[]) => () => {
     editingBoardId = i
     editName = name
     editGroups = cloneDeep(groups)
+    editVoteTypes = cloneDeep(voteTypes)
   }
 
-  const updateBoard = i => async (name, groups) => {
+  const updateBoard = i => async (name: string, groups: Group[], voteTypes: VoteType[]) => {
     let changes = []
     if (get($boards[i].name) != name) {
       console.log("updating board name to ",name)
@@ -64,6 +66,12 @@ import type { Group } from './board';
          groups: groups
         })
     }
+    if (!isEqual(voteTypes, get($boards[i].workspace.state).voteTypes)) {
+      console.log("with voteTypes:", voteTypes)
+      changes.push({type: 'set-vote-types',
+        voteTypes: voteTypes
+        })
+    }
     if (changes.length > 0) {
       await store.requestBoardChanges(i,changes)
     }
@@ -74,6 +82,7 @@ import type { Group } from './board';
     editingBoardId = null
     editName = ""
     editGroups = []
+    editVoteTypes = []
     creating = false
   }
 
@@ -144,14 +153,11 @@ import type { Group } from './board';
     <div class='board-list'>
         {#each $boards as board, i }
           {#if editingBoardId === i}
-            <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} groups={editGroups} />
+            <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
           {:else}
-            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups)}><PencilIcon  />
+            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups, get(board.workspace.state).voteTypes)}><PencilIcon  />
             </div>
-           
-
           </div>
-            
           {/if}
         {/each}
         {#if creating}

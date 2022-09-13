@@ -3,7 +3,7 @@ import type { TalkingStickiesDelta, TalkingStickiesGrammar } from "./grammar";
 import { Readable, derived } from "svelte/store";
 
 export class VoteType {
-    constructor(public type: string, public toolTip: string){}
+    constructor(public type: string, public toolTip: string, public maxVotes: number){}
 }
 
 export class Board {

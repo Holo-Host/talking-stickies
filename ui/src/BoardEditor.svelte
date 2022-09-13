@@ -5,13 +5,35 @@
     import PlusIcon from './icons/PlusIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
-    import { Group } from './board';
+    import { Group, VoteType } from './board';
   
     export let handleSave
     export let handleDelete = undefined
     export let cancelEdit
     export let text = ''
     export let groups = []
+    export let voteTypes = []
+
+    const addVoteType = () => {
+      voteTypes.push(new VoteType(``, `tool tip for voteTypes ${voteTypes.length+1}`, 1))
+      voteTypes = voteTypes
+    }
+    const deleteVoteType = (index) => () => {
+      voteTypes.splice(index, 1)
+      voteTypes = voteTypes
+    }
+    const moveVoteTypeUp = (index) => () => {
+      const g = voteTypes[index] 
+      voteTypes.splice(index, 1)
+      voteTypes.splice(index-1,0,g)
+      voteTypes = voteTypes
+    }
+    const moveVoteTypeDown = (index) => () => {
+      const g = voteTypes[index] 
+      voteTypes.splice(index, 1)
+      voteTypes.splice(index+1,0,g)
+      voteTypes = voteTypes
+    }
 
     const addGroup = () => {
       groups.push(new Group(`group ${groups.length+1}`))
@@ -59,6 +81,12 @@
       border-radius: 3px;
       width: 100%;
     }
+    .emoji-input {
+      width: 30px;
+    }
+    .num-input {
+      width: 20px;
+    }
     .controls {
       display: flex;
       flex-direction: row;
@@ -71,7 +99,11 @@
       display: flex;
       flex-direction: row;
     }
-    .add-group {
+    .vote-type {
+      display: flex;
+      flex-direction: row;
+    }
+    .add-item {
       display: inline-block;
       height: 20px;
     }
@@ -82,7 +114,7 @@
       <div on:click={cancelEdit}>
         <ExIcon />
       </div>
-      <div on:click={() => handleSave(text, groups)}>
+      <div on:click={() => handleSave(text, groups, voteTypes)}>
         <CheckIcon />
       </div>
       {#if handleDelete}
@@ -96,7 +128,7 @@
     </div>
     <div class="edit-groups">
       Groups:
-      <div class="add-group" on:click={() => addGroup()}>
+      <div class="add-item" on:click={() => addGroup()}>
         <PlusIcon />
       </div>
 
@@ -114,6 +146,32 @@
         </div>
         {/if}
         <div on:click={deleteGroup(i)} style="margin-left:5px;width:24px">
+          <TrashIcon />
+        </div>
+      </div>
+      {/each}
+    </div>
+    <div class="edit-vote-types">
+      Voting Types:
+      <div class="add-item" on:click={() => addVoteType()}>
+        <PlusIcon />
+      </div>
+      {#each voteTypes as voteType, i}
+      <div class="vote-type">
+        <input class='textarea emoji-input' bind:value={voteType.type} />
+        <input class='textarea num-input' bind:value={voteType.maxVotes} />
+        <input class='textarea' bind:value={voteType.toolTip} />
+        {#if i > 0}
+        <div on:click={moveVoteTypeUp(i)} style="margin-left:5px;width:30px">
+          <UpIcon />
+        </div>
+        {/if}
+        {#if i < voteTypes.length-1}
+        <div on:click={moveVoteTypeDown(i)} style="margin-left:5px;width:30px">
+          <DownIcon />
+        </div>
+        {/if}
+        <div on:click={deleteVoteType(i)} style="margin-left:5px;width:24px">
           <TrashIcon />
         </div>
       </div>

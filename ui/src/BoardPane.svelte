@@ -115,7 +115,7 @@
     clearEdit();
   };
 
-  const voteOnSticky = (id, type) => {
+  const voteOnSticky = (id, type, max) => {
     const sticky = stickies.find((sticky) => sticky.id === id);
     if (!sticky) {
       console.error("Failed to find sticky with id", id);
@@ -129,11 +129,15 @@
       votes[type] = {}
       votes[type][agent] = 1
     } else {
+      let voteBump = ((sticky.votes[type][agent] || 0) + 1)
+      if (voteBump > max) {
+        voteBump = 0
+      }
       votes = {
         ...sticky.votes,
         [type]: {
           ...sticky.votes[type],
-          [agent]: ((sticky.votes[type][agent] || 0) + 1) % 4,
+          [agent]: voteBump,
         },
       }
     }
@@ -223,12 +227,12 @@
                 >
                 {@html Marked.parse(text)}
                 <div class="votes">
-                  {#each $state.voteTypes as {type, toolTip}}
+                  {#each $state.voteTypes as {type, toolTip, maxVotes}}
                     <div
                       class="vote"
                       title={toolTip}
                       class:voted={myVotes(votes, type) > 0}
-                      on:click|stopPropagation={() => voteOnSticky(id, type)}
+                      on:click|stopPropagation={() => voteOnSticky(id, type, maxVotes)}
                     >
                       <EmojiIcon emoji={type} class="vote-icon" />
                       {countVotes(votes, type)}
