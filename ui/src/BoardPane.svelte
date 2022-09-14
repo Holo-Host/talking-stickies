@@ -14,7 +14,6 @@
   $: sortOption = null;
 
   function setSortOption(newSortOption) {
-    console.log("setting sort option", newSortOption);
     sortOption = newSortOption;
   }
 
@@ -227,14 +226,14 @@
                 >
                 {@html Marked.parse(text)}
                 <div class="votes">
-                  {#each $state.voteTypes as {type, toolTip, maxVotes}}
+                  {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
                     <div
                       class="vote"
                       title={toolTip}
                       class:voted={myVotes(votes, type) > 0}
                       on:click|stopPropagation={() => voteOnSticky(id, type, maxVotes)}
                     >
-                      <EmojiIcon emoji={type} class="vote-icon" />
+                      <EmojiIcon emoji={emoji} class="vote-icon" />
                       {countVotes(votes, type)}
                       <div class="vote-counts">
                         {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}

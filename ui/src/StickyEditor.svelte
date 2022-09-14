@@ -13,9 +13,8 @@
   export let props = {}
   const colors=["#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "yellow", "LightSkyBlue", "grey"]
   const setColor = (color) => {
-    console.log("setting color to ", color)
-    props.color = color
-    props = cloneDeep(props)
+    // TODO fix later when there are more properties
+    props = {color}
   }
   // let text = textA
 </script>

@@ -43,9 +43,9 @@
 </style>
 
 <div class='sort-options'>
-  {#each $state.voteTypes as {type, toolTip}}
+  {#each $state.voteTypes as {type, toolTip, emoji}}
   <div on:click={handleClick(type)} class='wrapper' class:selected={sortOption === type} title="Sort by '{type}' votes">
-    <EmojiIcon emoji="{type}" on:click={handleClick(type)}/>
+    <EmojiIcon emoji="{emoji}" on:click={handleClick(type)}/>
   </div>
   {/each}
 </div>
