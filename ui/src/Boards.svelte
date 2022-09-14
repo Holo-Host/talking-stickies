@@ -9,6 +9,8 @@
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
   import { Group, VoteType, DEFAULT_VOTE_TYPES } from './board';
+  import EmojiIcon from './icons/EmojiIcon.svelte';
+
  
   const { getStore } :any = getContext('tsStore');
 
@@ -88,7 +90,6 @@
   const reloadBoards = () => {
     store.joinExistingWorkspaces()
   }
-
 </script>
 
 <style>

@@ -3,6 +3,7 @@
   import StickyEditor from "./StickyEditor.svelte";
   import PlusIcon from "./icons/PlusIcon.svelte";
   import ExIcon from "./icons/ExIcon.svelte";
+  import ExportIcon from "./icons/ExportIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
   import { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
@@ -180,11 +181,32 @@
   const inGroup = (curGroupId, groupId) => {
     return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
   }
+
+  const download = (filename, text) => {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+  const exportBoard = () => {
+    const fileName = `ts_${$state.name}.json`
+    download(fileName, JSON.stringify($state))
+    alert(`Your board was exported to your Downloads folder as: '${fileName}.json'`)
+  }
 </script>
 
 <div class="board">
   <div class="close-board" on:click={closeBoard}>
     <ExIcon />
+  </div>
+  <div class="export-board" on:click={exportBoard} title="Export Board">
+    <ExportIcon />
   </div>
   <div class="top-bar">
     <h1>{$state.name}</h1>
@@ -278,6 +300,11 @@
   .close-board {
     position: absolute;
     right: 45px;
+    margin-top: -18px;
+  }
+  .export-board {
+    position: absolute;
+    right: 70px;
     margin-top: -18px;
   }
   .add-sticky, h2 {
