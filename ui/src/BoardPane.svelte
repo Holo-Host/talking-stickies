@@ -197,7 +197,7 @@
   const exportBoard = () => {
     const fileName = `ts_${$state.name}.json`
     download(fileName, JSON.stringify($state))
-    alert(`Your board was exported to your Downloads folder as: '${fileName}.json'`)
+    alert(`Your board was exported to your Downloads folder as: '${fileName}'`)
   }
 </script>
 

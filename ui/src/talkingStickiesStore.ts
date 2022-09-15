@@ -125,6 +125,15 @@ export class TalkingStickiesStore {
                     groups: options.groups
                 })
             }
+            if (options.stickies) {
+                options.stickies.forEach((sticky)=>{
+                    changes.push({
+                        type: "add-sticky",
+                        value: sticky
+                    })
+                        
+                })
+            }
             if (options.voteTypes) {
                 changes.push({
                     type: "set-vote-types",

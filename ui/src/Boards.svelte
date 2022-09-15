@@ -2,6 +2,7 @@
   import { createEventDispatcher, getContext } from 'svelte'
   import { get } from 'svelte/store';
   import PlusIcon from './icons/PlusIcon.svelte'
+  import ImportIcon from './icons/ImportIcon.svelte';
   import PencilIcon from './icons/PencilIcon.svelte'
   import ReloadIcon from './icons/ReloadIcon.svelte'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
@@ -9,7 +10,6 @@
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
   import { Group, VoteType, DEFAULT_VOTE_TYPES } from './board';
-  import EmojiIcon from './icons/EmojiIcon.svelte';
 
  
   const { getStore } :any = getContext('tsStore');
@@ -28,6 +28,19 @@
     editVoteTypes = cloneDeep(DEFAULT_VOTE_TYPES)
     creating = true
   }
+
+	let  avatar, fileinput;
+	
+	const onFileSelected = (e)=>{
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.addEventListener("load", async () => {
+      const b = JSON.parse(reader.result as string)
+      await store.makeBoard(b)
+    }, false);
+    reader.readAsText(file);
+  };
 
   const addBoard = async (name: string, groups: Group[], voteTypes: VoteType[]) => {
     await store.makeBoard({name, groups, voteTypes})
@@ -133,7 +146,7 @@
     width: 20px;
     height: 20px;
   }
-  .add-board {
+  .board-button {
     display: inline-block;
     height: 30px;
     margin-bottom: 10px;
@@ -146,9 +159,13 @@
       <ReloadIcon  />
     </div>
     <div class='top-bar'>
-        <div class='add-board' on:click={newBoard}>
-            <PlusIcon  />Add Board
+        <div class='board-button' on:click={newBoard} title="New board">
+            <PlusIcon  />
         </div>
+        <div class='board-button' on:click={()=>{fileinput.click();}} title="Import board from JSON file">
+          <ImportIcon  />
+          <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+      </div>
     </div>
     <div class='board-list'>
         {#each $boards as board, i }
