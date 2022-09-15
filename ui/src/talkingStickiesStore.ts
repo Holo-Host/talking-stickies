@@ -82,7 +82,7 @@ export class TalkingStickiesStore {
         }
     }
     closeActiveBoard() {
-        this.deleteBoard(get(this.activeBoardIndex))
+        this.setActiveBoard(-1)
     }
     async latestCommit() : Promise<EntryHashB64|undefined> {
         await this.synStore.fetchAllCommits()
