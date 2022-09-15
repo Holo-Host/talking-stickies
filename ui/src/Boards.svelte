@@ -23,13 +23,13 @@
   let editGroups = []
   let editVoteTypes = []
   let creating = false
-
+  let loading = false
   const newBoard = () => {
     editVoteTypes = cloneDeep(DEFAULT_VOTE_TYPES)
     creating = true
   }
 
-	let  avatar, fileinput;
+	let fileinput;
 	
 	const onFileSelected = (e)=>{
     let file = e.target.files[0];
@@ -100,8 +100,10 @@
     creating = false
   }
 
-  const reloadBoards = () => {
-    store.joinExistingWorkspaces()
+  const reloadBoards = async () => {
+    loading = true
+    await store.joinExistingWorkspaces()
+    loading = false
   }
 </script>
 
@@ -156,7 +158,7 @@
 
 <div class='boards'>
     <div class='reload-boards' on:click={reloadBoards}>
-      <ReloadIcon  />
+      <ReloadIcon spinning={loading}/>
     </div>
     <div class='top-bar'>
         <div class='board-button' on:click={newBoard} title="New board">

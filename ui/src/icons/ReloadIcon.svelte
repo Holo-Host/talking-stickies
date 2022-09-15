@@ -1,8 +1,25 @@
+<script lang="ts">
+  export let spinning:boolean = false
+</script>
 <style>
-   
+   .icn-spinner {
+    animation: spin-animation 1s infinite;
+    animation-timing-function: linear;
+    display: inline-block;
+}
+
+@keyframes spin-animation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
 </style>
   
-  <svg  version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+  <svg  class="{spinning ? 'icn-spinner':''}" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
   viewBox="0 0 492.883 492.883" style="enable-background:new 0 0 492.883 492.883;" xml:space="preserve">
 <g>
  <g>
