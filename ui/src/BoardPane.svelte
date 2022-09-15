@@ -9,8 +9,20 @@
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
-  import { Marked } from "@ts-stack/markdown";
+  import { Marked, Renderer } from "@ts-stack/markdown";
   import { cloneDeep, isEqual } from "lodash";
+
+  Marked.setOptions
+  ({
+    renderer: new Renderer,
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: true,
+    smartLists: true,
+    smartypants: false
+  });
 
   $: sortOption = null;
 
