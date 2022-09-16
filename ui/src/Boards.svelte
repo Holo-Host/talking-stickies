@@ -109,7 +109,7 @@
     loading = false
   }
 
-  const unarchiveBoard = (hash) => {
+  const unarchiveBoard = (hash: string) => {
     store.unarchiveBoard(hash)
   }
 </script>
