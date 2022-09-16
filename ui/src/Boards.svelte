@@ -4,6 +4,7 @@
   import PlusIcon from './icons/PlusIcon.svelte'
   import ImportIcon from './icons/ImportIcon.svelte';
   import PencilIcon from './icons/PencilIcon.svelte'
+  import UnarchiveIcon from './icons/UnarchiveIcon.svelte'
   import ReloadIcon from './icons/ReloadIcon.svelte'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import BoardEditor from './BoardEditor.svelte'
@@ -16,6 +17,7 @@
 
   const store:TalkingStickiesStore = getStore();
   $: boards = store.boards;
+  $: archivedBoards = store.archivedBoards;
   $: index = store.activeBoardIndex
 
   let editingBoardId
@@ -30,7 +32,8 @@
   }
 
 	let fileinput;
-	
+	let showArchived = false
+
 	const onFileSelected = (e)=>{
     let file = e.target.files[0];
     let reader = new FileReader();
@@ -105,6 +108,10 @@
     await store.joinExistingWorkspaces()
     loading = false
   }
+
+  const unarchiveBoard = (hash) => {
+    store.unarchiveBoard(hash)
+  }
 </script>
 
 <style>
@@ -122,12 +129,17 @@
     padding: 5px 5px;
     display: inherit;
     margin-right: 5px;
+    border: 1px solid;
   }
-  .pencil {
+  .board-button {
     margin-left: 5px;
   }
   .selected {
     background-color: rgb(183, 224, 180);
+  }
+  .archived {
+    background-color: rgb(224, 224, 224);
+    border: 1px dashed;
   }
   .top-bar {
     display: flex;
@@ -148,7 +160,7 @@
     width: 20px;
     height: 20px;
   }
-  .board-button {
+  .top-board-button {
     display: inline-block;
     height: 30px;
     margin-bottom: 10px;
@@ -161,26 +173,35 @@
       <ReloadIcon spinning={loading}/>
     </div>
     <div class='top-bar'>
-        <div class='board-button' on:click={newBoard} title="New board">
+        <div class='top-board-button' on:click={newBoard} title="New board">
             <PlusIcon  />
         </div>
-        <div class='board-button' on:click={()=>{fileinput.click();}} title="Import board from JSON file">
+        <div class='top-board-button' on:click={()=>{fileinput.click();}} title="Import board from JSON file">
           <ImportIcon  />
           <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
-      </div>
+        </div>
+        <div>
+          <input type=checkbox bind:checked={showArchived}> Show Archived 
+        </div>
     </div>
     <div class='board-list'>
         {#each $boards as board, i }
           {#if editingBoardId === i}
             <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
           {:else}
-            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>{get(board.name)} <div class="pencil" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups, get(board.workspace.state).voteTypes)}><PencilIcon  />
+            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>
+              {get(board.name)}
+              <div class="board-button" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups, get(board.workspace.state).voteTypes)}><PencilIcon /></div>
             </div>
-          </div>
           {/if}
         {/each}
-        {#if creating}
+        {#if showArchived}
+          {#each Object.entries($archivedBoards) as [hash, board],i }
+            <div class="board archived" on:click={unarchiveBoard(hash)}>{board.state.name}<div class="board-button"><UnarchiveIcon /></div></div>
+          {/each}
+        {/if}
+          {#if creating}
         <BoardEditor handleSave={addBoard} {cancelEdit} voteTypes={editVoteTypes} />
         {/if}
     </div>
-</div>
+  </div>

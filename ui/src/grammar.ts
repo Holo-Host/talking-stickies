@@ -12,6 +12,7 @@ type Sticky = {
 };
 
 export interface TalkingStickiesState {
+  status: string;
   name: string;
   groups: Group[];
   stickies: Sticky[];
@@ -19,6 +20,10 @@ export interface TalkingStickiesState {
 }
 
 export type TalkingStickiesDelta =
+  | {
+    type: "set-status";
+    status: string;
+  }
   | {
       type: "add-sticky";
       value: Sticky;
@@ -82,6 +87,7 @@ TalkingStickiesState
 
 export const talkingStickiesGrammar: TalkingStickiesGrammar = {
   initState(state)  {
+    state.status = ""
     state.name = "untitled"
     state.groups = [{id:0, name:"group1"}]
     state.stickies = []
@@ -93,6 +99,9 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
     _ephemeralState: any,
     _author: AgentPubKey
   ) {
+    if (delta.type == "set-status") {
+      state.status = delta.status
+    }
     if (delta.type == "set-name") {
       state.name = delta.name
     }

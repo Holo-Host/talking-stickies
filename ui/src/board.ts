@@ -1,6 +1,6 @@
 import type { WorkspaceStore } from "@holochain-syn/store";
-import type { TalkingStickiesDelta, TalkingStickiesGrammar } from "./grammar";
-import { Readable, derived } from "svelte/store";
+import type { TalkingStickiesDelta, TalkingStickiesGrammar, TalkingStickiesState } from "./grammar";
+import { Readable, derived, get } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
 
 export const DEFAULT_VOTE_TYPES = [
@@ -25,10 +25,19 @@ export class Board {
     close() {
         this.workspace.leaveWorkspace()
     }
+    state() {
+        return get(this.workspace.state)
+    }
     requestChanges(deltas: Array<TalkingStickiesDelta>) {
         console.log("REQUESTING CHANGES: ", deltas)
         this.workspace.requestChanges(deltas)
     }
+}
+
+export class ArchivedBoard {
+    constructor(
+        public state: TalkingStickiesState,
+    ) {}
 }
 
 export class Group {

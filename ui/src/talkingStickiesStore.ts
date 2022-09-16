@@ -1,14 +1,16 @@
 import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type {
+    Entry,
+    EntryHash,
     InstalledCell,
   } from '@holochain/client';
-import type { AgentPubKeyB64, EntryHashB64 } from '@holochain-open-dev/core-types';
+import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
-import { WorkspaceStore, SynStore, unnest} from '@holochain-syn/store';
+import { WorkspaceStore, SynStore} from '@holochain-syn/store';
 import { SynClient } from '@holochain-syn/client';
 import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
 import { get, Readable, writable, Writable } from "svelte/store";
-import { Board } from './board';
+import { ArchivedBoard, Board } from './board';
 import {isEqual} from "lodash"
 
 const ZOME_NAME = 'talking_stickies'
@@ -25,6 +27,7 @@ export class TalkingStickiesService {
 export class TalkingStickiesStore {
     service: TalkingStickiesService;
     boards: Writable<Array<Board>> = writable([]);
+    archivedBoards: Writable<Dictionary<ArchivedBoard>> = writable({});
     activeBoardIndex: Writable<number|undefined> = writable(undefined)
 
     synStore: SynStore;
@@ -70,15 +73,37 @@ export class TalkingStickiesStore {
         }
     }
 
+    addArchivedBoard(workspaceHash:EntryHash, state:TalkingStickiesState) {
+        this.archivedBoards.update((boards) => {
+            boards[serializeHash(workspaceHash)] = new ArchivedBoard(state)
+            return boards
+        })
+    }
+
+    async unarchiveBoard(hash: string) {
+        const workspaceHash = deserializeHash(hash)
+        const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
+        const board = this.newBoard(workspaceStore)
+        board.requestChanges([{type:"set-status",status:""}])
+        this.archivedBoards.update((boards) => {
+            delete boards[hash]
+            return boards
+        })
+    }
+
     deleteBoard(index: number) {
         const board = get(this.boards)[index]
         if (board) {
-            board.close()
+            board.requestChanges([{type:"set-status",status:"archived"}])
+            this.addArchivedBoard(board.workspace.workspaceHash, board.state())
+            //board.close()
             this.boards.update((boards)=> {
                 boards.splice(index,1)
                 return boards
             })
-            this.setActiveBoard(-1)
+            if (get(this.activeBoardIndex) == index) {
+                this.setActiveBoard(-1)
+            }
         }
     }
     closeActiveBoard() {
@@ -145,6 +170,7 @@ export class TalkingStickiesStore {
         }
         this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
     }
+    
     newBoard(workspace: WorkspaceStore<TalkingStickiesGrammar>) : Board {
         const board = new Board(workspace)
         this.boards.update((boards)=> {
@@ -153,17 +179,29 @@ export class TalkingStickiesStore {
         })
         return board
     }
+
     async joinExistingWorkspaces() : Promise<any> {
         const workspaces = get(await this.synStore.fetchAllWorkspaces());
-    
         console.log(`${workspaces.keys().length} WORKSPACES FOUND`, workspaces)    
         for (const [workspaceHash, workspace] of workspaces.entries()) {
-            console.log(`ATTEMPTING TO JOIN ${serializeHash(workspaceHash)}`)
+            console.log(`ATTEMPTING TO JOIN ${workspace.name}: ${serializeHash(workspaceHash)}`)
             const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
-            console.log("joined workspace:", workspaceStore, get(workspaceStore.state))
-            const board = get(this.boards).find((board) => isEqual(board.workspace.workspaceHash, workspaceHash))
-            if (!board) {
-                this.newBoard(workspaceStore)
+            const state = get(workspaceStore.state)
+            console.log("joined workspace:", workspaceStore, state)
+            const boards = get(this.boards)
+            const boardIndex = boards.findIndex((board) => isEqual(board.workspace.workspaceHash, workspaceHash))
+            if (boardIndex < 0) {
+                if (state.status == "archived") {
+                    this.addArchivedBoard(workspaceHash, state)
+                    workspaceStore.leaveWorkspace()
+                } else {
+                    this.newBoard(workspaceStore)
+                }
+            } else {
+                // if for some reason the board was archived and we have it in our active list remove it.
+                if (state.status == "archived")  {
+                    this.deleteBoard(boardIndex)
+                }
             }
         }
         return workspaces
