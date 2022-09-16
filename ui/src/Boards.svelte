@@ -165,6 +165,9 @@
     height: 30px;
     margin-bottom: 10px;
   }
+  .last-button {
+    margin-left:auto;
+  }
 
 </style>
 
@@ -180,7 +183,7 @@
           <ImportIcon  />
           <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
         </div>
-        <div>
+        <div class="last-button">
           <input type=checkbox bind:checked={showArchived}> Show Archived 
         </div>
     </div>
