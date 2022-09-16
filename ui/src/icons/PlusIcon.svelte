@@ -2,6 +2,7 @@
   .plus-icon {
     width: inherit;
     height: inherit;
+    cursor: pointer;
   }
 </style>
 

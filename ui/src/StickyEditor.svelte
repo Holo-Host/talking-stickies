@@ -62,6 +62,7 @@
     flex-direction: row;
     height: 19px;
     align-items: center;
+    cursor: pointer;
   }
   .color-button {
     width: 15px;

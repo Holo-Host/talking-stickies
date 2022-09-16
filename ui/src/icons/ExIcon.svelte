@@ -2,6 +2,7 @@
   .ex-icon {
     width: 17px;
     height: 17px;
+    cursor: pointer;
   }
 </style>
 

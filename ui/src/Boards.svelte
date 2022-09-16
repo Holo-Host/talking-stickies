@@ -130,9 +130,11 @@
     display: inherit;
     margin-right: 5px;
     border: 1px solid;
+    cursor: default;
   }
   .board-button {
     margin-left: 5px;
+    cursor:pointer;
   }
   .selected {
     background-color: rgb(183, 224, 180);
@@ -159,11 +161,13 @@
     margin-top: -18px;
     width: 20px;
     height: 20px;
+    cursor: pointer;
   }
   .top-board-button {
     display: inline-block;
     height: 30px;
     margin-bottom: 10px;
+    cursor: pointer;
   }
   .last-button {
     margin-left:auto;
@@ -172,7 +176,7 @@
 </style>
 
 <div class='boards'>
-    <div class='reload-boards' on:click={reloadBoards}>
+    <div class='reload-boards' on:click={reloadBoards} title="Reload Boards">
       <ReloadIcon spinning={loading}/>
     </div>
     <div class='top-bar'>

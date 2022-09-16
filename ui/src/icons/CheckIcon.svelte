@@ -2,6 +2,7 @@
   .check-icon {
     width: 26px;
     height: 26px;
+    cursor: pointer;
   }
 </style>
 

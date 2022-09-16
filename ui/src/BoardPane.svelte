@@ -214,17 +214,17 @@
 </script>
 
 <div class="board">
-  <div class="close-board" on:click={closeBoard}>
+  <div class="close-board global-board-button" on:click={closeBoard} title="Close Board">
     <ExIcon />
   </div>
-  <div class="export-board" on:click={exportBoard} title="Export Board">
+  <div class="export-board global-board-button" on:click={exportBoard} title="Export Board">
     <ExportIcon />
   </div>
   <div class="top-bar">
     <h1>{$state.name}</h1>
     {#if $state.groups.length == 0}
-      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px">
-        <PlusIcon />Add Sticky
+      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px" title="New Sticky">
+        <PlusIcon />
       </div>
     {/if}
     <SortSelector {setSortOption} {sortOption} />
@@ -309,15 +309,16 @@
     flex-direction: row;
     align-items: center;
   }
-  .close-board {
+  .global-board-button {
     position: absolute;
-    right: 45px;
     margin-top: -18px;
+    cursor: pointer;
+  }
+  .close-board {
+    right: 45px;
   }
   .export-board {
-    position: absolute;
     right: 70px;
-    margin-top: -18px;
   }
   .add-sticky, h2 {
     display: inline-block;
@@ -347,6 +348,7 @@
     color: #000000;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
   .add-sticky :global(svg) {
     margin-right: 6px;
