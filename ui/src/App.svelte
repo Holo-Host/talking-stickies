@@ -168,6 +168,17 @@
       max-width: none;
     }
   }
+  .issue {
+    position:absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    background-color: rgb(43, 198, 226);
+    color: white;
+    font-weight: bold;
+    border: solid 3px black;
+    border-radius: 10px;
+  }
 </style>
 
 <svelte:head>
@@ -182,7 +193,8 @@
       <BoardPane
         on:requestChange={(event) => {tsStore.requestChange(event.detail)}}/>
     {/if}
-  {:else}
+    <a class="issue" target="github" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo">Report Issue</a>
+    {:else}
     Loading
   {/if}
 </div>

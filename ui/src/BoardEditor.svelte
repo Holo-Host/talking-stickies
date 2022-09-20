@@ -159,7 +159,7 @@
       {#each voteTypes as voteType, i}
       <div class="vote-type">
         <input class='textarea emoji-input' bind:value={voteType.emoji} title="emoji"/>
-        <input class='textarea num-input' bind:value={voteType.maxVotes} title="max votes" />
+        <input class='textarea num-input' bind:value={voteType.maxVotes} title="max votes on type per card" />
         <input class='textarea' bind:value={voteType.toolTip} title="description"/>
         {#if i > 0}
         <div on:click={moveVoteTypeUp(i)} style="margin-left:5px;width:30px">
