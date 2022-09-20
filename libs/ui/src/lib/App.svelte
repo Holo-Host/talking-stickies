@@ -2,12 +2,15 @@
   import BoardPane from './BoardPane.svelte'
   import Boards from './Boards.svelte'
   import Toolbar from './Toolbar.svelte'
+  import { scribeStr } from './stores.js'
   import { setContext } from 'svelte';
   import { AppWebsocket, InstalledCell } from '@holochain/client';
   import { TalkingStickiesStore } from './talkingStickiesStore';
   import { HolochainClient } from '@holochain-open-dev/cell-client';
   import type { SynStore, unnest } from '@holochain-syn/store';
   import type { TalkingStickiesGrammar } from './grammar';
+
+  $: noscribe = $scribeStr === ''
  
   // The debug drawer's ability to resized and hidden
   let resizeable

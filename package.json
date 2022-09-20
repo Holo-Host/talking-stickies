@@ -2,7 +2,8 @@
   "name": "talking-stickies-dev",
   "private": true,
   "workspaces": [
-    "ui"
+    "libs/ui",
+    "apps/*/ui"
   ],
   "scripts": {
     "start": "npm run build:happ && HC_ID=0 npm run start:agent",
