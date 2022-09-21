@@ -2,6 +2,6 @@
 manifest_version: "1"
 name: talking-stickies
 ui:
-  bundled: "../ui/ui.zip"
+  bundled: "../apps/launcher/ui/ui.zip"
 happ_manifest:
   bundled: "../dna/workdir/happ/talking-stickies.happ"
