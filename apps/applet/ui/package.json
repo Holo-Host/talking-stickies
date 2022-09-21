@@ -1,9 +1,9 @@
 {
   "name": "we-applet",
-  "description": "Webcomponent lit-element following open-wc recommendations",
+  "description": "TalkingStickies in we-applet form",
   "license": "MIT",
-  "author": "lit-element",
-  "version": "0.0.0",
+  "author": "holochaindev",
+  "version": "0.0.1",
   "scripts": {
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
