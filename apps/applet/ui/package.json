@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
+    "build:ui": "tsc",
     "build": "rimraf dist && tsc && rollup -c rollup.config.js",
     "package": "npm run build:happ && npm run build && cd dist && bestzip ../dist.zip * && cd .. && hc web-app pack ../workdir",
     "demo": "npm run build:happ && npm run build && cross-env HC_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:happ\" \"wds --config web-dev-server.config.mjs\"",
