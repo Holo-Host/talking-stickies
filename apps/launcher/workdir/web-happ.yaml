@@ -1,0 +1,7 @@
+---
+manifest_version: "1"
+name: talking-stickies
+ui:
+  bundled: "../ui/ui.zip"
+happ_manifest:
+  bundled: "./talking-stickies.happ"
