@@ -6,6 +6,7 @@
   "author": "holochaindev",
   "exports": {
     "./package.json": "./package/package.json",
+    "./Controller.svelte": "./package/Controller.svelte",
     "./Toolbar.svelte": "./package/Toolbar.svelte",
     "./BoardEditor.svelte": "./package/BoardEditor.svelte",
     ".": "./package/index.js",

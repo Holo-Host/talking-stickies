@@ -2,6 +2,7 @@
 export * from './board';
 export * from './talkingStickiesStore';
 export * from './grammar';
+export { default as Controller } from './Controller.svelte';
 export { default as BoardEditor } from './BoardEditor.svelte';
 export { default as BoardPane } from './BoardPane.svelte';
 export { default as Boards} from './Boards.svelte';
