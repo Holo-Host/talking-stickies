@@ -3,11 +3,10 @@
   import { HolochainClient } from '@holochain-open-dev/cell-client';
   const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'talking-stickies'
   const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
-  import { AppWebsocket, type InstalledAppInfo } from '@holochain/client';
+  import { AppWebsocket, InstalledCell, type InstalledAppInfo } from '@holochain/client';
   const url = `ws://localhost:${appPort}`;
 
-  let appInfo : InstalledAppInfo
-  let appWebsocket : AppWebsocket
+  let talkingStickiesCell: InstalledCell
   let client : HolochainClient
 
   console.log("CLIENT: ", client);
@@ -21,9 +20,14 @@
     console.log('Connecting with', appPort, appId)
     client = new HolochainClient(appWebsocket);
     
-    appInfo = await client.appWebsocket.appInfo({
+    const appInfo = await client.appWebsocket.appInfo({
       installed_app_id: appId,
     });
+    const installedCells = appInfo.cell_data;
+    talkingStickiesCell = installedCells.find(
+        c => c.role_id === 'talking-stickies'
+      ) as InstalledCell;
+
     connected = true
   }
 </script>
@@ -34,7 +38,7 @@
 <svelte:head>
 </svelte:head>
 {#if connected}
-  <Controller appInfo={appInfo} appWebsocket={appWebsocket} client={client}></Controller>
+  <Controller talkingStickiesCell={talkingStickiesCell} client={client}></Controller>
 {:else}
   Loading
 {/if}

@@ -37,7 +37,6 @@ const env = envKeys.filter(key => key.startsWith('SVELTE_APP_')).reduce((acc, ke
   acc[key] = process.env[key]
   return acc
 }, {})
-
 export default {
 	input: 'src/main.ts',
 	output: {

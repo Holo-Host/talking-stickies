@@ -23,3 +23,6 @@
 storybook-static
 .rollup.cache
 tsconfig.tsbuildinfo
+
+index.js
+index.js.map

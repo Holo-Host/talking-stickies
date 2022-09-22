@@ -4,7 +4,6 @@
     import BoardPane from './BoardPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
-    import type { AppWebsocket, InstalledAppInfo } from '@holochain/client';
     import type { InstalledCell } from '@holochain/client';
     import type { HolochainClient } from '@holochain-open-dev/cell-client';
     import type { SynStore } from '@holochain-syn/store';
@@ -66,8 +65,7 @@
     let synStore: SynStore;
     let tsStore: TalkingStickiesStore;
     
-    export let appInfo : InstalledAppInfo
-    export let appWebsocket : AppWebsocket
+    export let talkingStickiesCell : InstalledCell
     export let client : HolochainClient
 
     initialize()
@@ -82,19 +80,14 @@
     });
 
     async function initialize() : Promise<void> {
-      console.log("appInfo is", appInfo)
-      const store = await createStore()
+      const store = createStore()
       synStore = store.synStore;
       tsStore = store
       console.log("Store Created")
       tsStore.joinExistingWorkspaces()
     }
-    async function createStore() : Promise<TalkingStickiesStore> {
+    function createStore() : TalkingStickiesStore {
   
-      const installedCells = appInfo.cell_data;
-      const talkingStickiesCell = installedCells.find(
-        c => c.role_id === 'talking-stickies'
-      ) as InstalledCell;
       const store = new TalkingStickiesStore(
         client,
         talkingStickiesCell,

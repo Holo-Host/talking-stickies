@@ -4,6 +4,8 @@
   "description": "web components and more for talking-stickies app",
   "license": "MIT",
   "author": "holochaindev",
+  "main": "package/index.js",
+  "module": "package/index.js",
   "exports": {
     "./package.json": "./package/package.json",
     "./Controller.svelte": "./package/Controller.svelte",
@@ -39,7 +41,7 @@
   },
   "dependencies": {
     "@holochain/client": "0.7.0",
-    "@holochain-open-dev/cell-client": "0.7.2",
+    "@holochain-open-dev/cell-client": "0.7.3",
     "@holochain-open-dev/core-types": "0.4.1",
     "@holochain-open-dev/utils": "0.3.2",
     "@holochain-syn/store": "0.1.5",

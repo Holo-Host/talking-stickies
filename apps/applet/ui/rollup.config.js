@@ -1,82 +1,99 @@
-import nodeResolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import replace from "@rollup/plugin-replace";
-// import builtins from "rollup-plugin-node-builtins";
-// import globals from "rollup-plugin-node-globals";
-
-import babel from "@rollup/plugin-babel";
-import { importMetaAssets } from "@web/rollup-plugin-import-meta-assets";
-import { terser } from "rollup-plugin-terser";
+import svelte from 'rollup-plugin-svelte';
+import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
+import resolve from '@rollup/plugin-node-resolve';
+import livereload from 'rollup-plugin-livereload';
+import { terser } from 'rollup-plugin-terser';
+import sveltePreprocess from 'svelte-preprocess';
+import typescript from '@rollup/plugin-typescript';
+import css from 'rollup-plugin-css-only';
 import copy from "rollup-plugin-copy";
 
-export default {
-  input: "out-tsc/index.js",
-  output: {
-    format: "es",
-    dir: 'dist',
-    sourcemap: false
-  },
-  watch: {
-    clearScreen: false,
-  },
-  external: [],
+const production = !process.env.ROLLUP_WATCH;
 
-  plugins: [
-    /** Resolve bare module imports */
-    nodeResolve({
-      browser: true,
-      preferBuiltins: false,
-    }),
+function serve() {
+	let server;
+
+	function toExit() {
+		if (server) server.kill(0);
+	}
+
+	return {
+		writeBundle() {
+			if (server) return;
+			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+				stdio: ['ignore', 'inherit', 'inherit'],
+				shell: true
+			});
+
+			process.on('SIGTERM', toExit);
+			process.on('exit', toExit);
+		}
+	};
+}
+
+// only allow env variables that start with SVELTE_APP_
+const envKeys = Object.keys(process.env)
+const env = envKeys.filter(key => key.startsWith('SVELTE_APP_')).reduce((acc, key) => {
+  acc[key] = process.env[key]
+  return acc
+}, {})
+export default {
+	input: 'src/index.ts',
+	output: {
+		format: "es",
+		dir: 'dist',
+		sourcemap: false
+	  },
+		plugins: [
     replace({
-      "process.env.NODE_ENV": '"production"',
+      'process.env': JSON.stringify({
+        NODE_ENV: process.env.NODE,
+        ...env
+      })
     }),
     copy({
-      targets: [{ src: "icon.png", dest: "dist" }],
-    }),
-    commonjs({}),
-    /** Minify JS */
-    terser(),
-    /** Bundle assets references via import.meta.url */
-    importMetaAssets(),
-    /** Compile JS to a lower language target */
-    babel({
-      exclude: /node_modules/,
+		targets: [{ src: "icon.png", dest: "dist" }],
+	  }),
+	svelte({
+			preprocess: sveltePreprocess(),
+			compilerOptions: {
+				// enable run-time checks when not in production
+				dev: !production
+			}
+		}),
+		// we'll extract any component CSS out into
+		// a separate file - better for performance
+		css({ output: 'bundle.css' }),
 
-      babelHelpers: "bundled",
-      presets: [
-        [
-          require.resolve("@babel/preset-env"),
-          {
-            targets: [
-              "last 3 Chrome major versions",
-              "last 3 Firefox major versions",
-              "last 3 Edge major versions",
-              "last 3 Safari major versions",
-            ],
-            modules: false,
-            bugfixes: true,
-          },
-        ],
-      ],
-      plugins: [
-        [
-          require.resolve("babel-plugin-template-html-minifier"),
-          {
-            modules: {
-              lit: ["html", { name: "css", encapsulation: "style" }],
-            },
-            failOnError: false,
-            strictCSS: true,
-            htmlMinifier: {
-              collapseWhitespace: true,
-              conservativeCollapse: true,
-              removeComments: true,
-              caseSensitive: true,
-              minifyCSS: true,
-            },
-          },
-        ],
-      ],
-    }),
-  ],
+		// If you have external dependencies installed from
+		// npm, you'll most likely need these plugins. In
+		// some cases you'll need additional configuration -
+		// consult the documentation for details:
+		// https://github.com/rollup/plugins/tree/master/packages/commonjs
+		resolve({
+			browser: true,
+			dedupe: ['svelte']
+		}),
+		commonjs(),
+		typescript({
+			sourceMap: !production,
+			inlineSources: !production
+		}),
+
+		// In dev mode, call `npm run start` once
+		// the bundle has been generated
+		!production && serve(),
+
+		// Watch the `public` directory and refresh the
+		// browser on changes when not in production
+		!production && livereload('public'),
+
+		// If we're building for production (npm run build
+		// instead of npm run dev), minify
+		production && terser()
+	],
+	watch: {
+		clearScreen: false
+	}
 };

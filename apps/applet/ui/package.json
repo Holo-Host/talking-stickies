@@ -17,7 +17,7 @@
     "build:zomes": "CARGO_TARGET_DIR=../../../target cargo build --release --target wasm32-unknown-unknown"
   },
   "dependencies": {
-    "@holochain-open-dev/cell-client": "^0.7.2",
+    "@holochain-open-dev/cell-client": "^0.7.3",
     "@holochain-open-dev/core-types": "^0.4.1",
     "@holochain/client": "^0.7.0",
     "@holo-host/talking-stickies": "^0.3.0",

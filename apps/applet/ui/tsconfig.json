@@ -1,7 +1,6 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
-    "outDir": "out-tsc",
 		"strict": false
   },
   "include": ["src/**/*"],
