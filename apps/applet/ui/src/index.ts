@@ -15,8 +15,11 @@ const talkingStickies: WeApplet = {
 
     return {
       full: (rootElement: HTMLElement, registry: CustomElementRegistry) => {
+        const target = rootElement.attachShadow({ mode: 'open' });
+        console.log("ROOT ELEM",target)
+
         controller = new Controller({
-          target: rootElement,
+          target,
           props: {
             talkingStickiesCell,
             client,

@@ -101,7 +101,9 @@
     .app {
       grid-column: 1/3;
       grid-row: 1/2;
-      }
+      width: 100%;
+      margin: 20px;
+    }
     :global(:root) {
       --resizeable-height: 200px;
       --tab-width: 60px;

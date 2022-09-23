@@ -33,6 +33,9 @@
 </script>
 
 <style>
+:global(body) {
+  font-family: Roboto,'Open Sans','Helvetica Neue',sans-serif;
+	}
 </style>
 
 <svelte:head>

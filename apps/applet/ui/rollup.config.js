@@ -64,14 +64,14 @@ export default {
     }),
     svelte({
       emitCss: false,
-      preprocess: sveltePreprocess(),
+     // preprocess: sveltePreprocess(),
       compilerOptions: {
         // enable run-time checks when not in production
         dev: !production,
       },
     }),
-	css({id:'talking-stickies-id'}),
-//	css2(),
+	//css({id:'talking-stickies-id'}),
+	//css2(),
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In
     // some cases you'll need additional configuration -

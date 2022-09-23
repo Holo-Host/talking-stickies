@@ -1,4 +1,6 @@
 <script>
+  import LogoIcon from "./icons/LogoIcon.svelte";
+
 
 </script>
 
@@ -6,13 +8,15 @@
   .toolbar {
     display: flex;
     align-items: center;
+    height: 70px;
   }
   .logo {
     width: 40px;
     margin-right: 10px;
+    display: contents;
   }
 </style>
 
 <div class='toolbar'>
-  <h1><img class="logo" src="icon.svg" alt="logo"/>Talking Stickies</h1>
+  <h1 class="logo"><LogoIcon />Talking Stickies</h1>
 </div>
