@@ -107,7 +107,6 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
     }
     if (delta.type == "set-groups") {
       state.groups = delta.groups
-        console.log("setting", delta.groups)
     }
     if (delta.type == "add-group") {
       console.log("PUSHING", delta.group)
@@ -130,7 +129,6 @@ export const talkingStickiesGrammar: TalkingStickiesGrammar = {
     }
     if (delta.type == "set-vote-types") {
       state.voteTypes = delta.voteTypes
-        console.log("setting", delta.voteTypes)
     }
     else if (delta.type == "add-sticky") {
       state.stickies.push(delta.value)

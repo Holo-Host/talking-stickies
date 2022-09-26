@@ -1,15 +1,14 @@
 import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type {
-    Entry,
     EntryHash,
     InstalledCell,
   } from '@holochain/client';
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
-import { WorkspaceStore, SynStore} from '@holochain-syn/store';
+import { WorkspaceStore, SynStore, stateFromCommit} from '@holochain-syn/store';
 import { SynClient } from '@holochain-syn/client';
-import { TalkingStickiesGrammar, talkingStickiesGrammar, TalkingStickiesState} from './grammar';
-import { get, Readable, writable, Writable } from "svelte/store";
+import { type TalkingStickiesGrammar, talkingStickiesGrammar, type TalkingStickiesState} from './grammar';
+import { get, type Readable, writable, type Writable } from "svelte/store";
 import { ArchivedBoard, Board } from './board';
 import {isEqual} from "lodash"
 
@@ -91,10 +90,10 @@ export class TalkingStickiesStore {
         })
     }
 
-    deleteBoard(index: number) {
+    async deleteBoard(index: number) {
         const board = get(this.boards)[index]
         if (board) {
-            board.requestChanges([{type:"set-status",status:"archived"}])
+            await board.requestChanges([{type:"set-status",status:"archived"}])
             this.addArchivedBoard(board.workspace.workspaceHash, board.state())
             //board.close()
             this.boards.update((boards)=> {
@@ -185,23 +184,25 @@ export class TalkingStickiesStore {
         console.log(`${workspaces.keys().length} WORKSPACES FOUND`, workspaces)    
         for (const [workspaceHash, workspace] of workspaces.entries()) {
             console.log(`ATTEMPTING TO JOIN ${workspace.name}: ${serializeHash(workspaceHash)}`)
-            const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
-            const state = get(workspaceStore.state)
-            console.log("joined workspace:", workspaceStore, state)
+            const getWorkspaceTip = await this.synStore.client.getWorkspaceTip(workspaceHash)
+            const commit = await this.synStore.client.getCommit(getWorkspaceTip)
+            if (commit) {
+                const state: TalkingStickiesState = stateFromCommit(commit) as TalkingStickiesState
+                if (state.status == "archived") {
+                    this.addArchivedBoard(workspaceHash, state)
+                    console.log("added archived workspace:", state)
+                    continue
+                }    
+            }
+
             const boards = get(this.boards)
             const boardIndex = boards.findIndex((board) => isEqual(board.workspace.workspaceHash, workspaceHash))
             if (boardIndex < 0) {
-                if (state.status == "archived") {
-                    this.addArchivedBoard(workspaceHash, state)
-                    workspaceStore.leaveWorkspace()
-                } else {
-                    this.newBoard(workspaceStore)
-                }
+                const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
+                this.newBoard(workspaceStore)
+                console.log("joined workspace:", workspaceStore)
             } else {
-                // if for some reason the board was archived and we have it in our active list remove it.
-                if (state.status == "archived")  {
-                    this.deleteBoard(boardIndex)
-                }
+                console.log("allready joined")
             }
         }
         return workspaces

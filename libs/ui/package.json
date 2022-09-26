@@ -1,6 +1,6 @@
 {
   "name": "@holo-host/talking-stickies",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "web components and more for talking-stickies app",
   "license": "MIT",
   "author": "holochaindev",
@@ -45,10 +45,10 @@
     "@holochain-open-dev/cell-client": "0.7.3",
     "@holochain-open-dev/core-types": "0.4.1",
     "@holochain-open-dev/utils": "0.3.2",
-    "@holochain-syn/store": "0.1.5",
+    "@holochain-syn/store": "0.1.7",
     "@ts-stack/markdown": "^1.4.0",
     "lodash": "^4.17.21",
-    "svelte-fa": "^2.2.0",
+    "svelte-fa": "^3.0.3",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -57,7 +57,7 @@
 		"@sveltejs/package": "next",
     "@open-wc/eslint-config": "^4.3.0",
 		"svelte": "^3.50.1",
-		"svelte-check": "^2.7.1",
+		"svelte-check": "^2.9.1",
 		"svelte-preprocess": "^4.10.7",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
@@ -68,7 +68,7 @@
 		"prettier-plugin-svelte": "^2.7.0",
     "tslib": "^2.3.1",
 		"typescript": "^4.7.4",
-    "@tsconfig/svelte": "^1.0.0",
+    "@tsconfig/svelte": "^3.0.0",
     "vite": "^3.1.0"
   },
 	"type": "module"
