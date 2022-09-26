@@ -10,7 +10,8 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import { Group, VoteType, DEFAULT_VOTE_TYPES } from './board';
+  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board } from './board';
+  import type { WorkspaceParticipant, WorkspaceStore } from '@holochain-syn/store';
 
  
   const { getStore } :any = getContext('tsStore');
@@ -112,6 +113,11 @@
   const unarchiveBoard = (hash: string) => {
     store.unarchiveBoard(hash)
   }
+
+  const getStats = (board: Board) => {
+    const participants = get(board.workspace.participants)
+    return `active: ${participants.active.length}, idle: ${participants.idle.length}, offline: ${participants.offline.length}`
+  }
 </script>
 
 <style>
@@ -197,7 +203,7 @@
           {#if editingBoardId === i}
             <BoardEditor handleSave={updateBoard(i)} handleDelete={deleteBoard(i)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
           {:else}
-            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)}>
+            <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)} title={getStats(board)}>
               {get(board.name)}
               <div class="board-button" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups, get(board.workspace.state).voteTypes)}><PencilIcon /></div>
             </div>
