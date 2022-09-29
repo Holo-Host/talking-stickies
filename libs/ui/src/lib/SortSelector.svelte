@@ -17,7 +17,7 @@
   let tsStore: TalkingStickiesStore = getStore();
 
   $: index = tsStore.activeBoardIndex;
-  $: state = tsStore.getBoardState($index);
+  $: state = tsStore.getReadableBoardState($index);
 
 </script>
 

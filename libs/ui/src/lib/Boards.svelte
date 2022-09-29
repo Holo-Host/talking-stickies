@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte'
+  import { getContext } from 'svelte'
   import { get } from 'svelte/store';
   import PlusIcon from './icons/PlusIcon.svelte'
   import ImportIcon from './icons/ImportIcon.svelte';
@@ -11,13 +11,25 @@
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
   import { Group, VoteType, DEFAULT_VOTE_TYPES, Board } from './board';
-  import type { WorkspaceParticipant, WorkspaceStore } from '@holochain-syn/store';
 
  
   const { getStore } :any = getContext('tsStore');
 
   const store:TalkingStickiesStore = getStore();
+
   $: boards = store.boards;
+  store.addTickler((board, newName)=> {
+    let boards = get(store.boards)
+    for (let i = 0;i<boards.length; i+=1) {
+      const b = boards[i]
+      if (b.hash() == board.hash()) {
+        store.boards.update((boards) => {
+          boards[i] = board
+          return boards
+        })
+      }
+    }
+  })
   $: archivedBoards = store.archivedBoards;
   $: index = store.activeBoardIndex
 
@@ -70,7 +82,8 @@
 
   const updateBoard = i => async (name: string, groups: Group[], voteTypes: VoteType[]) => {
     let changes = []
-    if (get($boards[i].name) != name) {
+    const state = $boards[i].state()
+    if (state.name != name) {
       console.log("updating board name to ",name)
       changes.push(
         {
@@ -78,13 +91,13 @@
           name: name
         })
     }
-    if (!isEqual(groups, get($boards[i].workspace.state).groups)) {
+    if (!isEqual(groups, state.groups)) {
       console.log("with groups:", groups)
       changes.push({type: 'set-groups',
          groups: groups
         })
     }
-    if (!isEqual(voteTypes, get($boards[i].workspace.state).voteTypes)) {
+    if (!isEqual(voteTypes, state.voteTypes)) {
       console.log("with voteTypes:", voteTypes)
       changes.push({type: 'set-vote-types',
         voteTypes: voteTypes
@@ -115,7 +128,7 @@
   }
 
   const getStats = (board: Board) => {
-    const participants = get(board.workspace.participants)
+    const participants = get(board.participants())
     return `active: ${participants.active.length}, idle: ${participants.idle.length}, offline: ${participants.offline.length}`
   }
 </script>
@@ -205,7 +218,7 @@
           {:else}
             <div class="board {$index === i ? "selected":""}" on:click={() => selectBoard(i)} title={getStats(board)}>
               {get(board.name)}
-              <div class="board-button" on:click={editBoard(i, get(board.name), get(board.workspace.state).groups, get(board.workspace.state).voteTypes)}><PencilIcon /></div>
+              <div class="board-button" on:click={editBoard(i, get(board.name), board.state().groups, board.state().voteTypes)}><PencilIcon /></div>
             </div>
           {/if}
         {/each}

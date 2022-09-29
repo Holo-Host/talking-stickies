@@ -12,4 +12,4 @@ chrono = { version = "0.4.22", default-features = false, features = ["clock", "s
 derive_more = "0"
 serde = "1"
 
-hc_zome_syn_coordinator = {git = "https://github.com/holochain/syn", branch = "expose-client"}
+hc_zome_syn_coordinator = {git = "https://github.com/holochain/syn", rev = "171d08c79aed2b89869a4198b9cb7522dc6e03ca"}

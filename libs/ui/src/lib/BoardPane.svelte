@@ -36,7 +36,7 @@
   let tsStore: TalkingStickiesStore = getStore();
 
   $: index = tsStore.activeBoardIndex;
-  $: state = tsStore.getBoardState($index);
+  $: state = tsStore.getReadableBoardState($index);
   $: stickies = $state ? $state.stickies : undefined;
   $: sortStickies = sortOption
     ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)

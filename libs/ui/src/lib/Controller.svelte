@@ -101,7 +101,7 @@
     .app {
       grid-column: 1/3;
       grid-row: 1/2;
-      width: 100%;
+      /* width: 100%; */
       margin: 20px;
     }
     :global(:root) {
