@@ -1,6 +1,6 @@
 {
     "name": "talking-stickies-app",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "scripts": {
       "build": "rimraf public/build && rollup -c",
       "build:watch": "run-singleton \"rollup -c -w\"",
