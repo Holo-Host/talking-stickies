@@ -4,7 +4,7 @@
   const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'talking-stickies'
   const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
   import WebSdk from '@holo-host/web-sdk'
-    import type { InstalledCell } from '@holochain/client';
+  import type { InstalledCell } from '@holochain/client';
   const url = `ws://localhost:${appPort}`;
 
   let websdkConnection: WebSdk

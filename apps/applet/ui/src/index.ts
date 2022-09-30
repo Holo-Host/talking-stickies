@@ -1,6 +1,6 @@
 import type { WeApplet } from '@lightningrodlabs/we-applet';
 import { Controller } from '@holo-host/talking-stickies';
-import { HolochainClient } from '@holochain-open-dev/cell-client';
+import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type { AppWebsocket, InstalledCell } from '@holochain/client';
 
 const talkingStickies: WeApplet = {
@@ -10,7 +10,9 @@ const talkingStickies: WeApplet = {
     c => c.role_id === 'talking-stickies'
   )!;
 
-    const client = new HolochainClient(appWebsocket);
+    const holochainClient = new HolochainClient(appWebsocket);
+    const cellClient = new CellClient(holochainClient, talkingStickiesCell)
+
     let controller : Controller
 
     return {
@@ -21,8 +23,7 @@ const talkingStickies: WeApplet = {
         controller = new Controller({
           target,
           props: {
-            talkingStickiesCell,
-            client,
+            cellClient,
           }
         });
       },
