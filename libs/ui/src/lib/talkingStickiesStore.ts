@@ -1,14 +1,15 @@
-import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
+import type { CellClient } from '@holochain-open-dev/cell-client';
 import type {
     EntryHash,
-    InstalledCell,
   } from '@holochain/client';
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
 import { WorkspaceStore, SynStore, stateFromCommit} from '@holochain-syn/store';
 import { SynClient } from '@holochain-syn/client';
-import { type TalkingStickiesGrammar, talkingStickiesGrammar, type TalkingStickiesState} from './grammar';
-import { get, type Readable, writable, type Writable } from "svelte/store";
+import type { TalkingStickiesGrammar, TalkingStickiesState } from './grammar';
+import { talkingStickiesGrammar } from './grammar';
+import type {Readable, Writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { ArchivedBoard, Board } from './board';
 import {isEqual} from "lodash"
 
@@ -34,15 +35,14 @@ export class TalkingStickiesStore {
     synStore: SynStore;
     cellClient: CellClient;
     myAgentPubKey(): AgentPubKeyB64 {
-        return serializeHash(this.talkingStickiesCell.cell_id[1]);
+        return serializeHash(this.cellClient.cell.cell_id[1]);
     }
 
     constructor(
-        protected client: HolochainClient,
-        protected talkingStickiesCell: InstalledCell,
+        protected cellClientIn: CellClient,
         zomeName: string = ZOME_NAME
     ) {
-        this.cellClient = new CellClient(client, talkingStickiesCell)
+        this.cellClient = cellClientIn
         this.service = new TalkingStickiesService(
           this.cellClient,
           zomeName

@@ -5,7 +5,7 @@
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
     import type { InstalledCell } from '@holochain/client';
-    import type { HolochainClient } from '@holochain-open-dev/cell-client';
+    import type { CellClient } from '@holochain-open-dev/cell-client';
     import type { SynStore } from '@holochain-syn/store';
    
     // The debug drawer's ability to resized and hidden
@@ -65,8 +65,7 @@
     let synStore: SynStore;
     let tsStore: TalkingStickiesStore;
     
-    export let talkingStickiesCell : InstalledCell
-    export let client : HolochainClient
+    export let client : CellClient
 
     initialize()
 
@@ -90,7 +89,6 @@
   
       const store = new TalkingStickiesStore(
         client,
-        talkingStickiesCell,
       );
       return store
     }
