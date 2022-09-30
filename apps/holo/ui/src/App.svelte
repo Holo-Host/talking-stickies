@@ -16,7 +16,7 @@
 
   async function initialize() : Promise<void> {
     websdkConnection = await WebSdk.connect({
-      chaperoneUrl: 'http://localhost:24274',
+      chaperoneUrl: process.env.SVELTE_APP_CHAPERONE_URL || 'http://localhost:24274',
       authFormCustomization: {
         publisherName: 'Holo',
         appName: 'TalkingStickies',

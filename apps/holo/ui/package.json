@@ -2,7 +2,10 @@
   "name": "talking-stickies-holo-app",
   "version": "0.5.0",
   "scripts": {
-    "build": "rimraf public/build && rollup -c",
+    "build:raw": "rimraf public/build && rollup -c",
+    "build:dev": "SVELTE_APP_CHAPERONE_URL=http://chaperone-rsm.dev.holotest.net npm run build:raw",
+    "build:QA": "SVELTE_APP_CHAPERONE_URL=http://chaperone-rsm.qa.holotest.net npm run build:raw",    
+    "build:alpha": "SVELTE_APP_CHAPERONE_URL=http://chaperone.holo.hosting npm run build:raw",        
     "build:watch": "run-singleton \"rollup -c -w\"",
     "dev:watch": "echo \"starting ui instance: $HC_ID\" && run-singleton \"PORT=500$HC_ID SVELTE_APP_APP_ID=\"talking-stickies$HC_ID\" SVELTE_APP_APP_PORT=\"$HC_PORT\" rollup -c -w\"",
     "dev": "echo \"starting ui instance: $HC_ID\" && PORT=500$HC_ID SVELTE_APP_APP_ID=\"talking-stickies$HC_ID\" SVELTE_APP_APP_PORT=\"$HC_PORT\" rollup -c",
@@ -44,6 +47,7 @@
     "@rollup/plugin-typescript": "^6.0.0",
     "typescript": "^3.9.3",
     "tslib": "^2.0.0",
-    "@tsconfig/svelte": "^1.0.0"
+    "@tsconfig/svelte": "^1.0.0",
+    "bestzip": "^2.2.0"
   }
 }
