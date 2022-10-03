@@ -17,7 +17,7 @@
     "build:ui": "npm run build -w \"@holo-host/talking-stickies\" -w talking-stickies-app",
     "build:applet": "npm run build -w we-applet",
     "package:applet": "npm run build:ui && npm run package -w we-applet",
-    "package": "npm run build:happ && npm run build:ui && npm run package -w talking-stickies-app && hc web-app pack ./apps/launcher/workdir",
+    "package:launcher": "npm run build:happ && npm run build:ui && npm run package -w talking-stickies-app && hc web-app pack ./apps/launcher/workdir",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check-env": "node -e 'console.log(process.env)' | grep npm"
   },
