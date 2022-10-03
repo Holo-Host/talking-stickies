@@ -12,7 +12,8 @@
     "dev2": "PORT=5001 SVELTE_APP_APP_ID=talking-stickies2 SVELTE_APP_APP_PORT=8887 rollup -c -w",
     "start": "sirv public",
     "validate": "svelte-check",
-    "package": "rimraf ui.zip && rimraf public/build && rollup -c && cd ./public && bestzip ../ui.zip * "
+    "package": "rimraf ui.zip && rimraf public/build && rollup -c && cd ./public && bestzip ../ui.zip * ",
+    "package:raw": "rimraf ui.zip && cd ./public && bestzip ../ui.zip * "
   },
   "dependencies": {
     "@holo-host/talking-stickies": "0.5.0",
