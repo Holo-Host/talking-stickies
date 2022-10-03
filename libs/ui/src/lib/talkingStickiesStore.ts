@@ -1,14 +1,15 @@
-import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
+import type { CellClient } from '@holochain-open-dev/cell-client';
 import type {
     EntryHash,
-    InstalledCell,
   } from '@holochain/client';
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
 import { WorkspaceStore, SynStore, stateFromCommit} from '@holochain-syn/store';
 import { SynClient } from '@holochain-syn/client';
-import { type TalkingStickiesGrammar, talkingStickiesGrammar, type TalkingStickiesState} from './grammar';
-import { get, type Readable, writable, type Writable } from "svelte/store";
+import type { TalkingStickiesGrammar, TalkingStickiesState } from './grammar';
+import { talkingStickiesGrammar } from './grammar';
+import type {Readable, Writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { ArchivedBoard, Board } from './board';
 import {isEqual} from "lodash"
 
@@ -34,15 +35,14 @@ export class TalkingStickiesStore {
     synStore: SynStore;
     cellClient: CellClient;
     myAgentPubKey(): AgentPubKeyB64 {
-        return serializeHash(this.talkingStickiesCell.cell_id[1]);
+        return serializeHash(this.cellClient.cell.cell_id[1]);
     }
 
     constructor(
-        protected client: HolochainClient,
-        protected talkingStickiesCell: InstalledCell,
+        protected cellClientIn: CellClient,
         zomeName: string = ZOME_NAME
     ) {
-        this.cellClient = new CellClient(client, talkingStickiesCell)
+        this.cellClient = cellClientIn
         this.service = new TalkingStickiesService(
           this.cellClient,
           zomeName
@@ -55,35 +55,44 @@ export class TalkingStickiesStore {
                 return
             }
             this.updating = true
-            console.log(`${workspaces.keys().length} WORKSPACES FOUND`, workspaces)
-            const boards = get(this.boards)
+            try {
+                console.log(`${workspaces.keys().length} WORKSPACES FOUND`, workspaces)
+                const boards = get(this.boards)
 
-            for (const [workspaceHash, workspace] of workspaces.entries()) {
-                const boardIndex = boards.findIndex((board) => isEqual(board.hash(), workspaceHash))
-                if (boardIndex < 0) {
-                    console.log("found board we don't have")
-                    const getWorkspaceTip = await this.synStore.client.getWorkspaceTip(workspaceHash)
-                    const commit = await this.synStore.client.getCommit(getWorkspaceTip)
-                    if (commit) {
-                        const state: TalkingStickiesState = stateFromCommit(commit) as TalkingStickiesState
-                        if (state.status == "archived") {
-                            this.addArchivedBoard(workspaceHash, state)
-                            console.log("added archived workspace:", state)
-                            continue
+                for (const [workspaceHash, workspace] of workspaces.entries()) {
+                    const boardIndex = boards.findIndex((board) => isEqual(board.hash(), workspaceHash))
+                    if (boardIndex < 0) {
+                        console.log("found board we don't have")
+                        const getWorkspaceTip = await this.synStore.client.getWorkspaceTip(workspaceHash)
+                        const commit = await this.synStore.client.getCommit(getWorkspaceTip)
+                        if (commit) {
+                            const state: TalkingStickiesState = stateFromCommit(commit) as TalkingStickiesState
+                            if (state.status == "archived") {
+                                this.addArchivedBoard(workspaceHash, state)
+                                console.log("added archived workspace:", state)
+                                continue
+                            }    
                         }    
-                    }    
-                    console.log(`ATTEMPTING TO JOIN ${workspace.name}: ${serializeHash(workspaceHash)}`)
-                    const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
-                    this.newBoard(workspaceStore)
-                    if (this.createdBoards.findIndex((hash) => isEqual(hash, workspaceHash)) >= 0) {
-                        // we created this board so activate it!
-                        console.log("ACTIVATING:", get(this.boards).length-1)
-                        this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
+                        const hashB64 = serializeHash(workspaceHash)
+                        console.log(`ATTEMPTING TO JOIN ${workspace.name}: ${hashB64}`)
+                        try {
+                            const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
+                            this.newBoard(workspaceStore)
+                            if (this.createdBoards.findIndex((hash) => isEqual(hash, workspaceHash)) >= 0) {
+                                // we created this board so activate it!
+                                console.log("ACTIVATING:", get(this.boards).length-1)
+                                this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
+                            }
+                            console.log("joined workspace:", workspaceStore)
+                        } catch (e) {
+                            console.log(`Error while joining ${hashB64}`, e)
+                        }
+                    } else {
+                        console.log("allready joined")
                     }
-                    console.log("joined workspace:", workspaceStore)
-                } else {
-                    console.log("allready joined")
                 }
+            } catch (e) {
+                console.log("Error while updating board list: ",e)
             }
             this.updating = false
         })
