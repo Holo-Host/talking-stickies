@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Boards from './Boards.svelte'
+    import BoardList from './BoardList.svelte'
     import Toolbar from './Toolbar.svelte'
     import BoardPane from './BoardPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
@@ -67,9 +67,11 @@
     
     export let client : CellClient
 
+    $: activeBoardIndex = tsStore ? tsStore.activeBoardHash : undefined
+    $: boardList = tsStore ? tsStore.boardList : undefined
+
     initialize()
 
-    $: activeBoardIndex = tsStore ? tsStore.activeBoardIndex : undefined
     setContext('synStore', {
       getStore: () => synStore,
     });
@@ -81,9 +83,9 @@
     async function initialize() : Promise<void> {
       const store = createStore()
       synStore = store.synStore;
-      tsStore = store
       console.log("Store Created")
-      tsStore.joinExistingWorkspaces()
+      await store.joinExistingWorkspaces()
+      tsStore = store
     }
     function createStore() : TalkingStickiesStore {
   
@@ -132,7 +134,11 @@
   <div class='app'>
     {#if tsStore}
       <Toolbar />
-      <Boards />
+      {#if boardList}
+      <BoardList />
+      {:else}
+        Loading for board list...
+      {/if}
       {#if $activeBoardIndex !== undefined}
         <BoardPane
           on:requestChange={(event) => {tsStore.requestChange(event.detail)}}/>

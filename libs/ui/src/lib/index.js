@@ -5,7 +5,7 @@ export * from './grammar';
 export { default as Controller } from './Controller.svelte';
 export { default as BoardEditor } from './BoardEditor.svelte';
 export { default as BoardPane } from './BoardPane.svelte';
-export { default as Boards} from './Boards.svelte';
+export { default as BoardList} from './BoardList.svelte';
 export { default as SortSelector} from './SortSelector.svelte';
 export { default as StickyEditor} from './StickyEditor.svelte';
 export { default as Toolbar } from './Toolbar.svelte';

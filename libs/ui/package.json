@@ -13,7 +13,7 @@
     "./BoardEditor.svelte": "./package/BoardEditor.svelte",
     ".": "./package/index.js",
     "./BoardPane.svelte": "./package/BoardPane.svelte",
-    "./Boards.svelte": "./package/Boards.svelte",
+    "./BoardList.svelte": "./package/BoardList.svelte",
     "./SortSelector.svelte": "./package/SortSelector.svelte",
     "./StickyEditor.svelte": "./package/StickyEditor.svelte",
     "./board": "./package/board.js",

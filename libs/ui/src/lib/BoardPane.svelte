@@ -35,8 +35,8 @@
   const { getStore } :any = getContext("tsStore");
   let tsStore: TalkingStickiesStore = getStore();
 
-  $: index = tsStore.activeBoardIndex;
-  $: state = tsStore.getReadableBoardState($index);
+  $: activeHash = tsStore.activeBoardHash;
+  $: state = tsStore.getReadableBoardState($activeHash);
   $: stickies = $state ? $state.stickies : undefined;
   $: sortStickies = sortOption
     ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)

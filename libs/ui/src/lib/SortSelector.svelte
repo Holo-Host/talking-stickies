@@ -16,8 +16,8 @@
   const { getStore } :any = getContext("tsStore");
   let tsStore: TalkingStickiesStore = getStore();
 
-  $: index = tsStore.activeBoardIndex;
-  $: state = tsStore.getReadableBoardState($index);
+  $: activeHash = tsStore.activeBoardHash;
+  $: state = tsStore.getReadableBoardState($activeHash);
 
 </script>
 

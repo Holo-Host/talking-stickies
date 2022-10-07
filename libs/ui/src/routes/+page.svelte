@@ -2,7 +2,7 @@
 	import Toolbar from "$lib/Toolbar.svelte";
   import BoardEditor from "../lib/BoardEditor.svelte";
   import BoardPane from "../lib/BoardPane.svelte";
-  import Boards from "../lib/Boards.svelte";
+  import BoardsList from "../lib/BoardList.svelte";
   import StickyEditor from "../lib/StickyEditor.svelte";
 
 </script>

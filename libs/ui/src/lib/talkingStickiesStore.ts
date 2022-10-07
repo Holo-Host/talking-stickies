@@ -5,12 +5,12 @@ import type {
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
 import { serializeHash, deserializeHash } from '@holochain-open-dev/utils';
 import { WorkspaceStore, SynStore, stateFromCommit} from '@holochain-syn/store';
-import { SynClient } from '@holochain-syn/client';
-import type { TalkingStickiesGrammar, TalkingStickiesState } from './grammar';
+import { SynClient, type Workspace } from '@holochain-syn/client';
+import type { TalkingStickiesDelta, TalkingStickiesGrammar, TalkingStickiesState } from './grammar';
 import { talkingStickiesGrammar } from './grammar';
 import type {Readable, Writable } from "svelte/store";
 import { get, writable } from "svelte/store";
-import { ArchivedBoard, Board } from './board';
+import { ArchivedBoard, Board, boardListGrammar, type BoardListDelta, type BoardListGrammar } from './board';
 import {isEqual} from "lodash"
 
 const ZOME_NAME = 'talking_stickies'
@@ -26,9 +26,10 @@ export class TalkingStickiesService {
 
 export class TalkingStickiesStore {
     service: TalkingStickiesService;
-    boards: Writable<Array<Board>> = writable([]);
+    boards: Writable<Dictionary<Board>> = writable({});
     archivedBoards: Writable<Dictionary<ArchivedBoard>> = writable({});
-    activeBoardIndex: Writable<number|undefined> = writable(undefined)
+    activeBoardHash: Writable<EntryHashB64| undefined> = writable(undefined)
+    boardList: WorkspaceStore<BoardListGrammar>;
     createdBoards: Array<EntryHash> = []
     ticklers = []
     updating = false
@@ -60,9 +61,14 @@ export class TalkingStickiesStore {
                 const boards = get(this.boards)
 
                 for (const [workspaceHash, workspace] of workspaces.entries()) {
-                    const boardIndex = boards.findIndex((board) => isEqual(board.hash(), workspaceHash))
-                    if (boardIndex < 0) {
-                        console.log("found board we don't have")
+                    if (workspace.name === "board-list") { // skip the board-list workspace
+                        continue
+                    }
+                    
+                    const hashB64 = serializeHash(workspaceHash)
+                    const board = boards[hashB64]
+                    if (!board) {
+                        console.log("found board we don't have:", hashB64)
                         const getWorkspaceTip = await this.synStore.client.getWorkspaceTip(workspaceHash)
                         const commit = await this.synStore.client.getCommit(getWorkspaceTip)
                         if (commit) {
@@ -73,22 +79,21 @@ export class TalkingStickiesStore {
                                 continue
                             }    
                         }    
-                        const hashB64 = serializeHash(workspaceHash)
                         console.log(`ATTEMPTING TO JOIN ${workspace.name}: ${hashB64}`)
                         try {
                             const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
                             this.newBoard(workspaceStore)
                             if (this.createdBoards.findIndex((hash) => isEqual(hash, workspaceHash)) >= 0) {
                                 // we created this board so activate it!
-                                console.log("ACTIVATING:", get(this.boards).length-1)
-                                this.activeBoardIndex.update((n) => {return get(this.boards).length-1} )
+                                console.log("ACTIVATING:", hashB64)
+                                this.activeBoardHash.update((n) => {return hashB64} )
                             }
                             console.log("joined workspace:", workspaceStore)
                         } catch (e) {
                             console.log(`Error while joining ${hashB64}`, e)
                         }
                     } else {
-                        console.log("allready joined")
+                        console.log("allready joined", hashB64)
                     }
                 }
             } catch (e) {
@@ -98,27 +103,35 @@ export class TalkingStickiesStore {
         })
     }
 
-    async requestBoardChanges(index, deltas) {
-        const board = get(this.boards)[index]
+    async requestBoardChanges(hash: EntryHashB64, deltas: TalkingStickiesDelta[]) {
+        const board = get(this.boards)[hash]
         if (board) {
             board.requestChanges(deltas)
         }
     }
 
-    async requestChange(deltas) {
-        this.requestBoardChanges(get(this.activeBoardIndex), deltas)
+    async requestBoardListChanges(deltas: BoardListDelta[]) {
+        if (this.boardList) {
+            this.boardList.requestChanges(deltas)
+        }
     }
-    getReadableBoardState(index: number | undefined) : Readable<TalkingStickiesState> | undefined {
-        console.log("getting board state", index, this.boards[index], this.boards )
-        if (index == undefined) return undefined
-        return get(this.boards)[index].workspace.state
+
+    async requestChange(deltas: TalkingStickiesDelta[]) {
+        this.requestBoardChanges(get(this.activeBoardHash), deltas)
     }
-    setActiveBoard(index: number) {
-        const board = get(this.boards)[index]
+
+    getReadableBoardState(hash: EntryHashB64 | undefined) : Readable<TalkingStickiesState> | undefined {
+        console.log("getting board state", hash, this.boards[hash], this.boards )
+        if (hash == undefined) return undefined
+        return get(this.boards)[hash].workspace.state
+    }
+
+    setActiveBoard(hash: EntryHashB64) {
+        const board = get(this.boards)[hash]
         if (board) {
-            this.activeBoardIndex.update((n) => {return index} )
+            this.activeBoardHash.update((n) => {return hash} )
         } else {
-            this.activeBoardIndex.update((n) => {return undefined} )
+            this.activeBoardHash.update((n) => {return undefined} )
         }
     }
 
@@ -129,50 +142,46 @@ export class TalkingStickiesStore {
         })
     }
 
-    async unarchiveBoard(hash: string) {
-        const workspaceHash = deserializeHash(hash)
-        const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
-        const board = this.newBoard(workspaceStore)
-        board.requestChanges([{type:"set-status",status:""}])
-        this.archivedBoards.update((boards) => {
+    async archiveBoard(hash: EntryHashB64) {
+        this.boardList.requestChanges([{type:"set-status", hash ,status:"archived"}])
+        this.boards.update((boards)=> {
             delete boards[hash]
             return boards
         })
-    }
-
-    async deleteBoard(index: number) {
-        const board = get(this.boards)[index]
-        if (board) {
-            await board.requestChanges([{type:"set-status",status:"archived"}])
-            this.addArchivedBoard(board.hash(), board.state())
-            //board.close()
-            this.boards.update((boards)=> {
-                boards.splice(index,1)
-                return boards
-            })
-            if (get(this.activeBoardIndex) == index) {
-                this.setActiveBoard(-1)
-            }
+        if (get(this.activeBoardHash) == hash) {
+            this.setActiveBoard(undefined)
         }
     }
+
+    async unarchiveBoard(hash: EntryHashB64) {
+        const workspaceHash = deserializeHash(hash)
+        const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar)
+        this.newBoard(workspaceStore)
+        let changes : BoardListDelta[] = 
+        [
+            {type:"set-status", hash ,status:""}
+        ]
+        const boardCount = get(this.boardList.state).boards.length
+        if (boardCount > 1) {
+            changes.push({type:"set-index", hash , index: boardCount-1})
+        }
+
+        this.boardList.requestChanges(changes)
+    }
+
     closeActiveBoard() {
-        this.setActiveBoard(-1)
+        this.setActiveBoard(undefined)
     }
-    async latestCommit() : Promise<EntryHashB64|undefined> {
-        await this.synStore.fetchAllCommits()
-        let latest = 0
-        let latestHash = undefined
-        const commits = Object.entries(get(this.synStore.knownCommits))
-        commits.forEach(async ([hash, commit]) => {
-            console.log("COMMIT", commit)
-            //await this.synStore.fetchSnapshot(commit.newContentHash)
-            //console.log("CONTENT STATE:", get(this.synStore.snapshots)[commit.newContentHash])
-            if (commit.createdAt > latest) {
-                latest = commit.createdAt; latestHash = hash    
-            }
-        })
-        return latestHash
+
+    async makeBoardList() {
+        const root = await this.synStore.createRoot(boardListGrammar)
+        const hash = root.initialCommitHash
+        let meta = new Uint8Array
+        meta[0] = 0
+        const workspaceHash = await this.synStore.createWorkspace({name:`board-list`, meta }, hash)
+        this.boardList = await this.synStore.joinWorkspace(workspaceHash, boardListGrammar);
     }
+
     async makeBoard(options: any, fromHash?: EntryHashB64) {
         let hash 
         if (fromHash) {
@@ -181,7 +190,9 @@ export class TalkingStickiesStore {
             const root = await this.synStore.createRoot(talkingStickiesGrammar)
             hash = root.initialCommitHash
          }
-        const workspaceHash = await this.synStore.createWorkspace({name:`${Date.now()}`, meta: undefined}, hash)
+        let meta = new Uint8Array
+        meta[0] = 1
+        const workspaceHash = await this.synStore.createWorkspace({name:`${Date.now()}`, meta }, hash)
         const workspaceStore = await this.synStore.joinWorkspace(workspaceHash, talkingStickiesGrammar);
 
         // we don't create the board here because we want the same board creation code to run when a
@@ -221,6 +232,14 @@ export class TalkingStickiesStore {
                 workspaceStore.requestChanges(changes)
                 await workspaceStore.commitChanges()
             }
+
+            this.boardList.requestChanges([{
+                type: 'add-board',
+                name: options.name ? options.name : "untitled",
+                hash: serializeHash(workspaceHash),
+                status: ""
+            }])
+        
         }
     }
     addTickler(fn) {
@@ -232,7 +251,7 @@ export class TalkingStickiesStore {
             this.ticklers.forEach((fn)=>fn(board, val))
         })
         this.boards.update((boards)=> {
-            boards.push(board)
+            boards[serializeHash(board.hash())] = board 
             return boards
         })
         return board
@@ -241,6 +260,18 @@ export class TalkingStickiesStore {
     async joinExistingWorkspaces() : Promise<any> {
         console.log("FETCHING ALL WORKSPACES")
         const workspaces = get(await this.synStore.fetchAllWorkspaces());
+        if (!this.boardList) {
+            workspaces.entries().forEach(async ([hash,workspace]) => {
+                if (workspace.name === "board-list") {
+                    console.log("Found a board-list, joining...")
+                    this.boardList = await this.synStore.joinWorkspace(hash, boardListGrammar)
+                    return
+                }
+            });
+        if (!this.boardList) {
+            await this.makeBoardList()
+        }
         return workspaces
       }
+    }
 }
