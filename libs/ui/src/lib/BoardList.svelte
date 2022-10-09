@@ -10,19 +10,18 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board, type BoardRecord, boardListGrammar } from './board';
-  import { serializeHash } from '@holochain-open-dev/utils';
+  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board } from './board';
   import type { EntryHashB64 } from '@holochain-open-dev/core-types';
+  import type { BoardState } from './board';
 
  
   const { getStore } :any = getContext('tsStore');
 
   const store:TalkingStickiesStore = getStore();
 
-  $: boards = store.boards;
-  $: boardList = store.boardList.state
+  $: boardList = store.boardList.stateStore()
 
-  $: activeHash = store.activeBoardHash
+  $: activeHash = store.boardList.activeBoardHash
 
   let editingBoardHash: EntryHashB64
   let editName = ''
@@ -44,36 +43,33 @@
 
     reader.addEventListener("load", async () => {
       const b = JSON.parse(reader.result as string)
-      await store.makeBoard(b)
+      const board = await store.boardList.makeBoard(b)
+      selectBoard(board.hashB64())
     }, false);
     reader.readAsText(file);
   };
 
   const addBoard = async (name: string, groups: Group[], voteTypes: VoteType[]) => {
-    await store.makeBoard({name, groups, voteTypes})
+    const board = await store.boardList.makeBoard({name, groups, voteTypes})
+    selectBoard(board.hashB64())
     creating = false
   }
   
   const selectBoard = (hash: EntryHashB64) => {
-    console.log("SELCTING:", hash)
-    store.setActiveBoard(hash)
-  }
-
-  const getBoard = (hash: EntryHashB64): Board | undefined => {
-    const boards = get(store.boards)
-    console.log("GET BOARD", boards)
-    return boards[hash]
+    store.boardList.setActiveBoard(hash)
   }
 
   const archiveBoard = (hash: EntryHashB64) => () => {
-    store.archiveBoard(hash)
+    store.boardList.archiveBoard(hash)
     cancelEdit()
   }
 
-  const editBoard = (hash: EntryHashB64) => () => {
-    console.log("Edditing:", hash)
+  const unarchiveBoard = (hash: EntryHashB64) => () => {
+    store.boardList.unarchiveBoard(hash)
+  }
 
-    const board: Board | undefined = getBoard(hash)
+  const editBoard = (hash: EntryHashB64) => async () => {
+    const board: Board | undefined = await store.boardList.getBoard(hash)
     if (board) {
       const state = board.state()
       editingBoardHash = hash
@@ -81,22 +77,21 @@
       editGroups = cloneDeep(state.groups)
       editVoteTypes = cloneDeep(state.voteTypes)
     } else {
-      console.log("not found:", hash)
-
+      console.log("board not found:", hash)
     }
   }
 
   const updateBoard = (hash: EntryHashB64) => async (name: string, groups: Group[], voteTypes: VoteType[]) => {
-    const board: Board | undefined = getBoard(hash)
+    const board: Board | undefined = await store.boardList.getBoard(hash)
     if (board) {
       let changes = []
-      const state = board.state()
+      const state: BoardState = board.state()
       if (state.name != name) {
         console.log("updating board name to ",name)
-        store.requestBoardListChanges([
+        store.boardList.requestChanges([
           {
             type: 'set-name',
-            hash: serializeHash(board.hash()),
+            hash: board.hashB64(),
             name: name
           }
         ])
@@ -119,7 +114,7 @@
           })
       }
       if (changes.length > 0) {
-        await store.requestBoardChanges(hash,changes)
+        await store.boardList.requestBoardChanges(hash,changes)
       }
     }
     cancelEdit()
@@ -135,21 +130,17 @@
 
   const reloadBoards = async () => {
     loading = true
-    await store.joinExistingWorkspaces()
+    await store.loadBoards()
     loading = false
   }
 
-  const unarchiveBoard = (hash: EntryHashB64) => {
-    store.unarchiveBoard(hash)
-  }
-
   const getStats = (hash: EntryHashB64) => {
-    const board: Board | undefined = getBoard(hash)
+    const board: Board | undefined = store.boardList.boards[hash]
     if (board) {
-      const participants = get(board.participants())
+      const participants:any = get(board.participants())
       return `active: ${participants.active.length}, idle: ${participants.idle.length}, offline: ${participants.offline.length}`
     }
-    return `not found`
+    return `not joined`
   }
 </script>
 
@@ -232,6 +223,10 @@
         </div>
     </div>
     <div class='board-list'>
+        {#if creating}
+        <BoardEditor handleSave={addBoard} {cancelEdit} voteTypes={editVoteTypes} />
+        {/if}
+
         {#each $boardList.boards as board }
           {#if editingBoardHash === board.hash}
             <BoardEditor handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
@@ -250,9 +245,6 @@
               <div class="board archived" on:click={unarchiveBoard(board.hash)}>{board.name}<div class="board-button"><UnarchiveIcon /></div></div>
             {/if}
           {/each}
-        {/if}
-        {#if creating}
-        <BoardEditor handleSave={addBoard} {cancelEdit} voteTypes={editVoteTypes} />
         {/if}
     </div>
   </div>

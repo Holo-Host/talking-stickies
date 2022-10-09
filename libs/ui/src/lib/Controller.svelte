@@ -4,7 +4,6 @@
     import BoardPane from './BoardPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
-    import type { InstalledCell } from '@holochain/client';
     import type { CellClient } from '@holochain-open-dev/cell-client';
     import type { SynStore } from '@holochain-syn/store';
    
@@ -67,7 +66,7 @@
     
     export let client : CellClient
 
-    $: activeBoardIndex = tsStore ? tsStore.activeBoardHash : undefined
+    $: activeBoardIndex = tsStore ? tsStore.boardList.activeBoardHash : undefined
     $: boardList = tsStore ? tsStore.boardList : undefined
 
     initialize()
@@ -84,7 +83,7 @@
       const store = createStore()
       synStore = store.synStore;
       console.log("Store Created")
-      await store.joinExistingWorkspaces()
+      await store.loadBoards()
       tsStore = store
     }
     function createStore() : TalkingStickiesStore {
@@ -141,7 +140,7 @@
       {/if}
       {#if $activeBoardIndex !== undefined}
         <BoardPane
-          on:requestChange={(event) => {tsStore.requestChange(event.detail)}}/>
+          on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
       {/if}
       <a class="issue" target="github" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo">Report Issue</a>
       {:else}

@@ -1,10 +1,9 @@
-import type { SynGrammar, WorkspaceStore } from "@holochain-syn/store";
-import type { TalkingStickiesDelta, TalkingStickiesGrammar, TalkingStickiesState } from "./grammar";
-import { type Readable, derived, get } from "svelte/store";
+import type { RootStore, SynGrammar, WorkspaceStore } from "@holochain-syn/core";
+import { get } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
 import type { AgentPubKey, EntryHash } from "@holochain/client";
-import { isEqual } from 'lodash'
-import type { EntryHashB64 } from "@holochain-open-dev/core-types";
+import type { AgentPubKeyB64, EntryHashB64 } from "@holochain-open-dev/core-types";
+import { serializeHash } from "@holochain-open-dev/utils";
 
 export const DEFAULT_VOTE_TYPES = [
     {type: "1", emoji: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
@@ -19,103 +18,204 @@ export class VoteType {
     }
 }
 
-export interface BoardRecord {
-    hash: EntryHashB64
-    name: string
-    status: string
-}
-
-export interface BoardListState {
-    boards: BoardRecord[];
-}
-
-export type BoardListDelta =
-  | {
-    type: "add-board";
-    hash: EntryHashB64;
-    name: string;
-    status?: string;
-  }
-  | {
-    type: "set-name";
-    hash: EntryHashB64;
-    name: string;
-  }
-  | {
-    type: "set-status";
-    hash: EntryHashB64;
-    status: string;
-  }
-  | {
-    type: "set-index";
-    hash: EntryHashB64;
-    index: number;
+export type Sticky = {
+    id: string;
+    text: string;
+    group: number;
+    votes: Object;
+    props: Object;
   };
-
-export type BoardListGrammar = SynGrammar<
-BoardListDelta,
-BoardListState
->;
-
-export const boardListGrammar: BoardListGrammar = {
+  
+  export interface BoardState {
+    status: string;
+    name: string;
+    groups: Group[];
+    stickies: Sticky[];
+    voteTypes: VoteType[];
+  }
+  
+  export type BoardDelta =
+    | {
+      type: "set-status";
+      status: string;
+    }
+    | {
+        type: "add-sticky";
+        value: Sticky;
+      }
+    | {
+        type: "set-name";
+        name: string;
+      }
+    | {
+        type: "set-groups";
+        groups: Group[];
+      }
+    | {
+        type: "set-vote-types";
+        voteTypes: VoteType[];
+      }
+    | {
+        type: "add-group";
+        group: Group;
+      }
+    | {
+        type: "delete-group";
+        id: number;
+      }
+    | {
+        type: "set-group-index";
+        id: number;
+        index: number;
+      }
+    | {
+        type: "update-sticky-group";
+        id: string;
+        group: number;
+      }
+      | {
+        type: "update-sticky-props";
+        id: string;
+        props: Object;
+      }
+   | {
+        type: "update-sticky-text";
+        id: string;
+        text: string;
+      }
+    | {
+        type: "update-sticky-votes";
+        id: string;
+        voteType: string;
+        voter: AgentPubKeyB64;
+        count: number
+      }
+    | {
+        type: "delete-sticky";
+        id: string;
+      };
+  
+  export type BoardGrammar = SynGrammar<
+  BoardDelta,
+  BoardState
+  >;
+  
+  export const boardGrammar: BoardGrammar = {
     initState(state)  {
-        state.boards = []
+      state.status = ""
+      state.name = "untitled"
+      state.groups = [{id:0, name:"group1"}]
+      state.stickies = []
+      state.voteTypes = DEFAULT_VOTE_TYPES
     },
     applyDelta( 
-        delta: BoardListDelta,
-        state: BoardListState,
-        _ephemeralState: any,
-        _author: AgentPubKey
-      ) {
-        if (delta.type == "add-board") {
-            const record: BoardRecord = {
-                name: delta.name,
-                hash: delta.hash,
-                status: delta.status,
-            }
-            state.boards.unshift(record)
+      delta: BoardDelta,
+      state: BoardState,
+      _ephemeralState: any,
+      _author: AgentPubKey
+    ) {
+      if (delta.type == "set-status") {
+        state.status = delta.status
+      }
+      if (delta.type == "set-name") {
+        state.name = delta.name
+      }
+      if (delta.type == "set-groups") {
+        state.groups = delta.groups
+      }
+      if (delta.type == "add-group") {
+        console.log("PUSHING", delta.group)
+  
+        state.groups.push(delta.group)
+      }
+      if (delta.type == "delete-group") {
+        const index = state.groups.findIndex((group) => group.id === delta.id)
+        if (index >= 0) {
+          state.groups.splice(index,1)
         }
-        if (delta.type == "set-name") {
-            state.boards.forEach((board, i) => {
-                if (board.hash === delta.hash) {
-                  state.boards[i].name = delta.name;
-                }
-            });
+      }
+      if (delta.type == "set-group-index") {
+        const index = state.groups.findIndex((group) => group.id === delta.id)
+        if (index >= 0) {
+          const c = state.groups[index]
+          state.groups.splice(index,1)
+          state.groups.splice(index, 0, c)
         }
-        if (delta.type == "set-status") {
-            state.boards.forEach((board, i) => {
-                if (board.hash === delta.hash) {
-                  state.boards[i].status = delta.status;
-                }
-            });
-        }
-        if (delta.type == "set-index") {
-            const index = state.boards.findIndex((board) => board.hash == delta.hash)
-            if (index >= 0) {
-              const c = state.boards[index]
-              state.boards.splice(index,1)
-              state.boards.splice(index, 0, c)
-            }
+      }
+      if (delta.type == "set-vote-types") {
+        state.voteTypes = delta.voteTypes
+      }
+      else if (delta.type == "add-sticky") {
+        state.stickies.push(delta.value)
+      }
+      else if (delta.type == "update-sticky-text") {
+        state.stickies.forEach((sticky, i) => {
+          if (sticky.id === delta.id) {
+            state.stickies[i].text = delta.text;
           }
-        }
+        });
+      }
+      else if (delta.type == "update-sticky-group") {
+        state.stickies.forEach((sticky, i) => {
+          if (sticky.id === delta.id) {
+            state.stickies[i].group = delta.group;
+          }
+        });
+      }
+      else if (delta.type == "update-sticky-props") {
+        state.stickies.forEach((sticky, i) => {
+          if (sticky.id === delta.id) {
+            state.stickies[i].props = delta.props;
+          }
+        });
+      }
+      else if (delta.type == "update-sticky-votes") {
+        state.stickies.forEach((sticky, i) => {
+          if (sticky.id === delta.id) {
+            if (!state.stickies[i].votes[delta.voteType]) {
+              state.stickies[i].votes[delta.voteType] = {}
+            }
+            state.stickies[i].votes[delta.voteType][delta.voter] = delta.count;
+          }
+        });
+      }
+      else if (delta.type == "delete-sticky") {
+        const index = state.stickies.findIndex((sticky) => sticky.id === delta.id)
+        state.stickies.splice(index,1)
+      }
+    },
+  };
+  
+
+export const CommitTypeBoard :string = "board"
+
+export class Board {    
+    constructor(public workspace: WorkspaceStore<BoardGrammar>) {
     }
 
-export class Board {
-    name: Readable<string>
-    constructor(public workspace: WorkspaceStore<TalkingStickiesGrammar>) {
-        this.name = derived(workspace.state, state => state.name)
+    public static async Create(rootStore: RootStore<BoardGrammar>) {
+        const workspaceHash = await rootStore.createWorkspace(
+            `${new Date}`,
+            rootStore.root.entryHash
+           );
+        const me = new Board(await rootStore.joinWorkspace(workspaceHash));
+        return me
     }
+
     hash() : EntryHash {
         return this.workspace.workspaceHash
+    }
+    hashB64() : EntryHashB64 {
+        return serializeHash(this.workspace.workspaceHash)
     }
     close() {
         this.workspace.leaveWorkspace()
     }
-    state() {
+    state(): BoardState {
         return get(this.workspace.state)
     }
-    requestChanges(deltas: Array<TalkingStickiesDelta>) {
-        console.log("REQUESTING CHANGES: ", deltas)
+    requestChanges(deltas: Array<BoardDelta>) {
+        console.log("REQUESTING BOARD CHANGES: ", deltas)
         this.workspace.requestChanges(deltas)
     }
     participants()  {
@@ -124,12 +224,6 @@ export class Board {
     async commitChanges() {
         this.workspace.commitChanges()
     }
-}
-
-export class ArchivedBoard {
-    constructor(
-        public state: TalkingStickiesState,
-    ) {}
 }
 
 export class Group {

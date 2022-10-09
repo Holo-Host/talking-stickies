@@ -35,8 +35,8 @@
   const { getStore } :any = getContext("tsStore");
   let tsStore: TalkingStickiesStore = getStore();
 
-  $: activeHash = tsStore.activeBoardHash;
-  $: state = tsStore.getReadableBoardState($activeHash);
+  $: activeHash = tsStore.boardList.activeBoardHash;
+  $: state = tsStore.boardList.getReadableBoardState($activeHash);
   $: stickies = $state ? $state.stickies : undefined;
   $: sortStickies = sortOption
     ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)
@@ -187,7 +187,7 @@
   };
 
   const closeBoard = () => {
-    tsStore.closeActiveBoard();
+    tsStore.boardList.closeActiveBoard();
   };
 
   const inGroup = (curGroupId, groupId) => {

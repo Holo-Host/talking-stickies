@@ -1,5 +1,5 @@
 import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
-import type { SynGrammar } from "@holochain-syn/store";
+import type { SynGrammar } from "@holochain-syn/core";
 import type { AgentPubKey } from "@holochain/client";
 import { Group, VoteType, DEFAULT_VOTE_TYPES } from "./board";
 

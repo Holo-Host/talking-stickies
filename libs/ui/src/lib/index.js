@@ -1,7 +1,7 @@
 // @ts-nocheck
 export * from './board';
 export * from './talkingStickiesStore';
-export * from './grammar';
+export * from './boardList';
 export { default as Controller } from './Controller.svelte';
 export { default as BoardEditor } from './BoardEditor.svelte';
 export { default as BoardPane } from './BoardPane.svelte';
