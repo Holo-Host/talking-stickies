@@ -3,7 +3,7 @@
   "description": "TalkingStickies in we-applet form",
   "license": "MIT",
   "author": "holochaindev",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "scripts": {
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@holochain-open-dev/cell-client": "^0.7.3",
-    "@holochain-open-dev/core-types": "^0.4.1",
-    "@holochain/client": "^0.7.0",
-    "@holo-host/talking-stickies": "^0.5.0",
+    "@holochain-open-dev/core-types": "^0.5.0",
+    "@holochain/client": "^0.9.2",
+    "@holo-host/talking-stickies": "^0.6.0",
     "@lightningrodlabs/we-applet": "^0.1.0",
     "@lit-labs/context": "^0.1.2",
     "@open-wc/scoped-elements": "^2.0.1",

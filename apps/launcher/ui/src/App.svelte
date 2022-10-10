@@ -25,7 +25,6 @@
     const talkingStickiesCell = installedCells.find(
         c => c.role_id === 'talking-stickies'
       ) as InstalledCell;
-
     cellClient = new CellClient(holochainClient, talkingStickiesCell)
 
     connected = true

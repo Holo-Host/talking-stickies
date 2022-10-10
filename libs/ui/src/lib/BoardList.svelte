@@ -6,6 +6,7 @@
   import PencilIcon from './icons/PencilIcon.svelte'
   import UnarchiveIcon from './icons/UnarchiveIcon.svelte'
   import ReloadIcon from './icons/ReloadIcon.svelte'
+  import AvatarIcon from './icons/AvatarIcon.svelte'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
@@ -13,21 +14,32 @@
   import { Group, VoteType, DEFAULT_VOTE_TYPES, Board } from './board';
   import type { EntryHashB64 } from '@holochain-open-dev/core-types';
   import type { BoardState } from './board';
+  import { serializeHash } from '@holochain-open-dev/utils';
+  import AvatarEditor from './AvatarEditor.svelte';
+  import type { Avatar } from './boardList';
 
  
   const { getStore } :any = getContext('tsStore');
 
   const store:TalkingStickiesStore = getStore();
 
+  const myAgentPubKey = store.myAgentPubKey()
+
   $: boardList = store.boardList.stateStore()
 
   $: activeHash = store.boardList.activeBoardHash
+  $: participants = store.boardList.participants()
+  $: avatars = store.boardList.avatars()
 
   let editingBoardHash: EntryHashB64
   let editName = ''
   let editGroups = []
   let editVoteTypes = []
   let creating = false
+
+  let editingAvatar = false
+  let avatar: Avatar = {name:"", url:""}
+  $: myName = $avatars[myAgentPubKey]? $avatars[myAgentPubKey].name : ""
   let loading = false
   const newBoard = () => {
     editVoteTypes = cloneDeep(DEFAULT_VOTE_TYPES)
@@ -71,11 +83,6 @@
   const editBoard = (hash: EntryHashB64) => async () => {
     const board: Board | undefined = await store.boardList.getBoard(hash)
     if (board) {
-      const state = board.state()
-      editingBoardHash = hash
-      editName = state.name
-      editGroups = cloneDeep(state.groups)
-      editVoteTypes = cloneDeep(state.voteTypes)
     } else {
       console.log("board not found:", hash)
     }
@@ -127,89 +134,50 @@
     editVoteTypes = []
     creating = false
   }
+  
+  const editAvatar = () => {
+    const myAvatar = $avatars[store.myAgentPubKey()]
+    if (myAvatar) {
+      avatar = myAvatar
+    }
+    editingAvatar = true
+  }
+
+  const setAvatar = (avatar: Avatar) => {
+    store.boardList.requestChanges([{type:'set-avatar', pubKey:store.myAgentPubKey(), avatar:cloneDeep(avatar)}])
+    closeEditAvatar()
+  }
+
+  const closeEditAvatar = () => {
+    editingAvatar = false
+  }
 
   const reloadBoards = async () => {
     loading = true
     await store.loadBoards()
     loading = false
   }
-
-  const getStats = (hash: EntryHashB64) => {
-    const board: Board | undefined = store.boardList.boards[hash]
-    if (board) {
-      const participants:any = get(board.participants())
-      return `active: ${participants.active.length}, idle: ${participants.idle.length}, offline: ${participants.offline.length}`
-    }
-    return `not joined`
-  }
 </script>
 
-<style>
-  .boards {
-    display: flex;
-    flex-direction: column;
-    padding: 30px 60px;
-    background-color: white;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
-    border-radius: 3px;
-    width: initial;
-  }
-  .board {
-    background-color: rgb(204, 204, 204);
-    border-radius: 3px;
-    padding: 5px 5px;
-    display: inherit;
-    margin-right: 5px;
-    border: 1px solid;
-    cursor: default;
-  }
-  .board-button {
-    margin-left: 5px;
-    cursor:pointer;
-  }
-  .selected {
-    background-color: rgb(183, 224, 180);
-  }
-  .archived {
-    background-color: rgb(224, 224, 224);
-    border: 1px dashed;
-  }
-  .top-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-  .board-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    flex-shrink: 1;
-  }
-  .reload-boards {
-    position: absolute;
-    right: 45px;
-    margin-top: -18px;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-  }
-  .top-board-button {
-    display: inline-block;
-    height: 30px;
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
-  .last-button {
-    margin-left:auto;
-  }
-
-</style>
 
 <div class='boards'>
-    <div class='reload-boards' on:click={reloadBoards} title="Reload Boards">
-      <ReloadIcon spinning={loading}/>
+    <div class='participants' title={$participants.active.map(folk => {
+      const hash = serializeHash(folk)
+      const a = $avatars[hash]
+      return a ? a.name : hash.slice(-4)
+    }).join(", ")}>
+      Participants: {$participants.active.length}
     </div>
+    <div class='avatar-button' on:click={editAvatar} title={myName}>
+      <AvatarIcon/>
+    </div>
+    {#if editingAvatar}
+        <AvatarEditor handleSave={setAvatar} cancelEdit={closeEditAvatar} avatar={avatar} />
+    {/if}
+
+    <!-- <div class='reload-boards' on:click={reloadBoards} title="Reload Boards">
+      <ReloadIcon spinning={loading}/>
+    </div> -->
     <div class='top-bar'>
         <div class='top-board-button' on:click={newBoard} title="New board">
             <PlusIcon  />
@@ -232,7 +200,7 @@
             <BoardEditor handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
           {:else}
             {#if board.status !== "archived" }
-              <div class="board {$activeHash === board.hash? "selected":""}" on:click={() => selectBoard(board.hash)} title={getStats(board.hash)}>
+              <div class="board {$activeHash === board.hash? "selected":""}" on:click={() => selectBoard(board.hash)}>
                 {board.name}
                 <div class="board-button" on:click={editBoard(board.hash)}><PencilIcon /></div>
               </div>
@@ -248,3 +216,79 @@
         {/if}
     </div>
   </div>
+
+  <style>
+    .boards {
+      display: flex;
+      flex-direction: column;
+      padding: 30px 60px;
+      background-color: white;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
+      border-radius: 3px;
+      width: initial;
+    }
+    .board {
+      background-color: rgb(204, 204, 204);
+      border-radius: 3px;
+      padding: 5px 5px;
+      display: inherit;
+      margin-right: 5px;
+      border: 1px solid;
+      cursor: default;
+    }
+    .board-button {
+      margin-left: 5px;
+      cursor:pointer;
+    }
+    .selected {
+      background-color: rgb(183, 224, 180);
+    }
+    .archived {
+      background-color: rgb(224, 224, 224);
+      border: 1px dashed;
+    }
+    .top-bar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    .board-list {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      flex-shrink: 1;
+    }
+    .reload-boards {
+      position: absolute;
+      right: 45px;
+      margin-top: -18px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .avatar-button {
+      position: absolute;
+      right: 45px;
+      margin-top: -18px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .participants {
+      position: absolute;
+      right: 75px;
+      margin-top: -18px;
+    }
+    .top-board-button {
+      display: inline-block;
+      height: 30px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .last-button {
+      margin-left:auto;
+    }
+  
+  </style>
+  

@@ -60,7 +60,6 @@ export class TalkingStickiesStore {
 
     commitType(commit: Commit) : string {
         const meta:any = decode(commit.meta)
-        console.log("CHECKING meta for board:", meta)
         return meta.type
     }
 
@@ -79,32 +78,32 @@ export class TalkingStickiesStore {
                 const rootCommit = roots.entryRecords[i]
                 if (commitType === CommitTypeBoardList) {
                     if (!boardListRoot) {
-                        console.log("Found a board list root, joining...", rootCommit.entryHash)
+                        console.log("Found a board list root:", serializeHash(rootCommit.entryHash))
                         boardListRoot = rootCommit
                     } else {
-                        console.log("Found a board list root, but have allready joined:", boardListRoot.entryHash)
+                        console.log("Found a board list root, but have allready joined:", serializeHash(boardListRoot.entryHash))
                     }
                 }
                 if (commitType === CommitTypeBoard) {
                     if (!boardsRoot) {
-                        console.log("Storing a board root:", rootCommit.entryHash)
+                        console.log("Found a board root:", serializeHash(rootCommit.entryHash))
                         boardsRoot = rootCommit
                     } else {
-                        console.log("Found a board root, but have allread stored: ", boardsRoot.entryHash)
+                        console.log("Found a board root, but have allread stored: ", serializeHash(boardsRoot.entryHash))
                     }
                 }
             });
             if (boardListRoot && boardsRoot) {
                 this.boardList = await BoardList.Join(this.synStore, boardListRoot, boardsRoot)
             } else {
-                console.log("Missing root, found: ",boardListRoot, boardsRoot )
+                console.log("Missing root, found: ", boardListRoot, boardsRoot )
             }
 
         }
     }
 
     async loadBoards() : Promise<any> {
-        console.log("FINDING ROOTS")
+        console.log("fetching all roots...")
         const roots = await this.synStore.fetchAllRoots()
         await this.findOrMakeRoots(get(roots))
     }

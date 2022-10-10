@@ -1,8 +1,8 @@
 import { RootStore, type Commit, type SynGrammar, type SynStore, type Workspace, type WorkspaceStore } from "@holochain-syn/core";
-import type { Dictionary, EntryHashB64 } from "@holochain-open-dev/core-types";
+import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from "@holochain-open-dev/core-types";
 import { Board, CommitTypeBoard } from "./board";
 import { deserializeHash, EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
-import { get, writable, type Readable, type Writable } from "svelte/store";
+import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
 import type { AgentPubKey, EntryHash } from "@holochain/client";
 
@@ -14,7 +14,13 @@ export interface BoardRecord {
     status: string
 }
 
+export interface Avatar {
+    name: string
+    url: string
+}
+
 export interface BoardListState {
+    avatars: Dictionary<Avatar>;
     boards: BoardRecord[];
 }
 
@@ -25,6 +31,11 @@ export type BoardListDelta =
     hash: EntryHashB64;
     name: string;
     status?: string;
+  }
+  | {
+    type: "set-avatar";
+    pubKey: AgentPubKeyB64;
+    avatar: Avatar;
   }
   | {
     type: "set-name";
@@ -49,6 +60,7 @@ BoardListState
 
 export const boardListGrammar: BoardListGrammar = {
     initState(state)  {
+        state.avatars = {}
         state.boards = []
     },
     applyDelta( 
@@ -71,6 +83,9 @@ export const boardListGrammar: BoardListGrammar = {
                   state.boards[i].name = delta.name;
                 }
             });
+        }
+        if (delta.type == "set-avatar") {
+            state.avatars[delta.pubKey] = delta.avatar
         }
         if (delta.type == "set-status") {
             state.boards.forEach((board, i) => {
@@ -147,6 +162,9 @@ export class BoardList {
     participants()  {
         return this.workspace.participants
     }
+    avatars() {
+        return derived(this.workspace.state, state => state.avatars)
+    }
     async commitChanges() {
         this.workspace.commitChanges()
     }
@@ -219,7 +237,6 @@ export class BoardList {
         const board = await Board.Create(this.boardsRootStore)
         const workspaceStore = board.workspace
         const boardHash = board.hashB64()
-        console.log("NEW BOARD: ", board.hash(), workspaceStore.workspaceHash, boardHash)
         this.boards[boardHash] = board 
 
         if (options !== undefined) {

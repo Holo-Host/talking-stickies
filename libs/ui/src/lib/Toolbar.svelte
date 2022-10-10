@@ -15,8 +15,11 @@
     margin-right: 10px;
     display: contents;
   }
+  .logo-text {
+    padding-bottom: 5px;
+  }
 </style>
 
 <div class='toolbar'>
-  <h1 class="logo"><LogoIcon />Talking Stickies</h1>
+  <div class="logo"><LogoIcon /></div><h1 class="logo-text">Talking Stickies</h1>
 </div>

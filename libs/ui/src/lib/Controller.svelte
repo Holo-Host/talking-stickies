@@ -6,7 +6,7 @@
     import { setContext } from 'svelte';
     import type { CellClient } from '@holochain-open-dev/cell-client';
     import type { SynStore } from '@holochain-syn/store';
-   
+
     // The debug drawer's ability to resized and hidden
     let resizeable
     let resizeHandle
@@ -82,7 +82,6 @@
     async function initialize() : Promise<void> {
       const store = createStore()
       synStore = store.synStore;
-      console.log("Store Created")
       await store.loadBoards()
       tsStore = store
     }
