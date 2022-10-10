@@ -23,7 +23,7 @@ const talkingStickies: WeApplet = {
         controller = new Controller({
           target,
           props: {
-            cellClient,
+            client: cellClient,
           }
         });
       },
