@@ -17,12 +17,11 @@
   import { serializeHash } from '@holochain-open-dev/utils';
   import AvatarEditor from './AvatarEditor.svelte';
   import type { Avatar } from './boardList';
-  import {CopiableHash} from "@holochain-open-dev/elements";
+  import Participants from './Participants.svelte';
   import {HoloIdenticon} from "@holochain-open-dev/elements";
-
-  customElements.define('copiable-hash', CopiableHash)
-  customElements.define('holo-identicon', HoloIdenticon)
-
+  if (!customElements.get('holo-identicon')){
+      customElements.define('holo-identicon', HoloIdenticon)
+    }
   const { getStore } :any = getContext('tsStore');
 
   const store:TalkingStickiesStore = getStore();
@@ -42,6 +41,7 @@
   let creating = false
 
   let editingAvatar = false
+  let showParticipants = false
   let avatar: Avatar = {name:"", url:""}
   $: myName = $avatars[myAgentPubKey]? $avatars[myAgentPubKey].name : ""
   let loading = false
@@ -161,26 +161,31 @@
     await store.loadBoards()
     loading = false
   }
+
+  const showParticpants = () => {
+    showParticipants = true
+  }
+  const closeParticpants = () => {
+    showParticipants = false
+  }
 </script>
 
 
 <div class='boards'>
-    <sl-tooltip placement="bottom-start">
-    <div class='participants'>
-      Participants: {$participants.active.length }
+    <div class='participants' on:click={showParticpants}>
+    Participants: {$participants.active.length }
     </div>
-    <div slot="content"> 
-      {#each get(participants).active.map(h => serializeHash(h)) as folk}
-        <holo-identicon hash={folk}></holo-identicon>
-        {$avatars[folk] ? $avatars[folk].name : ""}
-      {/each}
-    </sl-tooltip>
     <div class='avatar-button' on:click={editAvatar} title={myName}>
       <AvatarIcon/>
     </div>
     {#if editingAvatar}
         <AvatarEditor handleSave={setAvatar} cancelEdit={closeEditAvatar} avatar={avatar} />
     {/if}
+
+    {#if showParticipants}
+        <Participants active={get(participants).active} avatars={$avatars} close={closeParticpants} />
+    {/if}
+
 
     <!-- <div class='reload-boards' on:click={reloadBoards} title="Reload Boards">
       <ReloadIcon spinning={loading}/>
@@ -286,6 +291,7 @@
       position: absolute;
       right: 75px;
       margin-top: -18px;
+      cursor:pointer;
     }
     .top-board-button {
       display: inline-block;
@@ -296,6 +302,6 @@
     .last-button {
       margin-left:auto;
     }
-  
+ 
   </style>
   

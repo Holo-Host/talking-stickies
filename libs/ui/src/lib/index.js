@@ -5,6 +5,7 @@ export * from './boardList';
 export { default as Controller } from './Controller.svelte';
 export { default as BoardEditor } from './BoardEditor.svelte';
 export { default as AvatarEditor } from './AvatarEditor.svelte';
+export { default as Participants } from './Participants.svelte';
 export { default as BoardPane } from './BoardPane.svelte';
 export { default as BoardList} from './BoardList.svelte';
 export { default as SortSelector} from './SortSelector.svelte';
