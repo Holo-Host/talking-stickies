@@ -17,8 +17,12 @@
   import { serializeHash } from '@holochain-open-dev/utils';
   import AvatarEditor from './AvatarEditor.svelte';
   import type { Avatar } from './boardList';
+  import {CopiableHash} from "@holochain-open-dev/elements";
+  import {HoloIdenticon} from "@holochain-open-dev/elements";
 
- 
+  customElements.define('copiable-hash', CopiableHash)
+  customElements.define('holo-identicon', HoloIdenticon)
+
   const { getStore } :any = getContext('tsStore');
 
   const store:TalkingStickiesStore = getStore();
@@ -161,13 +165,16 @@
 
 
 <div class='boards'>
-    <div class='participants' title={$participants.active.map(folk => {
-      const hash = serializeHash(folk)
-      const a = $avatars[hash]
-      return a ? a.name : hash.slice(-4)
-    }).join(", ")}>
-      Participants: {$participants.active.length}
+    <sl-tooltip placement="bottom-start">
+    <div class='participants'>
+      Participants: {$participants.active.length }
     </div>
+    <div slot="content"> 
+      {#each get(participants).active.map(h => serializeHash(h)) as folk}
+        <holo-identicon hash={folk}></holo-identicon>
+        {$avatars[folk] ? $avatars[folk].name : ""}
+      {/each}
+    </sl-tooltip>
     <div class='avatar-button' on:click={editAvatar} title={myName}>
       <AvatarIcon/>
     </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ts-ignore
   import {Controller} from '@holo-host/talking-stickies'
   import { CellClient, HoloClient } from '@holochain-open-dev/cell-client';
   const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'talking-stickies'
