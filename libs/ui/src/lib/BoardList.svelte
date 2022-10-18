@@ -87,6 +87,11 @@
   const editBoard = (hash: EntryHashB64) => async () => {
     const board: Board | undefined = await store.boardList.getBoard(hash)
     if (board) {
+      const state = board.state()
+      editingBoardHash = hash
+      editName = state.name
+      editGroups = cloneDeep(state.groups)
+      editVoteTypes = cloneDeep(state.voteTypes)
     } else {
       console.log("board not found:", hash)
     }
