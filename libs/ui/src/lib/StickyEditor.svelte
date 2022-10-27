@@ -24,8 +24,9 @@
     display: flex;
     background-color: #D4F3EE;
     flex-basis: 270px;
-    height: 140px;
-    margin: 20px;
+    height: 200px;
+    width: 250px;
+    margin: 10px;
     padding: 10px;
     box-shadow: 4px 5px 13px 0px rgba(0,0,0,0.38);
     font-style: normal;

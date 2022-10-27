@@ -44,11 +44,21 @@
 
   $: sortedStickies = sortStickies(stickies);
   $: groupedStickies = groupStickies(sortedStickies);
+  $: totalStickies = stickies ? stickies.length : 0
+  $: stickesCounts = countStickies(sortedStickies)
 
   let creatingInGroup: number | undefined = undefined;
   let groupIds = []
   let groups = []
   let ungroupedStickies = 0
+
+  const countStickies = (stickies) : {} => {
+    let counts = {}
+    stickies.forEach((sticky) => {
+      counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 0
+    })
+    return counts
+  }
 
   const groupStickies = (stickies) => {
     ungroupedStickies = 0
@@ -233,7 +243,7 @@
     <div class="groups">
       {#each groups as curGroup}
         {#if (curGroup.id !== 0 || ungroupedStickies > 0)}
-        <div class="group">
+        <div class="group" style:max-width={totalStickies ? `${stickesCounts[curGroup.id]/totalStickies*100}%` : 'fit-content'}>
           {#if $state.groups.length > 0}
           <div class="group-title">
             <h2>{#if curGroup.id === 0}Ungrouped{:else}{curGroup.name}{/if}</h2>
@@ -258,7 +268,9 @@
               <div class="sticky" on:click={editSticky(id, text)} 
                 style:background-color={props && props.color ? props.color : "#d4f3ee"}
                 >
-                {@html Marked.parse(text)}
+                <div class="sticky-content">
+                  {@html Marked.parse(text)}
+                </div>
                 <div class="votes">
                   {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
                     <div
@@ -329,7 +341,6 @@
   }
   .group {
     display: block;
-    flex-basis: 33%;
   }
   .stickies {
     display: flex;
@@ -338,8 +349,8 @@
   .sticky {
     background-color: #d4f3ee;
     flex-basis: 200px;
-    min-height: 100px;
-    min-width: 200px;
+    height: 200px;
+    min-width: 250px;
     margin: 10px;
     padding: 10px;
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
@@ -349,6 +360,9 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+  }
+  .sticky-content {
+    overflow: scroll;
   }
   .add-sticky :global(svg) {
     margin-right: 6px;
