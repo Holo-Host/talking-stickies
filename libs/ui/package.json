@@ -49,7 +49,7 @@
     "@holochain-open-dev/core-types": "0.5.0",
     "@holochain-open-dev/utils": "0.4.3",
     "@holochain-open-dev/elements": "0.0.1",
-    "@holochain-syn/core": "0.2.3",
+    "@holochain-syn/core": "0.2.4",
     "@ts-stack/markdown": "^1.4.0",
     "lodash": "^4.17.21",
     "svelte-fa": "^3.0.3",
