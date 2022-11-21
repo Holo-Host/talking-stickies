@@ -10,7 +10,9 @@
     "network:foo": "concurrently-repeat \"npm run start:foo\"",
     "start:foo": "cross-env APP_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:ui:foo\"",
     "start": "npm run build:happ && npm run start:agent",
+    "start:playground": "npm run build:happ && npm run start:agent:playground",
     "start:agent": "cross-env UI_PORT=5000 APP_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:happ\" \"npm run start:ui:watch\"",
+    "start:agent:playground": "cross-env UI_PORT=5000 APP_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run playground\" \"npm run start:happ\" \"npm run start:ui:watch\"",
     "start:agent:multi": "cross-env UI_PORT=$(port) APP_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:happ\" \"npm run start:ui:watch\"",
     "start:ui": "npm run build:ui && npm run dev -w talking-stickies-app",
     "start:ui:foo": "npm run foo -w talking-stickies-app",
@@ -25,10 +27,11 @@
     "package:applet": "npm run build:ui && npm run package -w we-applet",
     "package:launcher": "npm run build:happ && npm run build:ui && npm run package -w talking-stickies-app && hc web-app pack ./apps/launcher/workdir",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "check-env": "node -e 'console.log(process.env)' | grep npm"
+    "check-env": "node -e 'console.log(process.env)' | grep npm",
+    "playground": "run-singleton \"holochain-playground\""
   },
   "devDependencies": {
-    "@holochain-playground/cli": "^0.0.8",
+    "@holochain-playground/cli": "^0.0.11",
     "concurrently": "^6.2.1",
     "concurrently-repeat": "^0.0.1",
     "cross-env": "^7.0.3",
