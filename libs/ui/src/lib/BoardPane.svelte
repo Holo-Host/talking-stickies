@@ -243,7 +243,7 @@
     <div class="groups">
       {#each groups as curGroup}
         {#if (curGroup.id !== 0 || ungroupedStickies > 0)}
-        <div class="group" style:max-width={totalStickies ? `${stickesCounts[curGroup.id]/totalStickies*100}%` : 'fit-content'}>
+        <div class="group" style:max-width={totalStickies && stickesCounts[curGroup.id]? `${stickesCounts[curGroup.id]/totalStickies*100}%` : 'fit-content'}>
           {#if $state.groups.length > 0}
           <div class="group-title">
             <h2>{#if curGroup.id === 0}Ungrouped{:else}{curGroup.name}{/if}</h2>
@@ -362,7 +362,7 @@
     overflow: hidden;
   }
   .sticky-content {
-    overflow: scroll;
+    overflow-y: scroll;
   }
   .add-sticky :global(svg) {
     margin-right: 6px;
