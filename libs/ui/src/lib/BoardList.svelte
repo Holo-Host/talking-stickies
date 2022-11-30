@@ -11,7 +11,7 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board } from './board';
+  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board, BoardType } from './board';
   import type { EntryHashB64 } from '@holochain-open-dev/core-types';
   import type { BoardState } from './board';
   import { serializeHash } from '@holochain-open-dev/utils';
@@ -65,8 +65,8 @@
     reader.readAsText(file);
   };
 
-  const addBoard = async (name: string, groups: Group[], voteTypes: VoteType[]) => {
-    const board = await store.boardList.makeBoard({name, groups, voteTypes})
+  const addBoard = async (type: BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
+    const board = await store.boardList.makeBoard({type, name, groups, voteTypes})
     selectBoard(board.hashB64())
     creating = false
   }
@@ -97,7 +97,8 @@
     }
   }
 
-  const updateBoard = (hash: EntryHashB64) => async (name: string, groups: Group[], voteTypes: VoteType[]) => {
+  const updateBoard = (hash: EntryHashB64) => async (_type:BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
+    // ignore board type we don't update that.
     const board: Board | undefined = await store.boardList.getBoard(hash)
     if (board) {
       let changes = []
@@ -209,7 +210,7 @@
     </div>
     <div class='board-list'>
         {#if creating}
-        <BoardEditor handleSave={addBoard} {cancelEdit} voteTypes={editVoteTypes} />
+        <BoardEditor handleSave={addBoard} {cancelEdit} boardType={BoardType.Stickies} voteTypes={editVoteTypes} />
         {/if}
 
         {#each $boardList.boards as board }

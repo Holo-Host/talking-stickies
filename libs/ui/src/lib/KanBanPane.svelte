@@ -48,12 +48,12 @@
   $: totalStickies = stickies ? stickies.length : 0
   $: stickesCounts = countStickies(sortedStickies)
 
-  let creatingInGroup: number | undefined = undefined;
+  let creatingInColumn: number | undefined = undefined;
   let editText = "";
-  let editingStickyId
+  let editingCardId
 
-  let groupIds = []
-  let groups = []
+  let columnIds = []
+  let columns = []
   let ungroupedStickies = 0
 
   const countStickies = (stickies) : {} => {
@@ -67,37 +67,37 @@
   const groupStickies = (stickies) => {
     ungroupedStickies = 0
     if ($state) {
-      groups = cloneDeep($state.groups);
-      groupIds = groups.map(c => c.id)
+      columns = cloneDeep($state.groups);
+      columnIds = columns.map(c => c.id)
 
       stickies.forEach((sticky) => {
-        if (!groupIds.includes(sticky.group)) ungroupedStickies += 1
+        if (!columnIds.includes(sticky.group)) ungroupedStickies += 1
       });
-      groups.unshift({id: 0, name:""})
+      columns.unshift({id: 0, name:""})
     }
   };
 
-  const newSticky = (group: number) => () => {
-      creatingInGroup = group;
+  const newCard = (group: number) => () => {
+      creatingInColumn = group;
   };
   
-  const createSticky = (text, _groupId, props) => {
-    pane.addSticky(text, creatingInGroup, props)
-    creatingInGroup = undefined
+  const createCard = (text, _groupId, props) => {
+    pane.addSticky(text, creatingInColumn, props)
+    creatingInColumn = undefined
   }
 
   const clearEdit = () => {
-    editingStickyId = null;
+    editingCardId = null;
     editText = "";
   };
 
   const cancelEdit = () => {
-    creatingInGroup = undefined;
+    creatingInColumn = undefined;
     clearEdit();
   }
   
-  const editSticky = (id, text: string) => () => {
-    editingStickyId = id;
+  const editCard = (id, text: string) => () => {
+    editingCardId = id;
     editText = text;
   };
 
@@ -123,8 +123,8 @@
     tsStore.boardList.closeActiveBoard();
   };
 
-  const inGroup = (curGroupId, groupId) => {
-    return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
+  const inColumn = (curGroupId, groupId) => {
+    return curGroupId === groupId || (curGroupId === 0 && !columnIds.includes(groupId))
   }
 
 </script>
@@ -138,29 +138,21 @@
   </div>
   <div class="top-bar">
     <h1>{$state.name}</h1>
-    {#if $state.groups.length == 0}
-      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px" title="New Sticky">
-        <PlusIcon />
-      </div>
-    {/if}
     <SortSelector {setSortOption} {sortOption} />
   </div>
   {#if $state}
-    <div class="groups">
-      {#each groups as curGroup}
-        {#if (curGroup.id !== 0 || ungroupedStickies > 0)}
-        <div class="group" style:max-width={totalStickies ? `${stickesCounts[curGroup.id]/totalStickies*100}%` : 'fit-content'}>
-          {#if $state.groups.length > 0}
-          <div class="group-title">
-            <h2>{#if curGroup.id === 0}Ungrouped{:else}{curGroup.name}{/if}</h2>
-              <div class="add-sticky" on:click={newSticky(curGroup.id)}>
-                <PlusIcon />
-              </div>
+    <div class="columns">
+      {#each columns as column}
+        <div class="column">
+          <div class="column-title">
+            <p>{column.name}</p>
+            <div class="add-card" on:click={newCard(column.id)}>
+              <PlusIcon />
+            </div>
           </div>
-          {/if}
-          <div class="stickies">
-          {#each sortedStickies as { id, text, votes, group, props } (id)}
-            {#if editingStickyId === id && inGroup(curGroup.id, group)}
+          <div class="cards">
+          {#each sortedStickies as { id, text, votes, column, props } (id)}
+            {#if editingCardId === id && inColumn(column.id, column)}
               <StickyEditor
                 handleSave={(stickies, id) => {
                   pane.updateSticky(stickies, id);
@@ -172,15 +164,15 @@
                 }}
                 {cancelEdit}
                 text={editText}
-                groupId={group}
-                groups={groups}
+                groupId={column}
+                groups={columns}
                 props={props}
               />
-            {:else if  inGroup(curGroup.id, group)}
-              <div class="sticky" on:click={editSticky(id, text)} 
+            {:else if inColumn(column.id, column)}
+              <div class="card" on:click={editCard(id, text)} 
                 style:background-color={props && props.color ? props.color : "#d4f3ee"}
                 >
-                <div class="sticky-content">
+                <div class="card-content">
                   {@html Marked.parse(text)}
                 </div>
                 <div class="votes">
@@ -205,13 +197,10 @@
             {/if}
           {/each}
           </div>
-            {#if creatingInGroup !==undefined && inGroup(curGroup.id, creatingInGroup)}
-            <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
+            {#if creatingInColumn !==undefined && inColumn(column.id, creatingInColumn)}
+            <StickyEditor handleSave={createCard} {cancelEdit} groups={columns} />
           {/if}
         </div>
-        {:else if groups.length===1 && creatingInGroup !==undefined}
-        <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
-        {/if}
       {/each}
     </div>
   {/if}
@@ -244,39 +233,43 @@
   .export-board {
     right: 70px;
   }
-  .add-sticky, h2 {
+  .add-card, h2 {
     display: inline-block;
   }
-  .groups {
+  .columns {
     display: flex;
     flex-wrap: wrap;
   }
-  .group {
+  .column-title {
+    padding: 5px;
+    display: flex;
+    align-items: center;  
+  }
+  .column {
     display: block;
+    background-color: #d6d7d7;
+    width: 300px;
+    margin: 5px;
+    border-radius: 5px;
   }
-  .stickies {
+  .cards {
     display: flex;
     flex-wrap: wrap;
   }
-  .sticky {
-    background-color: #d4f3ee;
-    flex-basis: 200px;
-    height: 200px;
-    min-width: 250px;
-    margin: 10px;
-    padding: 10px;
-    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+  .card {
+    background-color: #f6f7f7;
+    margin: 5px;
+    padding: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     font-size: 12px;
     line-height: 16px;
     color: #000000;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
   }
-  .sticky-content {
-    overflow: scroll;
+  .card-content {
+    overflow-y: scroll;
   }
-  .add-sticky :global(svg) {
+  .add-card :global(svg) {
     margin-right: 6px;
     height: 30px;
     width: 30px;

@@ -11,6 +11,11 @@ export const DEFAULT_VOTE_TYPES = [
     {type: "3", emoji: "❓", toolTip: "I have questions about this topic.", maxVotes: 1},
 ]
 
+export const enum BoardType {
+  KanBan = 'KanBan',
+  Stickies = 'Stickies'
+}
+
 export class VoteType {
     type: uuidv1
     constructor(public emoji: string, public toolTip: string, public maxVotes: number){
@@ -27,6 +32,7 @@ export type Sticky = {
   };
   
   export interface BoardState {
+    type: BoardType;
     status: string;
     name: string;
     groups: Group[];
@@ -36,9 +42,13 @@ export type Sticky = {
   
   export type BoardDelta =
     | {
+      type: "set-type";
+      boardType: BoardType;
+      }
+    | {
       type: "set-status";
       status: string;
-    }
+      }
     | {
         type: "add-sticky";
         value: Sticky;
@@ -114,6 +124,10 @@ export type Sticky = {
       _ephemeralState: any,
       _author: AgentPubKey
     ) {
+
+      if (delta.type == "set-type") {
+        state.type = delta.boardType
+      }      
       if (delta.type == "set-status") {
         state.status = delta.status
       }

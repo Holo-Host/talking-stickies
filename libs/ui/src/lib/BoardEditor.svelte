@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
     import ExIcon from './icons/ExIcon.svelte'
     import TrashIcon from './icons/TrashIcon.svelte'
     import CheckIcon from './icons/CheckIcon.svelte'
     import PlusIcon from './icons/PlusIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
-    import { Group, VoteType } from './board';
+    import { Group, VoteType, BoardType } from './board';
   
     export let handleSave
     export let handleDelete = undefined
@@ -13,7 +13,11 @@
     export let text = ''
     export let groups = []
     export let voteTypes = []
+    export let boardType: BoardType | undefined = undefined
 
+    const onTypeChange = (event) => {
+      boardType = event.currentTarget.value
+    }
     const addVoteType = () => {
       voteTypes.push(new VoteType(`🙂`, `description: edit-me`, 1))
       voteTypes = voteTypes
@@ -114,7 +118,7 @@
       <div on:click={cancelEdit}>
         <ExIcon />
       </div>
-      <div on:click={() => handleSave(text, groups, voteTypes)}>
+      <div on:click={() => handleSave(boardType, text, groups, voteTypes)}>
         <CheckIcon />
       </div>
       {#if handleDelete}
@@ -126,6 +130,17 @@
     <div class="edit-title">
       Title: <input class='textarea' bind:value={text} />
     </div>
+    {#if boardType !== undefined}
+    <div class="edit-type">
+      Type: 
+      <label>
+        <input checked={boardType===BoardType.Stickies} on:change={onTypeChange} type="radio" name="amount" value={BoardType.Stickies} /> Stickies
+      </label>
+      <label>
+        <input checked={boardType===BoardType.KanBan} on:change={onTypeChange} type="radio" name="amount" value={BoardType.KanBan}  /> KanBan
+      </label>
+    </div>
+    {/if}
     <div class="edit-groups">
       Groups:
       <div class="add-item" on:click={() => addGroup()}>

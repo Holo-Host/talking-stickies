@@ -1,6 +1,6 @@
 import { RootStore, type Commit, type SynGrammar, type SynStore, type Workspace, type WorkspaceStore } from "@holochain-syn/core";
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from "@holochain-open-dev/core-types";
-import { Board, CommitTypeBoard } from "./board";
+import { Board, BoardType, CommitTypeBoard } from "./board";
 import { deserializeHash, EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
@@ -111,6 +111,7 @@ export class BoardList {
     public workspace: WorkspaceStore<BoardListGrammar>
     public boards: Dictionary<Board>
     activeBoardHash: Writable<EntryHashB64| undefined> = writable(undefined)
+    activeBoardType: Writable<BoardType| undefined> = writable(undefined)
 
     constructor(public rootStore: RootStore<BoardListGrammar>, public boardsRootStore: RootStore<BoardGrammar>) {
         this.boards = {}
@@ -202,10 +203,12 @@ export class BoardList {
             board = await this.getBoard(hash)
             if (board) {
                 this.activeBoardHash.update((n) => {return hash} )
+                this.activeBoardType.update((n)=> {return board.state().type})
             }
         }
         if (!board) {
             this.activeBoardHash.update((n) => {return undefined} )
+            this.activeBoardType.update((n) => {return undefined} )
         }
     }
 
@@ -243,6 +246,12 @@ export class BoardList {
 
         if (options !== undefined) {
             let changes = []
+            if (options.type) {
+                changes.push({
+                    type: "set-type",
+                    boardType: options.type
+                })
+            }
             if (options.name) {
                 changes.push({
                     type: "set-name",

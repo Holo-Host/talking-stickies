@@ -2,10 +2,12 @@
     import BoardList from './BoardList.svelte'
     import Toolbar from './Toolbar.svelte'
     import BoardPane from './BoardPane.svelte'
+    import KanBanPane from './KanBanPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
     import type { CellClient } from '@holochain-open-dev/cell-client';
     import type { SynStore } from '@holochain-syn/store';
+  import { BoardType } from './board';
 
     // The debug drawer's ability to resized and hidden
     let resizeable
@@ -67,6 +69,7 @@
     export let client : CellClient
 
     $: activeBoardIndex = tsStore ? tsStore.boardList.activeBoardHash : undefined
+    $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
     $: boardList = tsStore ? tsStore.boardList : undefined
 
     initialize()
@@ -138,8 +141,12 @@
         Loading for board list...
       {/if}
       {#if $activeBoardIndex !== undefined}
-        <BoardPane
-          on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {#if $activeBoardType === BoardType.Stickies}
+          <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {/if}
+        {#if $activeBoardType === BoardType.KanBan}
+          <KanBanPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {/if}
       {/if}
       <a class="issue" target="github" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo">Report Issue</a>
       {:else}
