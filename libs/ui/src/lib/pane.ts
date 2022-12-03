@@ -41,31 +41,33 @@ export class Pane {
         this.dispatch("requestChange", [{ type: "add-sticky", value: sticky }]);
     };
 
-    updateSticky = (stickies, id) => (text:string, groupId: string, props:any) => {
+    updateSticky = (stickies, id, closeFn) => (text:string, groupId: string, props:any) => {
         const sticky = stickies.find((sticky) => sticky.id === id);
         if (!sticky) {
           console.error("Failed to find item with id", id);
-          return;
+        } else {
+          let changes = []
+          if (sticky.text != text) {
+            changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
+          }
+          const newGroupId: number = parseInt(groupId)
+          if (sticky.group != newGroupId) {
+            changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
+          }
+          console.log("sticky.props", sticky.props, "props", props)
+          if (!isEqual(sticky.props, props)) {
+            changes.push({ type: "update-sticky-props", id: sticky.id, props: cloneDeep(props)})
+          }
+          if (changes.length > 0) {
+          this.dispatch("requestChange", changes);
+          }
         }
-        let changes = []
-        if (sticky.text != text) {
-          changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
-        }
-        const newGroupId: number = parseInt(groupId)
-        if (sticky.group != newGroupId) {
-          changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
-        }
-        console.log("sticky.props", sticky.props, "props", props)
-        if (!isEqual(sticky.props, props)) {
-          changes.push({ type: "update-sticky-props", id: sticky.id, props: cloneDeep(props)})
-        }
-        if (changes.length > 0) {
-         this.dispatch("requestChange", changes);
-        }
+        closeFn()
     };
     
-    deleteSticky = (id) => () => {
+    deleteSticky = (id, closeFn) => () => {
         this.dispatch("requestChange", [{ type: "delete-sticky", id }]);
+        closeFn()
     };
  
     voteOnSticky = (agent, stickies, id, type, max) => {

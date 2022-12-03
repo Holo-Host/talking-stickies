@@ -11,6 +11,7 @@ export { default as KanBanPane } from './KanBanPane.svelte';
 export { default as BoardList} from './BoardList.svelte';
 export { default as SortSelector} from './SortSelector.svelte';
 export { default as StickyEditor} from './StickyEditor.svelte';
+export { default as CardEditor} from './CardEditor.svelte';
 export { default as Toolbar } from './Toolbar.svelte';
 export { default as AvatarIcon } from './icons/AvatarIcon.svelte';
 export { default as CheckIcon } from './icons/CheckIcon.svelte';

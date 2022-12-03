@@ -67,6 +67,7 @@
 
   const addBoard = async (type: BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
     const board = await store.boardList.makeBoard({type, name, groups, voteTypes})
+    console.log("ADD BOARD", board, groups)
     selectBoard(board.hashB64())
     creating = false
   }

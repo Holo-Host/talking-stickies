@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  import StickyEditor from "./StickyEditor.svelte";
+  import CardEditor from "./CardEditor.svelte";
   import PlusIcon from "./icons/PlusIcon.svelte";
   import ExIcon from "./icons/ExIcon.svelte";
   import ExportIcon from "./icons/ExportIcon.svelte";
@@ -38,15 +38,13 @@
 
   $: activeHash = tsStore.boardList.activeBoardHash;
   $: state = tsStore.boardList.getReadableBoardState($activeHash);
-  $: stickies = $state ? $state.stickies : undefined;
-  $: sortStickies = sortOption
+  $: items = $state ? $state.stickies : undefined;
+  $: sortCards = sortOption
     ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)
-    : (stickies) => stickies;
+    : (items) => items;
 
-  $: sortedStickies = sortStickies(stickies);
-  $: groupedStickies = groupStickies(sortedStickies);
-  $: totalStickies = stickies ? stickies.length : 0
-  $: stickesCounts = countStickies(sortedStickies)
+  $: sortedCards = sortCards(items);
+  $: groupedCards = groupCards(sortedCards);
 
   let creatingInColumn: number | undefined = undefined;
   let editText = "";
@@ -54,26 +52,19 @@
 
   let columnIds = []
   let columns = []
-  let ungroupedStickies = 0
 
-  const countStickies = (stickies) : {} => {
+  const countCards = (items) : {} => {
     let counts = {}
-    stickies.forEach((sticky) => {
-      counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 0
+    items.forEach((card) => {
+      counts[card.group] = counts[card.group] != undefined ? counts[card.group]+1 : 0
     })
     return counts
   }
     
-  const groupStickies = (stickies) => {
-    ungroupedStickies = 0
+  const groupCards = (items) => {
     if ($state) {
       columns = cloneDeep($state.groups);
       columnIds = columns.map(c => c.id)
-
-      stickies.forEach((sticky) => {
-        if (!columnIds.includes(sticky.group)) ungroupedStickies += 1
-      });
-      columns.unshift({id: 0, name:""})
     }
   };
 
@@ -123,10 +114,6 @@
     tsStore.boardList.closeActiveBoard();
   };
 
-  const inColumn = (curGroupId, groupId) => {
-    return curGroupId === groupId || (curGroupId === 0 && !columnIds.includes(groupId))
-  }
-
 </script>
 
 <div class="board">
@@ -151,54 +138,54 @@
             </div>
           </div>
           <div class="cards">
-          {#each sortedStickies as { id, text, votes, column, props } (id)}
-            {#if editingCardId === id && inColumn(column.id, column)}
-              <StickyEditor
-                handleSave={(stickies, id) => {
-                  pane.updateSticky(stickies, id);
-                  clearEdit();
-                }}
-                handleDelete={(id) => {
-                  pane.deleteSticky(id);
-                  clearEdit();
-                }}
-                {cancelEdit}
-                text={editText}
-                groupId={column}
-                groups={columns}
-                props={props}
-              />
-            {:else if inColumn(column.id, column)}
-              <div class="card" on:click={editCard(id, text)} 
-                style:background-color={props && props.color ? props.color : "#d4f3ee"}
-                >
-                <div class="card-content">
-                  {@html Marked.parse(text)}
-                </div>
-                <div class="votes">
-                  {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
-                    <div
-                      class="vote"
-                      title={toolTip}
-                      class:voted={myVotes(votes, type) > 0}
-                      on:click|stopPropagation={() => pane.voteOnSticky(tsStore.myAgentPubKey(), stickies, id, type, maxVotes)}
-                    >
-                      <EmojiIcon emoji={emoji} class="vote-icon" />
-                      {countVotes(votes, type)}
-                      <div class="vote-counts">
-                        {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}
-                          <div class="vote-count" />
-                        {/each}
+          {#each sortedCards as { id:cardId, text, votes, group:columnId, props }}
+            {#if column.id === columnId}
+              {#if editingCardId === cardId}
+                <CardEditor
+                  handleSave={
+                    pane.updateSticky(items, cardId, clearEdit)
+                  }
+                  handleDelete={
+                    pane.deleteSticky(cardId, clearEdit)
+                  }
+                  {cancelEdit}
+                  text={editText}
+                  groupId={columnId}
+                  groups={columns}
+                  props={props}
+                />
+              {:else}
+                <div class="card" on:click={editCard(cardId, text)} 
+                  style:background-color={props && props.color ? props.color : "white"}
+                  >
+                  <div class="card-content">
+                    {@html Marked.parse(text)}
+                  </div>
+                  <div class="votes">
+                    {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
+                      <div
+                        class="vote"
+                        title={toolTip}
+                        class:voted={myVotes(votes, type) > 0}
+                        on:click|stopPropagation={() => pane.voteOnSticky(tsStore.myAgentPubKey(), items, cardId, type, maxVotes)}
+                      >
+                        <EmojiIcon emoji={emoji} class="vote-icon" />
+                        {countVotes(votes, type)}
+                        <div class="vote-counts">
+                          {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}
+                            <div class="vote-count" />
+                          {/each}
+                        </div>
                       </div>
-                    </div>
-                  {/each}
+                    {/each}
+                  </div>
                 </div>
-              </div>
+              {/if}
             {/if}
           {/each}
           </div>
-            {#if creatingInColumn !==undefined && inColumn(column.id, creatingInColumn)}
-            <StickyEditor handleSave={createCard} {cancelEdit} groups={columns} />
+            {#if creatingInColumn !==undefined && column.id === creatingInColumn}
+            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} />
           {/if}
         </div>
       {/each}
@@ -254,10 +241,10 @@
   }
   .cards {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
   }
   .card {
-    background-color: #f6f7f7;
+    background-color: white;
     margin: 5px;
     padding: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);

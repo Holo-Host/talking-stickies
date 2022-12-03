@@ -162,14 +162,12 @@
           {#each sortedStickies as { id, text, votes, group, props } (id)}
             {#if editingStickyId === id && inGroup(curGroup.id, group)}
               <StickyEditor
-                handleSave={(stickies, id) => {
-                  pane.updateSticky(stickies, id);
-                  clearEdit();
-                }}
-                handleDelete={(id) => {
-                  pane.deleteSticky(id);
-                  clearEdit();
-                }}
+                handleSave={
+                  pane.updateSticky(stickies, id, clearEdit)
+                }
+                handleDelete={
+                  pane.deleteSticky(id, clearEdit)
+                }
                 {cancelEdit}
                 text={editText}
                 groupId={group}

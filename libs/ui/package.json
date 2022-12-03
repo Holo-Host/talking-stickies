@@ -18,6 +18,7 @@
     "./BoardList.svelte": "./package/BoardList.svelte",
     "./SortSelector.svelte": "./package/SortSelector.svelte",
     "./StickyEditor.svelte": "./package/StickyEditor.svelte",
+    "./CardEditor.svelte": "./package/CardEditor.svelte",
     "./board": "./package/board.js",
     "./grammar": "./package/grammar.js",
     "./icon.svg": "./package/icon.svg",
