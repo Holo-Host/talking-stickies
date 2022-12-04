@@ -241,8 +241,8 @@ export class Board {
 }
 
 export class Group {
-    id: number
+    id: uuidv1
     constructor(public name: string) {
-        this.id = Date.now()
+        this.id =  uuidv1()
     }
 }

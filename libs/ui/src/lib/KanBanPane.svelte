@@ -5,7 +5,6 @@
   import ExIcon from "./icons/ExIcon.svelte";
   import ExportIcon from "./icons/ExportIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
-  import { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
@@ -45,6 +44,7 @@
 
   $: sortedCards = sortCards(items);
   $: groupedCards = groupCards(sortedCards);
+  $: avatars = tsStore.boardList.avatars()
 
   let creatingInColumn: number | undefined = undefined;
   let editText = "";
@@ -153,6 +153,7 @@
                   groupId={columnId}
                   groups={columns}
                   props={props}
+                  avatars={avatars}
                 />
               {:else}
                 <div class="card" on:click={editCard(cardId, text)} 
@@ -161,6 +162,12 @@
                   <div class="card-content">
                     {@html Marked.parse(text)}
                   </div>
+                  {#if props && props.agents && props.agents.length > 0}
+                    Tagged: 
+                    {#each props.agents as agent}
+                      <span class="avatar-name">{$avatars[agent].name}</span>
+                    {/each}
+                  {/if}
                   <div class="votes">
                     {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
                       <div
@@ -185,7 +192,7 @@
           {/each}
           </div>
             {#if creatingInColumn !==undefined && column.id === creatingInColumn}
-            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} />
+            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
           {/if}
         </div>
       {/each}
@@ -220,7 +227,7 @@
   .export-board {
     right: 70px;
   }
-  .add-card, h2 {
+  .add-card {
     display: inline-block;
   }
   .columns {

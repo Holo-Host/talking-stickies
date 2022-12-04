@@ -278,14 +278,6 @@
       align-items: flex-start;
       flex-shrink: 1;
     }
-    .reload-boards {
-      position: absolute;
-      right: 45px;
-      margin-top: -18px;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
     .avatar-button {
       position: absolute;
       right: 45px;

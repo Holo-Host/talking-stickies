@@ -15,8 +15,21 @@
     export let voteTypes = []
     export let boardType: BoardType | undefined = undefined
 
+    let groupsTitle = "Groups"
+    let defaultGroupName = "group"
+
     const onTypeChange = (event) => {
       boardType = event.currentTarget.value
+      if (boardType == BoardType.Stickies) {
+        groupsTitle = "Groups"
+        defaultGroupName = "group"
+      } else {
+        if (groups.length == 0) {
+          groups = [new Group("Backlog"), new Group("Prioritized"), new Group("Doing"), new Group("Done")]
+        }
+        groupsTitle = "Columns"
+        defaultGroupName = "column"
+      }
     }
     const addVoteType = () => {
       voteTypes.push(new VoteType(`🙂`, `description: edit-me`, 1))
@@ -40,7 +53,7 @@
     }
 
     const addGroup = () => {
-      groups.push(new Group(`group ${groups.length+1}`))
+      groups.push(new Group(`${defaultGroupName} ${groups.length+1}`))
       groups = groups
     }
     const deleteGroup = (index) => () => {
@@ -142,7 +155,7 @@
     </div>
     {/if}
     <div class="edit-groups">
-      Groups:
+      {groupsTitle}:
       <div class="add-item" on:click={() => addGroup()}>
         <PlusIcon />
       </div>

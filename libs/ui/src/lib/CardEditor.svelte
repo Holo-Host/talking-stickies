@@ -1,8 +1,12 @@
-<script>
+<script lang="ts">
   import ExIcon from './icons/ExIcon.svelte'
   import TrashIcon from './icons/TrashIcon.svelte'
   import CheckIcon from './icons/CheckIcon.svelte'
-  import cloneDeep from "lodash"
+  import type { Dictionary } from "@holochain-open-dev/core-types";
+  import MultiSelect from 'svelte-multiselect'
+  import type { Option, ObjectOption } from 'svelte-multiselect'
+  import type { Avatar } from './boardList';
+  import type { Readable } from 'svelte/store';
 
   export let handleSave
   export let handleDelete = undefined
@@ -10,13 +14,63 @@
   export let text = ''
   export let groupId = undefined
   export let groups = []
-  export let props = {}
+  export let props = {color: "white", agents:[]}
+  export let avatars: Readable<Dictionary<Avatar>> 
+
   const colors=["white","#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "yellow", "LightSkyBlue", "grey"]
   const setColor = (color) => {
-    // TODO fix later when there are more properties
-    props = {color}
+    props.color  = color
+    props = props
   }
+  const setAgents = () => {
+    props.agents = selected.map(o => o.value)
+    props = props
+  }
+
+  const avatarNames = () : ObjectOption[] => {
+    const options:ObjectOption[] = Object.entries($avatars).map(([key,value]) => 
+    {return {label: value.name ? value.name:key, value: key}} )
+    return options
+  }
+  let selected = []
 </script>
+
+
+<div class='card-editor' style:background-color={props.color}>
+  <div class="card-elements">
+  <textarea class='textarea' bind:value={text} />
+  <div class="color-buttons">
+    {#each colors as color}
+      <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
+    {/each}
+  </div>
+  {#if groups.length > 1 && groupId !== undefined}
+    <select bind:value={groupId}>
+      {#each groups as group}
+        <option value={group.id}>
+          {group.name}
+        </option>
+      {/each}
+    </select>
+  {/if}
+  Tagged: <MultiSelect 
+    bind:selected options={avatarNames()}
+    on:change={(_event)=>setAgents()} />
+  </div>
+  <div class='controls'>
+    <div on:click={cancelEdit}>
+      <ExIcon />
+    </div>
+    <div on:click={() => handleSave(text, groupId, props)}>
+      <CheckIcon />
+    </div>
+    {#if handleDelete}
+      <div on:click={handleDelete} style="width:20px">
+        <TrashIcon />
+      </div>
+    {/if}
+  </div>
+</div>
 
 <style>
   .card-editor {
@@ -76,36 +130,3 @@
     border: 2px black solid;
   }
 </style>
-
-<div class='card-editor' style:background-color={props.color}>
-  <div class="card-elements">
-  <textarea class='textarea' bind:value={text} />
-  <div class="color-buttons">
-    {#each colors as color}
-      <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
-    {/each}
-  </div>
-  {#if groups.length > 1 && groupId !== undefined}
-    <select bind:value={groupId}>
-      {#each groups as group}
-        <option value={group.id}>
-          {group.name}
-        </option>
-      {/each}
-    </select>
-  {/if}
-  </div>
-  <div class='controls'>
-    <div on:click={cancelEdit}>
-      <ExIcon />
-    </div>
-    <div on:click={() => handleSave(text, groupId, props)}>
-      <CheckIcon />
-    </div>
-    {#if handleDelete}
-      <div on:click={handleDelete} style="width:20px">
-        <TrashIcon />
-      </div>
-    {/if}
-  </div>
-</div>
