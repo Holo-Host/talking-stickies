@@ -308,7 +308,7 @@
     margin-bottom: 2px;
   }
   .avatar-name {
-    border-radius: 10px;
+    border-radius: 5px;
     background-color: rgb(13, 145, 147);
     color: white;
     padding: 0 3px;
