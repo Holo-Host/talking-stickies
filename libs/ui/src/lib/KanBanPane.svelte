@@ -9,8 +9,10 @@
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
   import { Marked, Renderer } from "@ts-stack/markdown";
-  import { cloneDeep, isEqual } from "lodash";
+  import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
+  import type { v1 as uuidv1 } from "uuid";
+  import type { Sticky } from "./board";
 
   const pane = new Pane();
 
@@ -39,16 +41,16 @@
   $: state = tsStore.boardList.getReadableBoardState($activeHash);
   $: items = $state ? $state.stickies : undefined;
   $: sortCards = sortOption
-    ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)
+    ? sortBy((sticky: Sticky) => countVotes(sticky.votes, sortOption) * -1)
     : (items) => items;
 
   $: sortedCards = sortCards(items);
   $: groupedCards = groupCards(sortedCards);
   $: avatars = tsStore.boardList.avatars()
 
-  let creatingInColumn: number | undefined = undefined;
+  let creatingInColumn: uuidv1 | undefined = undefined;
   let editText = "";
-  let editingCardId
+  let editingCardId: uuidv1
 
   let columnIds = []
   let columns = []
@@ -68,11 +70,11 @@
     }
   };
 
-  const newCard = (group: number) => () => {
+  const newCard = (group: uuidv1) => () => {
       creatingInColumn = group;
   };
   
-  const createCard = (text, _groupId, props) => {
+  const createCard = (text:string, _groupId: uuidv1, props:any) => {
     pane.addSticky(text, creatingInColumn, props)
     creatingInColumn = undefined
   }
@@ -87,7 +89,7 @@
     clearEdit();
   }
   
-  const editCard = (id, text: string) => () => {
+  const editCard = (id: uuidv1, text: string) => () => {
     editingCardId = id;
     editText = text;
   };
@@ -132,7 +134,7 @@
       {#each columns as column}
         <div class="column">
           <div class="column-title">
-            <p>{column.name}</p>
+            <div>{column.name}</div>
             <div class="add-card" on:click={newCard(column.id)}>
               <PlusIcon />
             </div>
@@ -165,7 +167,7 @@
                   {#if props && props.agents && props.agents.length > 0}
                     Tagged: 
                     {#each props.agents as agent}
-                      <span class="avatar-name">{$avatars[agent].name}</span>
+                      <span class="avatar-name" title={agent}>{$avatars[agent] ? $avatars[agent].name : `${agent.substring(0,8)}...`}</span>
                     {/each}
                   {/if}
                   <div class="votes">
@@ -229,13 +231,14 @@
   }
   .add-card {
     display: inline-block;
+    margin-left: 7px;
   }
   .columns {
     display: flex;
     flex-wrap: wrap;
   }
   .column-title {
-    padding: 5px;
+    padding: 10px 5px 0px 5px;
     display: flex;
     align-items: center;  
   }
@@ -252,7 +255,7 @@
   }
   .card {
     background-color: white;
-    margin: 5px;
+    margin: 10px;
     padding: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     font-size: 12px;
@@ -303,5 +306,12 @@
     height: 5px;
     background-color: black;
     margin-bottom: 2px;
+  }
+  .avatar-name {
+    border-radius: 10px;
+    background-color: rgb(13, 145, 147);
+    color: white;
+    padding: 0 3px;
+    margin-right: 4px;
   }
 </style>

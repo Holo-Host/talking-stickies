@@ -24,9 +24,9 @@ export class VoteType {
 }
 
 export type Sticky = {
-    id: string;
+    id: uuidv1;
     text: string;
-    group: number;
+    group: uuidv1;
     votes: Object;
     props: Object;
   };
@@ -75,27 +75,27 @@ export type Sticky = {
       }
     | {
         type: "set-group-index";
-        id: number;
+        id: uuidv1;
         index: number;
       }
     | {
         type: "update-sticky-group";
-        id: string;
-        group: number;
+        id: uuidv1;
+        group: uuidv1;
       }
       | {
         type: "update-sticky-props";
-        id: string;
+        id: uuidv1;
         props: Object;
       }
    | {
         type: "update-sticky-text";
-        id: string;
+        id: uuidv1;
         text: string;
       }
     | {
         type: "update-sticky-votes";
-        id: string;
+        id: uuidv1;
         voteType: string;
         voter: AgentPubKeyB64;
         count: number
@@ -114,7 +114,7 @@ export type Sticky = {
     initState(state)  {
       state.status = ""
       state.name = "untitled"
-      state.groups = [{id:0, name:"group1"}]
+      state.groups = [{id:UngroupedId, name:"group1"}]
       state.stickies = []
       state.voteTypes = DEFAULT_VOTE_TYPES
     },
@@ -240,6 +240,7 @@ export class Board {
     }
 }
 
+export const UngroupedId = ""
 export class Group {
     id: uuidv1
     constructor(public name: string) {

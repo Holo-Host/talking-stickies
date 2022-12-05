@@ -21,5 +21,5 @@
 </style>
 
 <div class='toolbar'>
-  <div class="logo"><LogoIcon /></div><h1 class="logo-text">Clarity</h1>
+  <div class="logo"><LogoIcon /></div><h1 class="logo-text">Boardz</h1>
 </div>

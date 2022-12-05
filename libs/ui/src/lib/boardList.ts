@@ -243,7 +243,9 @@ export class BoardList {
         const workspaceStore = board.workspace
         const boardHash = board.hashB64()
         this.boards[boardHash] = board 
-
+        if (options.type === undefined) {
+            options.type = BoardType.Stickies
+        }
         if (options !== undefined) {
             let changes = []
             if (options.type) {

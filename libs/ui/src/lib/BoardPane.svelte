@@ -5,13 +5,14 @@
   import ExIcon from "./icons/ExIcon.svelte";
   import ExportIcon from "./icons/ExportIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
-  import { v1 as uuidv1 } from "uuid";
+  import type { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
   import { Marked, Renderer } from "@ts-stack/markdown";
   import { cloneDeep, isEqual } from "lodash";
   import { Pane } from "./pane";
+  import { UngroupedId, type Sticky } from "./board";
 
   const pane = new Pane();
 
@@ -48,9 +49,9 @@
   $: totalStickies = stickies ? stickies.length : 0
   $: stickesCounts = countStickies(sortedStickies)
 
-  let creatingInGroup: number | undefined = undefined;
+  let creatingInGroup: uuidv1 | undefined = undefined;
   let editText = "";
-  let editingStickyId
+  let editingStickyId: uuidv1
 
   let groupIds = []
   let groups = []
@@ -58,7 +59,7 @@
 
   const countStickies = (stickies) : {} => {
     let counts = {}
-    stickies.forEach((sticky) => {
+    stickies.forEach((sticky: Sticky) => {
       counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 0
     })
     return counts
@@ -73,15 +74,15 @@
       stickies.forEach((sticky) => {
         if (!groupIds.includes(sticky.group)) ungroupedStickies += 1
       });
-      groups.unshift({id: 0, name:""})
+      groups.unshift({id:UngroupedId, name:""})
     }
   };
 
-  const newSticky = (group: number) => () => {
+  const newSticky = (group: uuidv1) => () => {
       creatingInGroup = group;
   };
   
-  const createSticky = (text, _groupId, props) => {
+  const createSticky = (text: string, _groupId: uuidv1, props) => {
     pane.addSticky(text, creatingInGroup, props)
     creatingInGroup = undefined
   }
@@ -96,7 +97,7 @@
     clearEdit();
   }
   
-  const editSticky = (id, text: string) => () => {
+  const editSticky = (id:uuidv1, text: string) => () => {
     editingStickyId = id;
     editText = text;
   };
@@ -139,7 +140,7 @@
   <div class="top-bar">
     <h1>{$state.name}</h1>
     {#if $state.groups.length == 0}
-      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px" title="New Sticky">
+      <div class="add-sticky" on:click={newSticky(UngroupedId)} style="margin-left:5px" title="New Sticky">
         <PlusIcon />
       </div>
     {/if}
@@ -148,11 +149,11 @@
   {#if $state}
     <div class="groups">
       {#each groups as curGroup}
-        {#if (curGroup.id !== 0 || ungroupedStickies > 0)}
-        <div class="group" style:max-width={totalStickies ? `${stickesCounts[curGroup.id]/totalStickies*100}%` : 'fit-content'}>
+        {#if (curGroup.id !== UngroupedId || ungroupedStickies > 0)}
+        <div class="group" style:max-width={totalStickies ? stickesCounts[curGroup.id]/totalStickies*100 ? `${stickesCounts[curGroup.id]/totalStickies*100}%` :'fit-content' : 'fit-content'}>
           {#if $state.groups.length > 0}
           <div class="group-title">
-            <h2>{#if curGroup.id === 0}Ungrouped{:else}{curGroup.name}{/if}</h2>
+            <h2>{#if curGroup.id === UngroupedId}Ungrouped{:else}{curGroup.name}{/if}</h2>
               <div class="add-sticky" on:click={newSticky(curGroup.id)}>
                 <PlusIcon />
               </div>

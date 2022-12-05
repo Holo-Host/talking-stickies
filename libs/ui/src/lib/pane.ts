@@ -2,6 +2,7 @@ import { createEventDispatcher } from "svelte";
 import type { BoardState } from "./board";
 import { v1 as uuidv1 } from "uuid";
 import { cloneDeep, isEqual } from "lodash";
+import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
 
 const download = (filename: string, text: string) => {
     var element = document.createElement('a');
@@ -28,7 +29,7 @@ export class Pane {
         alert(`Your board was exported to your Downloads folder as: '${fileName}'`)
     }
 
-    addSticky = (text: string, group: number , props: any) => {
+    addSticky = (text: string, group: uuidv1 , props: any) => {
         if (group === undefined) {group = 0}
         const sticky = {
           id: uuidv1(),
@@ -41,7 +42,7 @@ export class Pane {
         this.dispatch("requestChange", [{ type: "add-sticky", value: sticky }]);
     };
 
-    updateSticky = (stickies, id, closeFn) => (text:string, groupId: string, props:any) => {
+    updateSticky = (stickies, id: uuidv1, closeFn) => (text:string, groupId: uuidv1, props:any) => {
         const sticky = stickies.find((sticky) => sticky.id === id);
         if (!sticky) {
           console.error("Failed to find item with id", id);
@@ -50,9 +51,8 @@ export class Pane {
           if (sticky.text != text) {
             changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
           }
-          const newGroupId: number = parseInt(groupId)
-          if (sticky.group != newGroupId) {
-            changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
+          if (sticky.group != groupId) {
+            changes.push({ type: "update-sticky-group", id: sticky.id, group: groupId  })
           }
           console.log("sticky.props", sticky.props, "props", props)
           if (!isEqual(sticky.props, props)) {
@@ -65,12 +65,12 @@ export class Pane {
         closeFn()
     };
     
-    deleteSticky = (id, closeFn) => () => {
+    deleteSticky = (id: uuidv1, closeFn) => () => {
         this.dispatch("requestChange", [{ type: "delete-sticky", id }]);
         closeFn()
     };
  
-    voteOnSticky = (agent, stickies, id, type, max) => {
+    voteOnSticky = (agent:AgentPubKeyB64, stickies, id: uuidv1, type, max) => {
         const sticky = stickies.find((sticky) => sticky.id === id);
         if (!sticky) {
           console.error("Failed to find sticky with id", id);
