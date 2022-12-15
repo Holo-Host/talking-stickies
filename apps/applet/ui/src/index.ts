@@ -7,7 +7,7 @@ const talkingStickies: WeApplet = {
  async appletRenderers(appWebsocket: AppWebsocket, adminWs, weServices, appletInfo) {
 
   const talkingStickiesCell: InstalledCell = appletInfo[0].installedAppInfo.cell_data.find(
-    c => c.role_id === 'talking-stickies'
+    c => c.role_name === 'talking-stickies'
   )!;
 
     const holochainClient = new HolochainClient(appWebsocket);

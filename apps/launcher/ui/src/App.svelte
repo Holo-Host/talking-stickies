@@ -23,7 +23,7 @@
     });
     const installedCells = appInfo.cell_data;
     const talkingStickiesCell = installedCells.find(
-        c => c.role_id === 'talking-stickies'
+        c => c.role_name === 'talking-stickies'
       ) as InstalledCell;
     cellClient = new CellClient(holochainClient, talkingStickiesCell)
 
