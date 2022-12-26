@@ -15,13 +15,11 @@
     "package": "echo \"packaging what was previously built in ./public\" && rimraf ui.zip && cd ./public && bestzip ../ui.zip * "
   },
   "dependencies": {
-    "@holo-host/talking-stickies": "0.7.0",
+    "@holo-host/talking-stickies": "0.8.0",
     "@holo-host/web-sdk": "^0.6.7-prerelease",
-    "@holochain-open-dev/cell-client": "0.9.1",
-    "@holochain-open-dev/core-types": "0.6.2",
-    "@holochain-open-dev/utils": "0.6.2",
-    "@holochain-syn/core": "0.2.6",
-    "@holochain/client": "0.10.2",
+    "@holochain-open-dev/utils": "0.7.2",
+    "@holochain-syn/core": "0.3.0-alpha.2",
+    "@holochain/client": "0.11.9",
     "@ts-stack/markdown": "^1.4.0",
     "lodash": "^4.17.21",
     "sirv-cli": "^1.0.0",

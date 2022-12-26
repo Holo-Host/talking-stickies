@@ -6,6 +6,8 @@
     "apps/*/ui"
   ],
   "scripts": {
+    "launch"      : "npm run build:happ && npm run build:ui && npm run launch:happ",
+    "launch:happ" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network mdns",
     "network": "hc s clean && npm run build:happ && concurrently-repeat \"npm run start:agent:multi\"",
     "network:foo": "concurrently-repeat \"npm run start:foo\"",
     "start:foo": "cross-env APP_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:ui:foo\"",

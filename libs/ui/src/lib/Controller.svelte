@@ -5,7 +5,7 @@
     import KanBanPane from './KanBanPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
-    import type { CellClient } from '@holochain-open-dev/cell-client';
+    import type { AppAgentClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
   import { BoardType } from './board';
 
@@ -66,7 +66,7 @@
     let synStore: SynStore;
     let tsStore: TalkingStickiesStore;
     
-    export let client : CellClient
+    export let client : AppAgentClient
 
     $: activeBoardIndex = tsStore ? tsStore.boardList.activeBoardHash : undefined
     $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
@@ -85,13 +85,17 @@
     async function initialize() : Promise<void> {
       const store = createStore()
       synStore = store.synStore;
-      await store.loadBoards()
-      tsStore = store
+      try {
+        await store.loadBoards()
+        tsStore = store
+      } catch (e) {
+        console.log("Error loading boards:", e)
+      }
     }
     function createStore() : TalkingStickiesStore {
-  
       const store = new TalkingStickiesStore(
         client,
+        'talking-stickies'
       );
       return store
     }

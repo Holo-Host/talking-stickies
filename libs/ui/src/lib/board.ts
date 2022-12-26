@@ -1,8 +1,7 @@
 import type { RootStore, SynGrammar, WorkspaceStore } from "@holochain-syn/core";
 import { get } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
-import type { AgentPubKey, EntryHash } from "@holochain/client";
-import type { AgentPubKeyB64, EntryHashB64 } from "@holochain-open-dev/core-types";
+import type { AgentPubKey, EntryHash, AgentPubKeyB64, EntryHashB64 } from "@holochain/client";
 import { serializeHash } from "@holochain-open-dev/utils";
 
 export const DEFAULT_VOTE_TYPES = [

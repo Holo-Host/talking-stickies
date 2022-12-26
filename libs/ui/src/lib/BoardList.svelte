@@ -12,9 +12,8 @@
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
   import { Group, VoteType, DEFAULT_VOTE_TYPES, Board, BoardType } from './board';
-  import type { EntryHashB64 } from '@holochain-open-dev/core-types';
+  import type { EntryHashB64 } from '@holochain/client';
   import type { BoardState } from './board';
-  import { serializeHash } from '@holochain-open-dev/utils';
   import AvatarEditor from './AvatarEditor.svelte';
   import type { Avatar } from './boardList';
   import Participants from './Participants.svelte';
