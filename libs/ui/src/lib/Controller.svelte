@@ -7,7 +7,9 @@
     import { setContext } from 'svelte';
     import type { AppAgentClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
-  import { BoardType } from './board';
+    import { BoardType } from './board';
+
+    export let boardType: BoardType = BoardType.Stickies
 
     // The debug drawer's ability to resized and hidden
     let resizeable
@@ -138,9 +140,9 @@
   
   <div class='app'>
     {#if tsStore}
-      <Toolbar />
+      <Toolbar title={boardType == BoardType.Stickies ? 'TalkingStickies' : 'KanBan' }/>
       {#if boardList}
-      <BoardList />
+      <BoardList boardType={boardType}/>
       {:else}
         Loading for board list...
       {/if}

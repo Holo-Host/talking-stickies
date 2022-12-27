@@ -1,6 +1,6 @@
 <script>
   import LogoIcon from "./icons/LogoIcon.svelte";
-
+  export let title = ""
 
 </script>
 
@@ -21,5 +21,5 @@
 </style>
 
 <div class='toolbar'>
-  <div class="logo"><LogoIcon /></div><h1 class="logo-text">Boardz</h1>
+  <div class="logo"><LogoIcon /></div><h1 class="logo-text">{title}</h1>
 </div>

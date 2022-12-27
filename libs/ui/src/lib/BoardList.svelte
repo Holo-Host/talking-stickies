@@ -18,6 +18,9 @@
   import type { Avatar } from './boardList';
   import Participants from './Participants.svelte';
   import {HoloIdenticon} from "@holochain-open-dev/elements";
+
+  export let boardType:BoardType = BoardType.Stickies
+
   if (!customElements.get('holo-identicon')){
       customElements.define('holo-identicon', HoloIdenticon)
     }
@@ -210,7 +213,7 @@
     </div>
     <div class='board-list'>
         {#if creating}
-        <BoardEditor handleSave={addBoard} {cancelEdit} boardType={BoardType.Stickies} voteTypes={editVoteTypes} />
+        <BoardEditor handleSave={addBoard} {cancelEdit} boardType={boardType} voteTypes={editVoteTypes} />
         {/if}
 
         {#each $boardList.boards as board }

@@ -6,6 +6,7 @@
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
     import { Group, VoteType, BoardType } from './board';
+  import { onMount } from 'svelte';
   
     export let handleSave
     export let handleDelete = undefined
@@ -18,9 +19,8 @@
     let groupsTitle = "Groups"
     let defaultGroupName = "group"
 
-    const onTypeChange = (event) => {
-      boardType = event.currentTarget.value
-      if (boardType == BoardType.Stickies) {
+    const setBoardType = (newBoardType: BoardType) => {
+      if (newBoardType == BoardType.Stickies) {
         groupsTitle = "Groups"
         defaultGroupName = "group"
       } else {
@@ -30,6 +30,11 @@
         groupsTitle = "Columns"
         defaultGroupName = "column"
       }
+    }
+
+ 
+    const onTypeChange = (event) => {
+      setBoardType(event.currentTarget.value)
     }
     const addVoteType = () => {
       voteTypes.push(new VoteType(`🙂`, `description: edit-me`, 1))
@@ -72,8 +77,12 @@
       groups.splice(index+1,0,g)
       groups = groups
     }
-    // let text = textA
-  </script>
+    
+    onMount( async () => {
+      setBoardType(boardType)
+    })
+
+</script>
   
   <style>
     .board-editor {
@@ -143,17 +152,6 @@
     <div class="edit-title">
       Title: <input class='textarea' bind:value={text} />
     </div>
-    {#if boardType !== undefined}
-    <div class="edit-type">
-      Type: 
-      <label>
-        <input checked={boardType===BoardType.Stickies} on:change={onTypeChange} type="radio" name="amount" value={BoardType.Stickies} /> Stickies
-      </label>
-      <label>
-        <input checked={boardType===BoardType.KanBan} on:change={onTypeChange} type="radio" name="amount" value={BoardType.KanBan}  /> KanBan
-      </label>
-    </div>
-    {/if}
     <div class="edit-groups">
       {groupsTitle}:
       <div class="add-item" on:click={() => addGroup()}>

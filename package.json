@@ -6,7 +6,7 @@
     "apps/*/ui"
   ],
   "scripts": {
-    "launch"      : "npm run build:happ && npm run build:ui && npm run launch:happ",
+    "launch"      : "npm run build:happ && npm run build:ui && WEBKIT_DISABLE_COMPOSITING_MODE=1 npm run launch:happ",
     "launch:happ" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network mdns",
     "network": "hc s clean && npm run build:happ && concurrently-repeat \"npm run start:agent:multi\"",
     "network:foo": "concurrently-repeat \"npm run start:foo\"",
