@@ -1,0 +1,18 @@
+---
+manifest_version: "1"
+name: kanban
+
+integrity:
+  uid: 00000000-0000-0000-0000-000000000002
+  properties: ~
+  origin_time: 2022-10-03T23:05:19.470323Z
+  zomes:
+    - name: syn_integrity
+      bundled: ../../../../target/wasm32-unknown-unknown/release/syn_integrity.wasm
+
+coordinator:
+  zomes:
+    - name: syn
+      bundled: ../../../../target/wasm32-unknown-unknown/release/syn.wasm
+      dependencies:
+        - name: syn_integrity

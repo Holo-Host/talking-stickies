@@ -1,5 +1,5 @@
 import type { WeApplet } from '@lightningrodlabs/we-applet';
-import { Controller } from '@holo-host/talking-stickies';
+import { Controller } from '@holo-host/boardz';
 import { CellClient, HolochainClient } from '@holochain-open-dev/cell-client';
 import type { AppWebsocket, InstalledCell } from '@holochain/client';
 

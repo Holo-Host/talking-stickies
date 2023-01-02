@@ -1,0 +1,15 @@
+---
+manifest_version: "1"
+name: kanban
+description: ~
+roles:
+  - name: kanban
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: "../dnas/kanban/kanban.dna"
+      properties: ~
+      uuid: ~
+      version: ~
+      clone_limit: 0

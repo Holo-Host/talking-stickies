@@ -4,10 +4,17 @@ import { v1 as uuidv1 } from "uuid";
 import type { AgentPubKey, EntryHash, AgentPubKeyB64, EntryHashB64 } from "@holochain/client";
 import { serializeHash } from "@holochain-open-dev/utils";
 
-export const DEFAULT_VOTE_TYPES = [
+export const DEFAULT_STICKIE_VOTE_TYPES = [
     {type: "1", emoji: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
     {type: "2", emoji: "⭐", toolTip: "Interesting!", maxVotes: 1},
     {type: "3", emoji: "❓", toolTip: "I have questions about this topic.", maxVotes: 1},
+]
+
+export const DEFAULT_KANBAN_VOTE_TYPES = [
+  {type: "1", emoji: "⭐", toolTip: "Important", maxVotes: 1},
+  {type: "2", emoji: "🚩", toolTip: "Flagged", maxVotes: 1},
+  {type: "3", emoji: "❓", toolTip: "Unclear", maxVotes: 1},
+  {type: "4", emoji: "❗", toolTip: "Risky", maxVotes: 1}
 ]
 
 export const enum BoardType {
@@ -115,7 +122,7 @@ export type Sticky = {
       state.name = "untitled"
       state.groups = [{id:UngroupedId, name:"group1"}]
       state.stickies = []
-      state.voteTypes = DEFAULT_VOTE_TYPES
+      state.voteTypes = []
     },
     applyDelta( 
       delta: BoardDelta,

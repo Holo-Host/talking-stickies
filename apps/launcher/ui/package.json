@@ -1,9 +1,13 @@
 {
   "name": "talking-stickies-app",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "scripts": {
-    "build": "rimraf public/build && rollup -c",
-    "build:watch": "run-singleton \"rollup -c -w\"",
+    "build": "npm run build:happ && npm run build:ui",
+    "build:happ": "npm run build:dna && hc app pack ../workdir",
+    "build:dna": "npm run build:zome && hc dna pack ../dnas/talking-stickies",
+    "build:zome": "CARGO_TARGET_DIR=../../../target cargo build --release --target wasm32-unknown-unknown",
+    "build:ui": "rimraf public/build && rollup -c",
+    "build:ui:watch": "run-singleton \"rollup -c -w\"",
     "foo": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" ",
 
     "dev:watch": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" && run-singleton \"PORT=$UI_PORT SVELTE_APP_APP_ID=\"talking-stickies$APP_PORT\" SVELTE_APP_APP_PORT=\"$APP_PORT\" rollup -c -w\"",
@@ -14,7 +18,7 @@
     "package": "rimraf ui.zip && rimraf public/build && rollup -c && cd ./public && bestzip ../ui.zip * "
   },
   "dependencies": {
-    "@holo-host/talking-stickies": "0.8.0",
+    "@holo-host/boardz": "0.8.0",
     "@holochain/client": "0.11.9",
     "@holochain-open-dev/utils": "0.7.2",
     "@holochain-syn/core": "0.3.0-alpha.2",

@@ -10,6 +10,7 @@
     import { BoardType } from './board';
 
     export let boardType: BoardType = BoardType.Stickies
+    export let appId = ""
 
     // The debug drawer's ability to resized and hidden
     let resizeable
@@ -97,7 +98,7 @@
     function createStore() : TalkingStickiesStore {
       const store = new TalkingStickiesStore(
         client,
-        'talking-stickies'
+        appId
       );
       return store
     }
@@ -140,7 +141,7 @@
   
   <div class='app'>
     {#if tsStore}
-      <Toolbar title={boardType == BoardType.Stickies ? 'TalkingStickies' : 'KanBan' }/>
+      <Toolbar boardType={boardType}/>
       {#if boardList}
       <BoardList boardType={boardType}/>
       {:else}

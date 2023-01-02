@@ -1,6 +1,8 @@
-<script>
-  import LogoIcon from "./icons/LogoIcon.svelte";
-  export let title = ""
+<script type="ts">
+  import { BoardType } from "./board";
+  import TSLogoIcon from "./icons/TSLogoIcon.svelte";
+  import KBLogoIcon from "./icons/KBLogoIcon.svelte";
+  export let boardType : BoardType = BoardType.Stickies
 
 </script>
 
@@ -17,9 +19,14 @@
   }
   .logo-text {
     padding-bottom: 5px;
+    margin-left: 15px;
   }
 </style>
 
 <div class='toolbar'>
-  <div class="logo"><LogoIcon /></div><h1 class="logo-text">{title}</h1>
+  {#if boardType === BoardType.Stickies}
+    <div class="logo"><TSLogoIcon /></div><h1 class="logo-text">TalkingStickies</h1>
+  {:else}
+    <div class="logo"><KBLogoIcon /></div><h1 class="logo-text">KanBan</h1>
+  {/if}
 </div>

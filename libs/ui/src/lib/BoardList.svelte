@@ -11,7 +11,7 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board, BoardType } from './board';
+  import { Group, VoteType, DEFAULT_STICKIE_VOTE_TYPES, DEFAULT_KANBAN_VOTE_TYPES, Board, BoardType } from './board';
   import type { EntryHashB64 } from '@holochain/client';
   import type { BoardState } from './board';
   import AvatarEditor from './AvatarEditor.svelte';
@@ -48,7 +48,7 @@
   $: myName = $avatars[myAgentPubKey]? $avatars[myAgentPubKey].name : ""
   let loading = false
   const newBoard = () => {
-    editVoteTypes = cloneDeep(DEFAULT_VOTE_TYPES)
+    editVoteTypes = cloneDeep(boardType == BoardType.Stickies ? DEFAULT_STICKIE_VOTE_TYPES : DEFAULT_KANBAN_VOTE_TYPES)
     creating = true
   }
 
