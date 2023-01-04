@@ -6,8 +6,8 @@
     "apps/*/ui"
   ],
   "scripts": {
-    "launch:ts"   : "npm run build -w \"@holo-host/boardz\" -w talking-stickies-app && WEBKIT_DISABLE_COMPOSITING_MODE=1 npm run launch:happ:ts",
-    "launch:kb"   : "npm run build -w \"@holo-host/boardz\" -w kanban-app && WEBKIT_DISABLE_COMPOSITING_MODE=1 npm run launch:happ:kb",
+    "launch:ts"   : "npm run build -w \"@holo-host/boardz\" -w talking-stickies-app && npm run launch:happ:ts",
+    "launch:kb"   : "npm run build -w \"@holo-host/boardz\" -w kanban-app && npm run launch:happ:kb",
     "launch:happ:ts" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network mdns",
     "launch:happ:kb" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./apps/launcher-kanban/workdir/kanban.happ -w --ui-path apps/launcher-kanban/ui/public network mdns",
     "start": "npm run build:happ && npm run start:agent",

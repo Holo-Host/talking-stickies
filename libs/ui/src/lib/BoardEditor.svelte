@@ -14,7 +14,7 @@
     export let text = ''
     export let groups = []
     export let voteTypes = []
-    export let boardType: BoardType | undefined = undefined
+    export let boardType: BoardType
 
     let groupsTitle = "Groups"
     let defaultGroupName = "group"

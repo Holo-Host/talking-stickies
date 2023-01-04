@@ -3,8 +3,9 @@ manifest_version: "1"
 name: kanban
 
 integrity:
-  uid: 00000000-0000-0000-0000-000000000002
-  properties: ~
+  network_seed: ~
+  properties: 
+    type: "KanBan"
   origin_time: 2022-10-03T23:05:19.470323Z
   zomes:
     - name: syn_integrity

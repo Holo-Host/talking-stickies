@@ -218,7 +218,7 @@
 
         {#each $boardList.boards as board }
           {#if editingBoardHash === board.hash}
-            <BoardEditor handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
+            <BoardEditor boardType={boardType} handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
           {:else}
             {#if board.status !== "archived" }
               <div class="board {$activeHash === board.hash? "selected":""}" on:click={() => selectBoard(board.hash)}>

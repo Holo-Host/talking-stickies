@@ -253,6 +253,11 @@
   .group {
     display: block;
   }
+  .group-title {
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 270px;
+  }
   .stickies {
     display: flex;
     flex-wrap: wrap;
