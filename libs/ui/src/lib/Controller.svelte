@@ -10,7 +10,7 @@
     import { BoardType } from './board';
 
     export let boardType: BoardType = BoardType.Stickies
-    export let appId = ""
+    export let roleName = ""
 
     // The debug drawer's ability to resized and hidden
     let resizeable
@@ -98,7 +98,7 @@
     function createStore() : TalkingStickiesStore {
       const store = new TalkingStickiesStore(
         client,
-        appId
+        roleName
       );
       return store
     }

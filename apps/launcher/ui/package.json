@@ -8,10 +8,9 @@
     "build:zome": "CARGO_TARGET_DIR=../../../target cargo build --release --target wasm32-unknown-unknown",
     "build:ui": "rimraf public/build && rollup -c",
     "build:ui:watch": "run-singleton \"rollup -c -w\"",
-    "foo": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" ",
 
-    "dev:watch": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" && run-singleton \"PORT=$UI_PORT SVELTE_APP_APP_ID=\"talking-stickies$APP_PORT\" SVELTE_APP_APP_PORT=\"$APP_PORT\" rollup -c -w\"",
-    "dev": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" && PORT=$UI_PORT SVELTE_APP_APP_ID=\"talking-stickies$APP_PORT\" SVELTE_APP_APP_PORT=\"$APP_PORT\" rollup -c",
+    "dev:watch": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" && run-singleton \"PORT=$UI_PORT SVELTE_APP_APP_ID=\"talking-stickies$APP_PORT\" SVELTE_APP_APP_PORT=\"$APP_PORT\" SVELTE_APP_ADMIN_PORT=\"$ADMIN_PORT\" rollup -c -w\"",
+    "dev": "echo \"starting ui UI_PORT=$UI_PORT APP_PORT=$APP_PORT\" && PORT=$UI_PORT SVELTE_APP_APP_ID=\"talking-stickies$APP_PORT\" SVELTE_APP_APP_PORT=\"$APP_PORT\" SVELTE_APP_ADMIN_PORT=\"$ADMIN_PORT\" rollup -c",
     "dev2": "PORT=5001 SVELTE_APP_APP_ID=talking-stickies2 SVELTE_APP_APP_PORT=8887 rollup -c -w",
     "start": "sirv public",
     "validate": "svelte-check",

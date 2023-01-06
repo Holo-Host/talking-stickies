@@ -139,10 +139,12 @@
               <PlusIcon />
             </div>
           </div>
-          <div class="cards">
           {#if creatingInColumn !==undefined && column.id === creatingInColumn}
-          <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
+          <div class="new-card">
+            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
+          </div>
           {/if}
+          <div class="cards">
           {#each sortedCards as { id:cardId, text, votes, group:columnId, props }}
             {#if column.id === columnId}
               {#if editingCardId === cardId}
@@ -206,12 +208,10 @@
   .board {
     display: flex;
     flex-direction: column;
-    min-height: 500px;
     padding: 30px 60px;
     background-color: white;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
-    flex: 1;
   }
   .top-bar {
     display: flex;
@@ -236,11 +236,13 @@
   .columns {
     display: flex;
     flex-wrap: wrap;
+    flex: 0 1 auto;
   }
   .column-title {
     padding: 10px 5px 0px 5px;
     display: flex;
-    align-items: center;  
+    align-items: center;
+    flex: 0 1 auto;
   }
   .column {
     display: block;
@@ -252,6 +254,8 @@
   .cards {
     display: flex;
     flex-direction: column;
+    overflow: scroll;
+    flex: 1 1 auto;
   }
   .card {
     background-color: white;

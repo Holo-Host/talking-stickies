@@ -118,7 +118,7 @@ export class TalkingStickiesStore {
             const roots = await this.synStore.fetchAllRoots()
             await this.findOrMakeRoots(get(roots))
         } catch (e) {
-            console.log("FISH", e)
+            console.log("Error Fetching Roots:", e)
         }
     }
 }
