@@ -1,6 +1,6 @@
 <script lang="ts">
   import {Controller, BoardType} from '@holo-host/boardz'
-  const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'talking-stickies'
+  const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'kanban'
   const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
   import { AppAgentWebsocket, AppWebsocket } from '@holochain/client';
   const url = `ws://localhost:${appPort}`;
@@ -28,7 +28,7 @@
 <svelte:head>
 </svelte:head>
 {#if connected}
-  <Controller client={client} boardType={BoardType.TalkingStickies} appId={appId}></Controller>
+  <Controller client={client} boardType={BoardType.KanBan} appId={appId}></Controller>
 {:else}
   Loading
 {/if}

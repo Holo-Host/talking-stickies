@@ -1,15 +1,26 @@
 import type { RootStore, SynGrammar, WorkspaceStore } from "@holochain-syn/core";
 import { get } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
-import type { AgentPubKey, EntryHash } from "@holochain/client";
-import type { AgentPubKeyB64, EntryHashB64 } from "@holochain-open-dev/core-types";
+import type { AgentPubKey, EntryHash, AgentPubKeyB64, EntryHashB64 } from "@holochain/client";
 import { serializeHash } from "@holochain-open-dev/utils";
 
-export const DEFAULT_VOTE_TYPES = [
+export const DEFAULT_STICKIE_VOTE_TYPES = [
     {type: "1", emoji: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
     {type: "2", emoji: "⭐", toolTip: "Interesting!", maxVotes: 1},
     {type: "3", emoji: "❓", toolTip: "I have questions about this topic.", maxVotes: 1},
 ]
+
+export const DEFAULT_KANBAN_VOTE_TYPES = [
+  {type: "1", emoji: "⭐", toolTip: "Important", maxVotes: 1},
+  {type: "2", emoji: "🚩", toolTip: "Flagged", maxVotes: 1},
+  {type: "3", emoji: "❓", toolTip: "Unclear", maxVotes: 1},
+  {type: "4", emoji: "❗", toolTip: "Risky", maxVotes: 1}
+]
+
+export const enum BoardType {
+  KanBan = 'KanBan',
+  Stickies = 'Stickies'
+}
 
 export class VoteType {
     type: uuidv1
@@ -19,14 +30,15 @@ export class VoteType {
 }
 
 export type Sticky = {
-    id: string;
+    id: uuidv1;
     text: string;
-    group: number;
+    group: uuidv1;
     votes: Object;
     props: Object;
   };
   
   export interface BoardState {
+    type: BoardType;
     status: string;
     name: string;
     groups: Group[];
@@ -36,9 +48,13 @@ export type Sticky = {
   
   export type BoardDelta =
     | {
+      type: "set-type";
+      boardType: BoardType;
+      }
+    | {
       type: "set-status";
       status: string;
-    }
+      }
     | {
         type: "add-sticky";
         value: Sticky;
@@ -65,27 +81,27 @@ export type Sticky = {
       }
     | {
         type: "set-group-index";
-        id: number;
+        id: uuidv1;
         index: number;
       }
     | {
         type: "update-sticky-group";
-        id: string;
-        group: number;
+        id: uuidv1;
+        group: uuidv1;
       }
       | {
         type: "update-sticky-props";
-        id: string;
+        id: uuidv1;
         props: Object;
       }
    | {
         type: "update-sticky-text";
-        id: string;
+        id: uuidv1;
         text: string;
       }
     | {
         type: "update-sticky-votes";
-        id: string;
+        id: uuidv1;
         voteType: string;
         voter: AgentPubKeyB64;
         count: number
@@ -104,9 +120,9 @@ export type Sticky = {
     initState(state)  {
       state.status = ""
       state.name = "untitled"
-      state.groups = [{id:0, name:"group1"}]
+      state.groups = [{id:UngroupedId, name:"group1"}]
       state.stickies = []
-      state.voteTypes = DEFAULT_VOTE_TYPES
+      state.voteTypes = []
     },
     applyDelta( 
       delta: BoardDelta,
@@ -114,6 +130,10 @@ export type Sticky = {
       _ephemeralState: any,
       _author: AgentPubKey
     ) {
+
+      if (delta.type == "set-type") {
+        state.type = delta.boardType
+      }      
       if (delta.type == "set-status") {
         state.status = delta.status
       }
@@ -226,9 +246,10 @@ export class Board {
     }
 }
 
+export const UngroupedId = ""
 export class Group {
-    id: number
+    id: uuidv1
     constructor(public name: string) {
-        this.id = Date.now()
+        this.id =  uuidv1()
     }
 }

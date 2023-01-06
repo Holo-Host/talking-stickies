@@ -1,16 +1,20 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from "svelte";
+  import { getContext } from "svelte";
   import StickyEditor from "./StickyEditor.svelte";
   import PlusIcon from "./icons/PlusIcon.svelte";
   import ExIcon from "./icons/ExIcon.svelte";
   import ExportIcon from "./icons/ExportIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
-  import { v1 as uuidv1 } from "uuid";
+  import type { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
   import { Marked, Renderer } from "@ts-stack/markdown";
   import { cloneDeep, isEqual } from "lodash";
+  import { Pane } from "./pane";
+  import { UngroupedId, type Sticky } from "./board";
+
+  const pane = new Pane();
 
   Marked.setOptions
   ({
@@ -30,8 +34,6 @@
     sortOption = newSortOption;
   }
 
-  const dispatch = createEventDispatcher();
-
   const { getStore } :any = getContext("tsStore");
   let tsStore: TalkingStickiesStore = getStore();
 
@@ -47,19 +49,22 @@
   $: totalStickies = stickies ? stickies.length : 0
   $: stickesCounts = countStickies(sortedStickies)
 
-  let creatingInGroup: number | undefined = undefined;
+  let creatingInGroup: uuidv1 | undefined = undefined;
+  let editText = "";
+  let editingStickyId: uuidv1
+
   let groupIds = []
   let groups = []
   let ungroupedStickies = 0
 
   const countStickies = (stickies) : {} => {
     let counts = {}
-    stickies.forEach((sticky) => {
+    stickies.forEach((sticky: Sticky) => {
       counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 0
     })
     return counts
   }
-
+    
   const groupStickies = (stickies) => {
     ungroupedStickies = 0
     if ($state) {
@@ -69,113 +74,32 @@
       stickies.forEach((sticky) => {
         if (!groupIds.includes(sticky.group)) ungroupedStickies += 1
       });
-      groups.unshift({id: 0, name:""})
+      groups.unshift({id:UngroupedId, name:""})
     }
   };
 
-  const newSticky = (group) => () => {
-    creatingInGroup = group;
+  const newSticky = (group: uuidv1) => () => {
+      creatingInGroup = group;
   };
+  
+  const createSticky = (text: string, _groupId: uuidv1, props) => {
+    pane.addSticky(text, creatingInGroup, props)
+    creatingInGroup = undefined
+  }
 
   const clearEdit = () => {
     editingStickyId = null;
     editText = "";
   };
 
-  let editingStickyId;
-  let editText = "";
-
-  const editSticky = (id, text) => () => {
-    editingStickyId = id;
-    editText = text;
-  };
-
   const cancelEdit = () => {
     creatingInGroup = undefined;
     clearEdit();
-  };
-
-  const addSticky = (text, _groupId, props) => {
-    const sticky = {
-      id: uuidv1(),
-      text,
-      group: creatingInGroup,
-      props,
-      votes: {
-      },
-    };
-    dispatch("requestChange", [{ type: "add-sticky", value: sticky }]);
-    creatingInGroup = undefined;
-  };
-
-  const deleteSticky = (id) => () => {
-    dispatch("requestChange", [{ type: "delete-sticky", id }]);
-    clearEdit();
-  };
-
-  const updateSticky = (id) => (text, groupId, props) => {
-    const sticky = stickies.find((sticky) => sticky.id === id);
-    if (!sticky) {
-      console.error("Failed to find sticky with id", id);
-      return;
-    }
-    let changes = []
-    if (sticky.text != text) {
-      changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
-    }
-    const newGroupId = parseInt(groupId)
-    if (sticky.group != newGroupId) {
-      changes.push({ type: "update-sticky-group", id: sticky.id, group: newGroupId  })
-    }
-    console.log("sticky.props", sticky.props, "props", props)
-    if (!isEqual(sticky.props, props)) {
-      changes.push({ type: "update-sticky-props", id: sticky.id, props: cloneDeep(props)})
-    }
-    if (changes.length > 0) {
-      dispatch("requestChange", changes);
-    }
-    clearEdit();
-  };
-
-  const voteOnSticky = (id, type, max) => {
-    const sticky = stickies.find((sticky) => sticky.id === id);
-    if (!sticky) {
-      console.error("Failed to find sticky with id", id);
-      return;
-    }
-    const agent = tsStore.myAgentPubKey();
-    let votes = {
-      ...sticky.votes,
-    }
-    if (typeof votes[type] === 'undefined') {
-      votes[type] = {}
-      votes[type][agent] = 1
-    } else {
-      let voteBump = ((sticky.votes[type][agent] || 0) + 1)
-      if (voteBump > max) {
-        voteBump = 0
-      }
-      votes = {
-        ...sticky.votes,
-        [type]: {
-          ...sticky.votes[type],
-          [agent]: voteBump,
-        },
-      }
-    }
-    console.log("VOTING", agent);
-    console.log("votes before", sticky.votes);
-    console.log("votes after", votes);
-
-    dispatch("requestChange", [
-      {
-        type: "update-sticky-votes",
-        id: sticky.id,
-        voteType: type,
-        voter: agent,
-        count: votes[type][agent],
-      },
-    ]);
+  }
+  
+  const editSticky = (id:uuidv1, text: string) => () => {
+    editingStickyId = id;
+    editText = text;
   };
 
   const countVotes = (votes, type) => {
@@ -204,36 +128,19 @@
     return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
   }
 
-  const download = (filename, text) => {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-  }
-  const exportBoard = () => {
-    const fileName = `ts_${$state.name}.json`
-    download(fileName, JSON.stringify($state))
-    alert(`Your board was exported to your Downloads folder as: '${fileName}'`)
-  }
 </script>
 
 <div class="board">
   <div class="close-board global-board-button" on:click={closeBoard} title="Close Board">
     <ExIcon />
   </div>
-  <div class="export-board global-board-button" on:click={exportBoard} title="Export Board">
+  <div class="export-board global-board-button" on:click={() => pane.exportBoard($state)} title="Export Board">
     <ExportIcon />
   </div>
   <div class="top-bar">
     <h1>{$state.name}</h1>
     {#if $state.groups.length == 0}
-      <div class="add-sticky" on:click={newSticky(0)} style="margin-left:5px" title="New Sticky">
+      <div class="add-sticky" on:click={newSticky(UngroupedId)} style="margin-left:5px" title="New Sticky">
         <PlusIcon />
       </div>
     {/if}
@@ -242,11 +149,11 @@
   {#if $state}
     <div class="groups">
       {#each groups as curGroup}
-        {#if (curGroup.id !== 0 || ungroupedStickies > 0)}
-        <div class="group" style:max-width={totalStickies && stickesCounts[curGroup.id]? `${stickesCounts[curGroup.id]/totalStickies*100}%` : 'fit-content'}>
+        {#if (curGroup.id !== UngroupedId || ungroupedStickies > 0)}
+        <div class="group" style:max-width={totalStickies ? stickesCounts[curGroup.id]/totalStickies*100 ? `${stickesCounts[curGroup.id]/totalStickies*100}%` :'fit-content' : 'fit-content'}>
           {#if $state.groups.length > 0}
           <div class="group-title">
-            <h2>{#if curGroup.id === 0}Ungrouped{:else}{curGroup.name}{/if}</h2>
+            <h2>{#if curGroup.id === UngroupedId}Ungrouped{:else}{curGroup.name}{/if}</h2>
               <div class="add-sticky" on:click={newSticky(curGroup.id)}>
                 <PlusIcon />
               </div>
@@ -256,8 +163,12 @@
           {#each sortedStickies as { id, text, votes, group, props } (id)}
             {#if editingStickyId === id && inGroup(curGroup.id, group)}
               <StickyEditor
-                handleSave={updateSticky(id)}
-                handleDelete={deleteSticky(id)}
+                handleSave={
+                  pane.updateSticky(stickies, id, clearEdit)
+                }
+                handleDelete={
+                  pane.deleteSticky(id, clearEdit)
+                }
                 {cancelEdit}
                 text={editText}
                 groupId={group}
@@ -277,7 +188,7 @@
                       class="vote"
                       title={toolTip}
                       class:voted={myVotes(votes, type) > 0}
-                      on:click|stopPropagation={() => voteOnSticky(id, type, maxVotes)}
+                      on:click|stopPropagation={() => pane.voteOnSticky(tsStore.myAgentPubKey(), stickies, id, type, maxVotes)}
                     >
                       <EmojiIcon emoji={emoji} class="vote-icon" />
                       {countVotes(votes, type)}
@@ -294,11 +205,11 @@
           {/each}
           </div>
             {#if creatingInGroup !==undefined && inGroup(curGroup.id, creatingInGroup)}
-            <StickyEditor handleSave={addSticky} {cancelEdit} groups={groups} />
+            <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
           {/if}
         </div>
         {:else if groups.length===1 && creatingInGroup !==undefined}
-        <StickyEditor handleSave={addSticky} {cancelEdit} groups={groups} />
+        <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
         {/if}
       {/each}
     </div>
@@ -341,6 +252,11 @@
   }
   .group {
     display: block;
+  }
+  .group-title {
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 270px;
   }
   .stickies {
     display: flex;

@@ -11,14 +11,16 @@
   import BoardEditor from './BoardEditor.svelte'
   import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import { Group, VoteType, DEFAULT_VOTE_TYPES, Board } from './board';
-  import type { EntryHashB64 } from '@holochain-open-dev/core-types';
+  import { Group, VoteType, DEFAULT_STICKIE_VOTE_TYPES, DEFAULT_KANBAN_VOTE_TYPES, Board, BoardType } from './board';
+  import type { EntryHashB64 } from '@holochain/client';
   import type { BoardState } from './board';
-  import { serializeHash } from '@holochain-open-dev/utils';
   import AvatarEditor from './AvatarEditor.svelte';
   import type { Avatar } from './boardList';
   import Participants from './Participants.svelte';
   import {HoloIdenticon} from "@holochain-open-dev/elements";
+
+  export let boardType:BoardType = BoardType.Stickies
+
   if (!customElements.get('holo-identicon')){
       customElements.define('holo-identicon', HoloIdenticon)
     }
@@ -46,7 +48,7 @@
   $: myName = $avatars[myAgentPubKey]? $avatars[myAgentPubKey].name : ""
   let loading = false
   const newBoard = () => {
-    editVoteTypes = cloneDeep(DEFAULT_VOTE_TYPES)
+    editVoteTypes = cloneDeep(boardType == BoardType.Stickies ? DEFAULT_STICKIE_VOTE_TYPES : DEFAULT_KANBAN_VOTE_TYPES)
     creating = true
   }
 
@@ -65,8 +67,9 @@
     reader.readAsText(file);
   };
 
-  const addBoard = async (name: string, groups: Group[], voteTypes: VoteType[]) => {
-    const board = await store.boardList.makeBoard({name, groups, voteTypes})
+  const addBoard = async (type: BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
+    const board = await store.boardList.makeBoard({type, name, groups, voteTypes})
+    console.log("ADD BOARD", board, groups)
     selectBoard(board.hashB64())
     creating = false
   }
@@ -97,7 +100,8 @@
     }
   }
 
-  const updateBoard = (hash: EntryHashB64) => async (name: string, groups: Group[], voteTypes: VoteType[]) => {
+  const updateBoard = (hash: EntryHashB64) => async (_type:BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
+    // ignore board type we don't update that.
     const board: Board | undefined = await store.boardList.getBoard(hash)
     if (board) {
       let changes = []
@@ -209,12 +213,12 @@
     </div>
     <div class='board-list'>
         {#if creating}
-        <BoardEditor handleSave={addBoard} {cancelEdit} voteTypes={editVoteTypes} />
+        <BoardEditor handleSave={addBoard} {cancelEdit} boardType={boardType} voteTypes={editVoteTypes} />
         {/if}
 
         {#each $boardList.boards as board }
           {#if editingBoardHash === board.hash}
-            <BoardEditor handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
+            <BoardEditor boardType={boardType} handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
           {:else}
             {#if board.status !== "archived" }
               <div class="board {$activeHash === board.hash? "selected":""}" on:click={() => selectBoard(board.hash)}>
@@ -275,14 +279,6 @@
       flex-wrap: wrap;
       align-items: flex-start;
       flex-shrink: 1;
-    }
-    .reload-boards {
-      position: absolute;
-      right: 45px;
-      margin-top: -18px;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
     }
     .avatar-button {
       position: absolute;

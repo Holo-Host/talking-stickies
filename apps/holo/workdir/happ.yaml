@@ -3,7 +3,7 @@ manifest_version: "1"
 name: talking-stickies
 description: ~
 roles:
-  - id: talking-stickies
+  - name: talking-stickies
     provisioning:
       strategy: create
       deferred: false

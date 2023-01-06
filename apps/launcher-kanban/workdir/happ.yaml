@@ -1,14 +1,14 @@
 ---
 manifest_version: "1"
-name: talking-stickies
+name: kanban
 description: ~
 roles:
-  - name: talking-stickies
+  - name: kanban
     provisioning:
       strategy: create
       deferred: false
     dna:
-      bundled: "../dnas/talking-stickies/talking-stickies.dna"
+      bundled: "../dnas/kanban/kanban.dna"
       properties: ~
       uuid: ~
       version: ~

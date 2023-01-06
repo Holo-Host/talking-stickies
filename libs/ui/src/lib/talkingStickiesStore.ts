@@ -1,22 +1,30 @@
-import type { CellClient } from '@holochain-open-dev/cell-client';
 import type {
+    AppAgentClient,
     EntryHash,
+    AgentPubKeyB64,
+    AppAgentCallZomeRequest,
+    RoleName,
   } from '@holochain/client';
-import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from '@holochain-open-dev/core-types';
-import { serializeHash, deserializeHash, RecordBag, EntryHashMap } from '@holochain-open-dev/utils';
+import { serializeHash, RecordBag } from '@holochain-open-dev/utils';
 import { WorkspaceStore, SynStore, stateFromCommit,  SynClient, type Workspace, type Commit, RootStore } from '@holochain-syn/core';
 import { get } from "svelte/store";
 import { CommitTypeBoard } from './board';
 import { BoardList, CommitTypeBoardList } from './boardList';
 import { decode } from '@msgpack/msgpack';
 
-const ZOME_NAME = 'talking_stickies'
+const ZOME_NAME = 'syn'
 
 export class TalkingStickiesService {
-    constructor(public cellClient: CellClient, public zomeName = ZOME_NAME) {}
+    constructor(public client: AppAgentClient, public roleName, public zomeName = ZOME_NAME) {}
 
     private callZome(fnName: string, payload: any) {
-        return this.cellClient.callZome(this.zomeName, fnName, payload);
+        const req: AppAgentCallZomeRequest = {
+            role_name: this.roleName,
+            zome_name: this.zomeName,
+            fn_name: fnName,
+            payload
+          }
+        return this.client.callZome(req);
     }
 }
 
@@ -27,22 +35,24 @@ export class TalkingStickiesStore {
     createdBoards: Array<EntryHash> = []
     updating = false
     synStore: SynStore;
-    cellClient: CellClient;
+    client: AppAgentClient;
     myAgentPubKey(): AgentPubKeyB64 {
-        return serializeHash(this.cellClient.cell.cell_id[1]);
+        return serializeHash(this.client.myPubKey);
     }
 
     constructor(
-        protected cellClientIn: CellClient,
-        zomeName: string = ZOME_NAME
+        protected clientIn: AppAgentClient,
+        protected roleName: RoleName,
+        protected zomeName: string = ZOME_NAME
     ) {
-        this.cellClient = cellClientIn
+        this.client = clientIn
         this.service = new TalkingStickiesService(
-          this.cellClient,
-          zomeName
+          this.client,
+          this.roleName,
+          this.zomeName
         );
         //@ts-ignore
-        this.synStore = new SynStore(new SynClient(this.cellClient))
+        this.synStore = new SynStore(new SynClient(this.client,this.roleName,this.zomeName))
         // this.synStore.knownRoots.subscribe( async (roots) => {
         //     if (this.updating) {
         //         console.log(`${roots.entryActions.keys().length} ROOTS UPDATE CALLED but allready updating`, roots)
@@ -104,7 +114,11 @@ export class TalkingStickiesStore {
 
     async loadBoards() : Promise<any> {
         console.log("fetching all roots...")
-        const roots = await this.synStore.fetchAllRoots()
-        await this.findOrMakeRoots(get(roots))
+        try {
+            const roots = await this.synStore.fetchAllRoots()
+            await this.findOrMakeRoots(get(roots))
+        } catch (e) {
+            console.log("FISH", e)
+        }
     }
 }

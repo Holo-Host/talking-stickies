@@ -53,6 +53,7 @@
       justify-content: flex-start;
       position: absolute;
       right: 20px;
+      z-index: 10;
     }
     .participant {
       display: flex;

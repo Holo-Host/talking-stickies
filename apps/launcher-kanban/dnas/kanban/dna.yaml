@@ -1,11 +1,11 @@
 ---
 manifest_version: "1"
-name: talking-stickies
+name: kanban
 
 integrity:
   network_seed: ~
-  properties:
-    type: "TalkingStickies"
+  properties: 
+    type: "KanBan"
   origin_time: 2022-10-03T23:05:19.470323Z
   zomes:
     - name: syn_integrity

@@ -1,0 +1,43 @@
+<style>
+  .icon {
+    width: inherit;
+    height: inherit;
+    margin: inherit;
+  }
+</style>
+
+<svg viewBox="196.397 177.864 27.348 24.969" width="45" height="45"  xmlns="http://www.w3.org/2000/svg">
+  <rect style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 2px;" x="196.867" y="178.042" width="26.878" height="24.531" rx="2" ry="2"></rect>
+  <path style="fill: rgb(216, 216, 216); stroke-width: 2px; stroke: rgb(129, 128, 128);" d="M 217.518 181.283 L 221.57 181.283"></path>
+  <path style="fill: rgb(216, 216, 216); stroke-width: 2px; stroke: rgb(129, 128, 128);" d="M 208.658 181.366 L 213.003 181.366"></path>
+  <path style="fill: rgb(216, 216, 216); stroke-width: 2px; stroke: rgb(129, 128, 128);" d="M 199.739 181.324 L 203.937 181.324"></path>
+  <g transform="matrix(0.380921, 0, 0, 0.380921, 123.689766, 122.639267)" style="">
+    <rect y="190.466" width="11.882" height="0.995" style="fill: rgb(108, 213, 199);" x="199.517"></rect>
+    <rect y="191.382" width="11.882" height="6.504" style="fill: rgb(120, 250, 232);" x="199.517"></rect>
+  </g>
+  <rect y="190.581" width="4.526" height="0.379" style="fill: rgb(148, 213, 108);" x="199.648"></rect>
+  <rect y="190.929" width="4.526" height="2.478" style="fill: rgb(204, 250, 120);" x="199.648"></rect>
+  <g transform="matrix(0.380921, 0, 0, 0.380921, 123.648094, 113.416855)" style="">
+    <rect y="190.466" width="11.882" height="0.995" style="fill: rgb(108, 213, 199);" x="199.517"></rect>
+    <rect y="191.382" width="11.882" height="6.504" style="fill: rgb(120, 250, 232);" x="199.517"></rect>
+  </g>
+  <path style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" d="M 206.439 177.864 L 206.439 202.797"></path>
+  <path style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" d="M 196.397 183.86 L 223.629 183.86"></path>
+  <path style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" d="M 215.35 178.135 L 215.35 202.833"></path>
+  <rect y="190.694" width="4.526" height="0.379" style="fill: rgb(197, 126, 115);" x="208.691"></rect>
+  <rect y="191.043" width="4.526" height="2.478" style="fill: rgb(247, 144, 129);" x="208.691"></rect>
+  <g transform="matrix(0.380921, 0, 0, 0.380921, 132.690399, 113.530411)" style="">
+    <rect y="190.466" width="11.882" height="0.995" style="fill: rgb(108, 213, 199);" x="199.517"></rect>
+    <rect y="191.382" width="11.882" height="6.504" style="fill: rgb(120, 250, 232);" x="199.517"></rect>
+  </g>
+  <g transform="matrix(0.380921, 0, 0, 0.380921, 140.924362, 122.567337)" style="">
+    <rect y="190.466" width="11.882" height="0.995" style="fill: rgb(108, 213, 199);" x="199.517"></rect>
+    <rect y="191.382" width="11.882" height="6.504" style="fill: rgb(120, 250, 232);" x="199.517"></rect>
+  </g>
+  <g transform="matrix(0.380921, 0, 0, 0.380921, 140.88269, 117.956131)" style="">
+    <rect y="190.466" width="11.882" height="0.995" style="fill: rgb(108, 213, 199);" x="199.517"></rect>
+    <rect y="191.382" width="11.882" height="6.504" style="fill: rgb(120, 250, 232);" x="199.517"></rect>
+  </g>
+  <rect y="185.897" width="4.526" height="0.379" style="fill: rgb(150, 85, 172);" x="216.883"></rect>
+  <rect y="186.246" width="4.526" height="2.478" style="fill: rgb(187, 108, 213);" x="216.883"></rect>
+</svg>

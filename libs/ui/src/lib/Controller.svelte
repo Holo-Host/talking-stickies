@@ -2,10 +2,15 @@
     import BoardList from './BoardList.svelte'
     import Toolbar from './Toolbar.svelte'
     import BoardPane from './BoardPane.svelte'
+    import KanBanPane from './KanBanPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
-    import type { CellClient } from '@holochain-open-dev/cell-client';
+    import type { AppAgentClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
+    import { BoardType } from './board';
+
+    export let boardType: BoardType = BoardType.Stickies
+    export let appId = ""
 
     // The debug drawer's ability to resized and hidden
     let resizeable
@@ -64,9 +69,10 @@
     let synStore: SynStore;
     let tsStore: TalkingStickiesStore;
     
-    export let client : CellClient
+    export let client : AppAgentClient
 
     $: activeBoardIndex = tsStore ? tsStore.boardList.activeBoardHash : undefined
+    $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
     $: boardList = tsStore ? tsStore.boardList : undefined
 
     initialize()
@@ -82,13 +88,17 @@
     async function initialize() : Promise<void> {
       const store = createStore()
       synStore = store.synStore;
-      await store.loadBoards()
-      tsStore = store
+      try {
+        await store.loadBoards()
+        tsStore = store
+      } catch (e) {
+        console.log("Error loading boards:", e)
+      }
     }
     function createStore() : TalkingStickiesStore {
-  
       const store = new TalkingStickiesStore(
         client,
+        appId
       );
       return store
     }
@@ -131,15 +141,19 @@
   
   <div class='app'>
     {#if tsStore}
-      <Toolbar />
+      <Toolbar boardType={boardType}/>
       {#if boardList}
-      <BoardList />
+      <BoardList boardType={boardType}/>
       {:else}
         Loading for board list...
       {/if}
       {#if $activeBoardIndex !== undefined}
-        <BoardPane
-          on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {#if $activeBoardType === BoardType.Stickies}
+          <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {/if}
+        {#if $activeBoardType === BoardType.KanBan}
+          <KanBanPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {/if}
       {/if}
       <a class="issue" target="github" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo">Report Issue</a>
       {:else}

@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
     import ExIcon from './icons/ExIcon.svelte'
     import TrashIcon from './icons/TrashIcon.svelte'
     import CheckIcon from './icons/CheckIcon.svelte'
     import PlusIcon from './icons/PlusIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
-    import { Group, VoteType } from './board';
+    import { Group, VoteType, BoardType } from './board';
+  import { onMount } from 'svelte';
   
     export let handleSave
     export let handleDelete = undefined
@@ -13,7 +14,28 @@
     export let text = ''
     export let groups = []
     export let voteTypes = []
+    export let boardType: BoardType
 
+    let groupsTitle = "Groups"
+    let defaultGroupName = "group"
+
+    const setBoardType = (newBoardType: BoardType) => {
+      if (newBoardType == BoardType.Stickies) {
+        groupsTitle = "Groups"
+        defaultGroupName = "group"
+      } else {
+        if (groups.length == 0) {
+          groups = [new Group("Backlog"), new Group("Prioritized"), new Group("Doing"), new Group("Done")]
+        }
+        groupsTitle = "Columns"
+        defaultGroupName = "column"
+      }
+    }
+
+ 
+    const onTypeChange = (event) => {
+      setBoardType(event.currentTarget.value)
+    }
     const addVoteType = () => {
       voteTypes.push(new VoteType(`🙂`, `description: edit-me`, 1))
       voteTypes = voteTypes
@@ -36,7 +58,7 @@
     }
 
     const addGroup = () => {
-      groups.push(new Group(`group ${groups.length+1}`))
+      groups.push(new Group(`${defaultGroupName} ${groups.length+1}`))
       groups = groups
     }
     const deleteGroup = (index) => () => {
@@ -55,8 +77,12 @@
       groups.splice(index+1,0,g)
       groups = groups
     }
-    // let text = textA
-  </script>
+    
+    onMount( async () => {
+      setBoardType(boardType)
+    })
+
+</script>
   
   <style>
     .board-editor {
@@ -114,7 +140,7 @@
       <div on:click={cancelEdit}>
         <ExIcon />
       </div>
-      <div on:click={() => handleSave(text, groups, voteTypes)}>
+      <div on:click={() => handleSave(boardType, text, groups, voteTypes)}>
         <CheckIcon />
       </div>
       {#if handleDelete}
@@ -127,7 +153,7 @@
       Title: <input class='textarea' bind:value={text} />
     </div>
     <div class="edit-groups">
-      Groups:
+      {groupsTitle}:
       <div class="add-item" on:click={() => addGroup()}>
         <PlusIcon />
       </div>
