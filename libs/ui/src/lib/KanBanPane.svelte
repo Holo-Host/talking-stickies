@@ -140,6 +140,9 @@
             </div>
           </div>
           <div class="cards">
+          {#if creatingInColumn !==undefined && column.id === creatingInColumn}
+          <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
+          {/if}
           {#each sortedCards as { id:cardId, text, votes, group:columnId, props }}
             {#if column.id === columnId}
               {#if editingCardId === cardId}
@@ -193,9 +196,6 @@
             {/if}
           {/each}
           </div>
-            {#if creatingInColumn !==undefined && column.id === creatingInColumn}
-            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
-          {/if}
         </div>
       {/each}
     </div>
