@@ -60,7 +60,7 @@
   const countStickies = (stickies) : {} => {
     let counts = {}
     stickies.forEach((sticky: Sticky) => {
-      counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 0
+      counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 1
     })
     return counts
   }
@@ -128,26 +128,29 @@
     return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
   }
   const groupWidth = (groupId) : string => {
+    console.log("gl", groups.length)
+    console.log("counds", stickesCounts[UngroupedId])
+    const len = groups.length > 0 ? (stickesCounts[UngroupedId] > 0 ? groups.length : groups.length - 1) : 1
     // TODO: maybe set width dynamically by number of cards in group...
-    if (groups.length <= 4) {
-      return 100/groups.length+"%"
+    if (len <= 4) {
+      return 100/len+"%"
     }
-    if (groups.length == 5) {
+    if (len == 5) {
       return "33%"
     }
-    if (groups.length == 6) {
+    if (len == 6) {
       return "33%"
     }
-    if (groups.length == 7) {
+    if (len == 7) {
       return "25%"
     }
-    if (groups.length == 8) {
+    if (len == 8) {
       return "25%"
     }
-    if (groups.length == 9) {
+    if (len == 9) {
       return "33%"
     }
-    if (groups.length == 10) {
+    if (len == 10) {
       return "25%"
     }
     return 'fit-content'
@@ -227,10 +230,10 @@
               </div>
             {/if}
           {/each}
-          </div>
-            {#if creatingInGroup !==undefined && inGroup(curGroup.id, creatingInGroup)}
+          {#if creatingInGroup !==undefined && inGroup(curGroup.id, creatingInGroup)}
             <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
           {/if}
+          </div>
         </div>
         {:else if groups.length===1 && creatingInGroup !==undefined}
         <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />

@@ -1,6 +1,6 @@
 {
   "name": "kanban-app",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "scripts": {
     "build": "npm run build:happ && npm run build:ui",
     "build:happ": "npm run build:dna && hc app pack ../workdir",
