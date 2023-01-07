@@ -127,7 +127,31 @@
   const inGroup = (curGroupId, groupId) => {
     return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
   }
-
+  const groupWidth = (groupId) : string => {
+    // TODO: maybe set width dynamically by number of cards in group...
+    if (groups.length <= 4) {
+      return 100/groups.length+"%"
+    }
+    if (groups.length == 5) {
+      return "33%"
+    }
+    if (groups.length == 6) {
+      return "33%"
+    }
+    if (groups.length == 7) {
+      return "25%"
+    }
+    if (groups.length == 8) {
+      return "25%"
+    }
+    if (groups.length == 9) {
+      return "33%"
+    }
+    if (groups.length == 10) {
+      return "25%"
+    }
+    return 'fit-content'
+  }
 </script>
 
 <div class="board">
@@ -150,7 +174,7 @@
     <div class="groups">
       {#each groups as curGroup}
         {#if (curGroup.id !== UngroupedId || ungroupedStickies > 0)}
-        <div class="group" style:max-width={totalStickies ? stickesCounts[curGroup.id]/totalStickies*100 ? `${stickesCounts[curGroup.id]/totalStickies*100}%` :'fit-content' : 'fit-content'}>
+        <div class="group" style:width={groupWidth(curGroup.id)}>
           {#if $state.groups.length > 0}
           <div class="group-title">
             <h2>{#if curGroup.id === UngroupedId}Ungrouped{:else}{curGroup.name}{/if}</h2>
@@ -252,6 +276,7 @@
   }
   .group {
     display: block;
+    min-width: 290px;
   }
   .group-title {
     padding-left: 10px;
@@ -278,7 +303,8 @@
     overflow: hidden;
   }
   .sticky-content {
-    overflow-y: scroll;
+    overflow-y: auto;
+    max-width: 300px;
   }
   .add-sticky :global(svg) {
     margin-right: 6px;

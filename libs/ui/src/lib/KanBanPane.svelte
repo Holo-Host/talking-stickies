@@ -133,17 +133,9 @@
     <div class="columns">
       {#each columns as column}
         <div class="column">
-          <div class="column-title">
+          <div class="column-item column-title">
             <div>{column.name}</div>
-            <div class="add-card" on:click={newCard(column.id)}>
-              <PlusIcon />
-            </div>
           </div>
-          {#if creatingInColumn !==undefined && column.id === creatingInColumn}
-          <div class="new-card">
-            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
-          </div>
-          {/if}
           <div class="cards">
           {#each sortedCards as { id:cardId, text, votes, group:columnId, props }}
             {#if column.id === columnId}
@@ -198,6 +190,18 @@
             {/if}
           {/each}
           </div>
+          {#if creatingInColumn !==undefined && column.id === creatingInColumn}
+          <div class="new-card">
+            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
+          </div>
+          {:else}
+          <div class="column-item column-footer">
+            <div>Add Card</div>
+            <div class="add-card" on:click={newCard(column.id)}>
+              <PlusIcon />
+            </div>
+          </div>
+          {/if}
         </div>
       {/each}
     </div>
@@ -237,15 +241,24 @@
     display: flex;
     flex-wrap: wrap;
     flex: 0 1 auto;
+    max-height: 100%;
   }
-  .column-title {
+  .column-item {
     padding: 10px 5px 0px 5px;
     display: flex;
     align-items: center;
     flex: 0 1 auto;
   }
+  .column-title {
+    border-bottom: 1px solid gray;
+    font-weight: bold;
+  }
+  .column-footer {
+    border-top: 1px solid gray;
+  }
   .column {
-    display: block;
+    display: flex;
+    flex-direction: column;
     background-color: #d6d7d7;
     width: 300px;
     margin: 5px;
@@ -254,7 +267,7 @@
   .cards {
     display: flex;
     flex-direction: column;
-    overflow: scroll;
+    overflow-y: auto;
     flex: 1 1 auto;
   }
   .card {
@@ -268,12 +281,12 @@
     overflow: hidden;
   }
   .card-content {
-    overflow-y: scroll;
+    overflow-y: auto;
+    max-height: 200px;
   }
   .add-card :global(svg) {
     margin-right: 6px;
-    height: 30px;
-    width: 30px;
+    width: 20px;
   }
   .votes {
     display: flex;
