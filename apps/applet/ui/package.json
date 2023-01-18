@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@holochain-open-dev/core-types": "^0.6.2",
-    "@holochain/client": "^0.11.9",
+    "@holochain/client": "^0.11.12",
     "@holo-host/boardz": "^0.8.0",
     "@lightningrodlabs/we-applet": "^0.1.0",
     "@lit-labs/context": "^0.1.2",

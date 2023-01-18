@@ -8,7 +8,7 @@
   "scripts": {
     "launch:ts"   : "npm run build:ts && npm run launch:happ:ts",
     "launch:kb"   : "npm run build:kb && npm run launch:happ:kb",
-    "launch:happ:ts" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network mdns",
+    "launch:happ:ts" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 2 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network mdns",
     "launch:happ:kb" : "RUST_LOG=warn echo \"pass\" | hc launch --piped -n 1 ./apps/launcher-kanban/workdir/kanban.happ -w --ui-path apps/launcher-kanban/ui/public network mdns",
     "start:ts": "npm run build:ts && npm run start:agent:ts",
     "start:kb": "npm run build:kb && npm run start:agent:kb",
