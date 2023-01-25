@@ -18,7 +18,7 @@
     "package": "rimraf ui.zip && rimraf public/build && rollup -c && cd ./public && bestzip ../ui.zip * "
   },
   "dependencies": {
-    "@holo-host/boardz": "0.8.0",
+    "@holo-host/boardz": "0.1.0",
     "@holochain/client": "0.11.16",
     "@holochain-open-dev/utils": "0.9.3",
     "@holochain-syn/core": "0.3.0-alpha.6",

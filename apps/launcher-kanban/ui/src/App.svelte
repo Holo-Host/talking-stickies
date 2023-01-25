@@ -23,8 +23,7 @@
       await adminWebsocket.authorizeSigningCredentials(cellIds[0])
     }
     console.log("appPort and Id is", appPort, appId)
-    const appWebsocket = await AppWebsocket.connect(url);
-    client = await AppAgentWebsocket.connect(appWebsocket, appId)
+    client = await AppAgentWebsocket.connect(url, appId)
 
     connected = true
   }

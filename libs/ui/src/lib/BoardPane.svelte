@@ -128,8 +128,6 @@
     return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
   }
   const groupWidth = (groupId) : string => {
-    console.log("gl", groups.length)
-    console.log("counds", stickesCounts[UngroupedId])
     const len = groups.length > 0 ? (stickesCounts[UngroupedId] > 0 ? groups.length : groups.length - 1) : 1
     // TODO: maybe set width dynamically by number of cards in group...
     if (len <= 4) {

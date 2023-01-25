@@ -15,7 +15,7 @@
     "package": "echo \"packaging what was previously built in ./public\" && rimraf ui.zip && cd ./public && bestzip ../ui.zip * "
   },
   "dependencies": {
-    "@holo-host/boardz": "0.8.0",
+    "@holo-host/boardz": "0.1.0",
     "@holo-host/web-sdk": "^0.6.7-prerelease",
     "@holochain-open-dev/utils": "0.9.3",
     "@holochain-syn/core": "0.3.0-alpha.6",
