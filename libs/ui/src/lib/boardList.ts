@@ -1,10 +1,10 @@
 import { RootStore, type Commit, type SynGrammar, type SynStore, type Workspace, type WorkspaceStore } from "@holochain-syn/core";
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from "@holochain-open-dev/core-types";
 import { Board, BoardType, CommitTypeBoard } from "./board";
-import { deserializeHash, EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
+import type { EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
-import type { AgentPubKey, EntryHash } from "@holochain/client";
+import { type AgentPubKey, type EntryHash, decodeHashFromBase64 } from "@holochain/client";
 
 export const CommitTypeBoardList :string = "board-list"
 
@@ -191,7 +191,7 @@ export class BoardList {
     async getBoard(hash: EntryHashB64) : Promise<Board | undefined> {
         let board = this.boards[hash]
         if (!board) {
-            const workspaceHash = deserializeHash(hash)
+            const workspaceHash = decodeHashFromBase64(hash)
             board = this.boards[hash] = new Board(await this.boardsRootStore.joinWorkspace(workspaceHash));
         }
         return board

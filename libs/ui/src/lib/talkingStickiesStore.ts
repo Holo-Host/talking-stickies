@@ -1,12 +1,13 @@
-import type {
-    AppAgentClient,
-    EntryHash,
-    AgentPubKeyB64,
-    AppAgentCallZomeRequest,
-    RoleName,
+import {
+    type AppAgentClient,
+    type EntryHash,
+    type AgentPubKeyB64,
+    type AppAgentCallZomeRequest,
+    type RoleName,
+    encodeHashToBase64,
   } from '@holochain/client';
-import { serializeHash, RecordBag } from '@holochain-open-dev/utils';
-import { WorkspaceStore, SynStore, stateFromCommit,  SynClient, type Workspace, type Commit, RootStore } from '@holochain-syn/core';
+import type { RecordBag } from '@holochain-open-dev/utils';
+import { SynStore,  SynClient, type Commit } from '@holochain-syn/core';
 import { get } from "svelte/store";
 import { CommitTypeBoard } from './board';
 import { BoardList, CommitTypeBoardList } from './boardList';
@@ -37,7 +38,7 @@ export class TalkingStickiesStore {
     synStore: SynStore;
     client: AppAgentClient;
     myAgentPubKey(): AgentPubKeyB64 {
-        return serializeHash(this.client.myPubKey);
+        return encodeHashToBase64(this.client.myPubKey);
     }
 
     constructor(
@@ -88,18 +89,18 @@ export class TalkingStickiesStore {
                 const rootCommit = roots.entryRecords[i]
                 if (commitType === CommitTypeBoardList) {
                     if (!boardListRoot) {
-                        console.log("Found a board list root:", serializeHash(rootCommit.entryHash))
+                        console.log("Found a board list root:", encodeHashToBase64(rootCommit.entryHash))
                         boardListRoot = rootCommit
                     } else {
-                        console.log("Found a board list root, but have allready joined:", serializeHash(boardListRoot.entryHash))
+                        console.log("Found a board list root, but have allready joined:", encodeHashToBase64(boardListRoot.entryHash))
                     }
                 }
                 if (commitType === CommitTypeBoard) {
                     if (!boardsRoot) {
-                        console.log("Found a board root:", serializeHash(rootCommit.entryHash))
+                        console.log("Found a board root:", encodeHashToBase64(rootCommit.entryHash))
                         boardsRoot = rootCommit
                     } else {
-                        console.log("Found a board root, but have allread stored: ", serializeHash(boardsRoot.entryHash))
+                        console.log("Found a board root, but have allread stored: ", encodeHashToBase64(boardsRoot.entryHash))
                     }
                 }
             });

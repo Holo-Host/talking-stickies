@@ -1,8 +1,7 @@
 import type { RootStore, SynGrammar, WorkspaceStore } from "@holochain-syn/core";
 import { get } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
-import type { AgentPubKey, EntryHash, AgentPubKeyB64, EntryHashB64 } from "@holochain/client";
-import { serializeHash } from "@holochain-open-dev/utils";
+import { type AgentPubKey, type EntryHash, type AgentPubKeyB64, type EntryHashB64, encodeHashToBase64 } from "@holochain/client";
 
 export const DEFAULT_STICKIE_VOTE_TYPES = [
     {type: "1", emoji: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
@@ -226,7 +225,7 @@ export class Board {
         return this.workspace.workspaceHash
     }
     hashB64() : EntryHashB64 {
-        return serializeHash(this.workspace.workspaceHash)
+        return encodeHashToBase64(this.workspace.workspaceHash)
     }
     close() {
         this.workspace.leaveWorkspace()

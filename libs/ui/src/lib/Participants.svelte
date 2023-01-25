@@ -1,7 +1,7 @@
 <script>
     import ExIcon from './icons/ExIcon.svelte'
     import {HoloIdenticon} from "@holochain-open-dev/elements";
-  import { serializeHash } from '@holochain-open-dev/utils';
+  import { encodeHashToBase64 } from '@holochain/client';
 
     if (!customElements.get('holo-identicon')){
       customElements.define('holo-identicon', HoloIdenticon)
@@ -89,8 +89,8 @@
       <div class="participant">
         <holo-identicon hash={folk}></holo-identicon>
         <div class="name">
-        {#if avatars[serializeHash(folk)]}
-          {avatars[serializeHash(folk)].name}
+        {#if avatars[encodeHashToBase64(folk)]}
+          {avatars[encodeHashToBase64(folk)].name}
         {:else} <i>no-name</i>
         {/if}
         </div>
