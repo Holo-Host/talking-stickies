@@ -1,8 +1,5 @@
-<script>
-  import ExIcon from './icons/ExIcon.svelte'
-  import TrashIcon from './icons/TrashIcon.svelte'
-  import CheckIcon from './icons/CheckIcon.svelte'
-  import cloneDeep from "lodash"
+<script lang='ts'>
+  import Button from "./Button.svelte"
 
   export let handleSave
   export let handleDelete = undefined
@@ -24,7 +21,7 @@
     display: flex;
     background-color: #D4F3EE;
     flex-basis: 270px;
-    height: 200px;
+    height: 210px;
     width: 250px;
     margin: 10px;
     padding: 10px;
@@ -35,10 +32,11 @@
     line-height: 16px;
     color: #000000;
     justify-content: space-between;
+    flex-direction: column;
   }
   .sticky-elements {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-basis: 100%;
   }
   .textarea {
@@ -51,30 +49,31 @@
   }
   .controls {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding-left: 7px;
     padding-top: 5px;
   }
   .color-buttons {
     display: flex;
     justify-content: space-between;
-    flex-direction: row;
-    height: 19px;
+    flex-direction: column;
     align-items: center;
     cursor: pointer;
+    margin-left: 5px;
   }
   .color-button {
     width: 15px;
     height: 15px;
     margin: 2px;
+    outline: 1px lightgray solid;
   }
   select {
     margin-top:5px;
   }
   .selected {
-    border: 2px black solid;
+    outline: 2px #000 solid;
   }
 </style>
 
@@ -97,16 +96,16 @@
   {/if}
   </div>
   <div class='controls'>
-    <div on:click={cancelEdit}>
-      <ExIcon />
-    </div>
-    <div on:click={() => handleSave(text, groupId, props)}>
-      <CheckIcon />
-    </div>
     {#if handleDelete}
-      <div on:click={handleDelete} style="width:20px">
-        <TrashIcon />
-      </div>
+      <Button on:click={handleDelete} class="secondary" style="align-self:flex-start">
+        Delete
+      </Button>
     {/if}
+    <Button on:click={cancelEdit} class="secondary">
+      Cancel
+    </Button>
+    <Button on:click={() => handleSave(text, groupId, props) } class="primary">
+      Save
+    </Button>
   </div>
 </div>

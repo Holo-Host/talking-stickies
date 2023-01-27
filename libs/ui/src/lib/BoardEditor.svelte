@@ -1,12 +1,11 @@
 <script lang="ts">
-    import ExIcon from './icons/ExIcon.svelte'
-    import TrashIcon from './icons/TrashIcon.svelte'
-    import CheckIcon from './icons/CheckIcon.svelte'
+    import Button from "./Button.svelte"
     import PlusIcon from './icons/PlusIcon.svelte'
+    import TrashIcon from './icons/TrashIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
     import { Group, VoteType, BoardType } from './board';
-  import { onMount } from 'svelte';
+    import { onMount } from 'svelte';
   
     export let handleSave
     export let handleDelete = undefined
@@ -117,7 +116,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding-left: 7px;
       padding-top: 5px;
     }
@@ -136,19 +135,6 @@
   </style>
   
   <div class='board-editor'>
-    <div class='controls'>
-      <div on:click={cancelEdit}>
-        <ExIcon />
-      </div>
-      <div on:click={() => handleSave(boardType, text, groups, voteTypes)}>
-        <CheckIcon />
-      </div>
-      {#if handleDelete}
-        <div on:click={handleDelete} style="width:20px">
-          <TrashIcon />
-        </div>
-      {/if}
-    </div>
     <div class="edit-title">
       Title: <input class='textarea' bind:value={text} />
     </div>
@@ -203,4 +189,17 @@
       </div>
       {/each}
     </div>
-  </div>
+    <div class='controls'>
+      {#if handleDelete}
+        <Button on:click={handleDelete} class="secondary">
+          Archive
+        </Button>
+      {/if}
+      <Button on:click={cancelEdit} class="secondary">
+        Cancel
+      </Button>
+      <Button on:click={() => handleSave(boardType, text, groups, voteTypes)} class="primary">
+        Save
+      </Button>
+    </div>
+ </div>

@@ -7,6 +7,7 @@
   import type { Option, ObjectOption } from 'svelte-multiselect'
   import type { Avatar } from './boardList';
   import type { Readable } from 'svelte/store';
+  import Button from "./Button.svelte"
 
   export let handleSave
   export let handleDelete = undefined
@@ -58,16 +59,16 @@
     on:change={(_event)=>setAgents()} />
   </div>
   <div class='controls'>
-    <div on:click={cancelEdit}>
-      <ExIcon />
-    </div>
-    <div on:click={() => handleSave(text, groupId, props)}>
-      <CheckIcon />
-    </div>
+    <Button on:click={cancelEdit}>
+      Cancel
+    </Button>
+    <Button on:click={() => handleSave(text, groupId, props)}>
+      Save
+    </Button>
     {#if handleDelete}
-      <div on:click={handleDelete} style="width:20px">
-        <TrashIcon />
-      </div>
+      <Button on:click={handleDelete}>
+        Archive
+      </Button>
     {/if}
   </div>
 </div>
@@ -120,6 +121,7 @@
     height: 19px;
     align-items: center;
     cursor: pointer;
+    outline: 1px lightgray solid;
   }
   .color-button {
     width: 15px;
@@ -127,6 +129,6 @@
     margin: 2px;
   }
   .selected {
-    border: 2px black solid;
+    outline: 2px #000 solid;
   }
 </style>
