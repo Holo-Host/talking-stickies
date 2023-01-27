@@ -25,8 +25,8 @@
 
 <div class='toolbar'>
   {#if boardType === BoardType.Stickies}
-    <div class="logo" title="TalkingStickies UI v0.1.2"><TSLogoIcon /></div><h1 class="logo-text">TalkingStickies</h1>
+    <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div><h1 class="logo-text">TalkingStickies</h1>
   {:else}
-    <div class="logo" title="KanBan UI v0.1.2"><KBLogoIcon /></div><h1 class="logo-text">KanBan</h1>
+    <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h1 class="logo-text">KanBan</h1>
   {/if}
 </div>
