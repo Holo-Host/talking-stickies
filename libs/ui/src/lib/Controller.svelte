@@ -1,5 +1,4 @@
 <script lang="ts">
-    import BoardList from './BoardList.svelte'
     import Toolbar from './Toolbar.svelte'
     import BoardPane from './BoardPane.svelte'
     import KanBanPane from './KanBanPane.svelte'
@@ -8,7 +7,8 @@
     import type { AppAgentClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import { BoardType } from './board';
-    import { MaterialApp } from 'svelte-materialify';
+    import { MaterialApp, Icon } from 'svelte-materialify';
+    import { mdiShapeSquarePlus } from '@mdi/js';
 
     export let boardType: BoardType = BoardType.Stickies
     export let roleName = ""
@@ -74,7 +74,6 @@
 
     $: activeBoardIndex = tsStore ? tsStore.boardList.activeBoardHash : undefined
     $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
-    $: boardList = tsStore ? tsStore.boardList : undefined
 
     initialize()
 
@@ -85,6 +84,8 @@
     setContext('tsStore', {
       getStore: () => tsStore,
     });
+
+    $: boardList = tsStore? tsStore.boardList.stateStore() : undefined
 
     async function initialize() : Promise<void> {
       const store = createStore()
@@ -134,6 +135,13 @@
       border: solid 3px black;
       border-radius: 10px;
     }
+    .welcome-text {
+      border-radius: 5px;
+      border: 1px solid black;
+      margin: 50px;
+      padding: 26px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
   </style>
   
   <svelte:head>
@@ -145,11 +153,13 @@
 
     {#if tsStore}
       <Toolbar boardType={boardType}/>
-      {#if boardList}
-      <BoardList boardType={boardType}/>
-      {:else}
-        Loading for board list...
-      {/if}
+      {#if boardList && $boardList.boards.length == 0}
+        <div class="welcome-text">
+          <h5>Welcome!</h5>
+          <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
+          <p>Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board. </p>
+        </div>
+      {/if}    
       {#if $activeBoardIndex !== undefined}
         {#if $activeBoardType === BoardType.Stickies}
           <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
@@ -159,7 +169,7 @@
         {/if}
       {/if}
       <a class="issue" target="github" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo">Report Issue</a>
-      {:else}
+    {:else}
       Loading
     {/if}
   </MaterialApp>

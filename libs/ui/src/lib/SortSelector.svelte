@@ -32,12 +32,11 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: #E4E4E4;
     border: 5px solid white;
     cursor: pointer;
   }
   .selected {
-    border: 5px solid black;
+    border: 3px solid black;
     background-color: transparent;
   }
 </style>
