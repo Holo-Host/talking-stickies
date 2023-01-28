@@ -94,7 +94,7 @@
 <Button icon on:click={()=>creating = true} style="margin-left:10px" title="New Board"><Icon path={mdiShapeSquarePlus} /></Button>
 <Button icon on:click={()=>{fileinput.click();}} style="margin-left:10px" title="Import Board"><Icon path={mdiImport} /></Button>
 <Button icon on:click={()=>{showParticipants=true}} style="margin-left:10px" title="Show Participants"><Icon path={mdiAccountGroup} />{$participants.active.length }</Button>
-<Button icon on:click={editAvatar} title={myName} style="margin-left:10px"><Icon path={mdiAccount} /></Button>
+<Button icon on:click={editAvatar} title={myName ? myName:"Edit Avatar"} style="margin-left:10px"><Icon path={mdiAccount} /></Button>
 
 {#if showParticipants}
 <ParticipantsDialog bind:active={showParticipants} participants={get(participants).active} avatars={$avatars} />
