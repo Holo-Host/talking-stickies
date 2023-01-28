@@ -31,5 +31,5 @@
   {:else}
     <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
   {/if}
-  <BoardMenu></BoardMenu>
+  <BoardMenu boardType={boardType}></BoardMenu>
 </div>

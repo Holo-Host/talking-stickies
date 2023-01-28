@@ -6,8 +6,11 @@
     import { BoardType } from './board';
     import NewBoardDialog from './NewBoardDialog.svelte';
     import { mdiChevronDown, mdiImport, mdiShapeSquarePlus, mdiArchiveArrowUp } from '@mdi/js';
+    import ParticipantsDialog from './ParticipantsDialog.svelte';
+  import { get } from 'svelte/store';
 
     let creating = false
+    let showParticipants = false
     export const boardType:BoardType = BoardType.Stickies
 
     const { getStore } :any = getContext('tsStore');
@@ -16,6 +19,8 @@
     $: boardList = store.boardList.stateStore()
     $: activeHash = store.boardList.activeBoardHash;
     $: state = store.boardList.getReadableBoardState($activeHash);
+    $: participants = store.boardList.participants()
+    $: avatars = store.boardList.avatars()
 
     const selectBoard = (hash: EntryHashB64) => {
         store.boardList.setActiveBoard(hash)
@@ -68,6 +73,12 @@
 {/if}
 <Button icon on:click={()=>creating = true} style="margin-left:10px" title="New Board"><Icon path={mdiShapeSquarePlus} /></Button>
 <Button icon on:click={()=>{fileinput.click();}} style="margin-left:10px" title="Import Board"><Icon path={mdiImport} /></Button>
+
+{#if showParticipants}
+<ParticipantsDialog bind:active={showParticipans} participants={get(participants).active} avatars={$avatars} />
+{/if}
+
+
 {#if creating}
     <NewBoardDialog boardType={boardType} bind:active={creating}></NewBoardDialog>
 {/if}
