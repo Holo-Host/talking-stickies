@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Button from "./Button.svelte"
+    import {Button} from "svelte-materialify"
     import PlusIcon from './icons/PlusIcon.svelte'
     import TrashIcon from './icons/TrashIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
@@ -86,15 +86,10 @@
   <style>
     .board-editor {
       display: flex;
-      background-color: #D4F3EE;
       flex-basis: 270px;
       margin: 20px;
-      padding: 10px;
-      box-shadow: 4px 5px 13px 0px rgba(0,0,0,0.38);
       font-style: normal;
       font-weight: 600;
-      font-size: 12px;
-      line-height: 16px;
       color: #000000;
       flex-direction: column;
       justify-content: flex-start;
@@ -105,6 +100,9 @@
       box-sizing: border-box;
       border-radius: 3px;
       width: 100%;
+      padding: 5px;
+      margin-right: 5px;
+      margin-bottom: 5px;
     }
     .emoji-input {
       width: 30px;
@@ -118,7 +116,7 @@
       align-items: center;
       justify-content: flex-end;
       padding-left: 7px;
-      padding-top: 5px;
+      padding-top: 10px;
     }
     .group {
       display: flex;
@@ -127,6 +125,7 @@
     .vote-type {
       display: flex;
       flex-direction: row;
+      align-items: center;
     }
     .add-item {
       display: inline-block;
@@ -191,14 +190,14 @@
     </div>
     <div class='controls'>
       {#if handleDelete}
-        <Button on:click={handleDelete} class="secondary">
+        <Button on:click={handleDelete} size="small">
           Archive
         </Button>
       {/if}
-      <Button on:click={cancelEdit} class="secondary">
+      <Button on:click={cancelEdit} style="margin-left:10px" size="small">
         Cancel
       </Button>
-      <Button on:click={() => handleSave(boardType, text, groups, voteTypes)} class="primary">
+      <Button style="margin-left:10px" size="small" on:click={() => handleSave(boardType, text, groups, voteTypes)} class="primary-color">
         Save
       </Button>
     </div>

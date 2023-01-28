@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import Button from "./Button.svelte"
+  import {Button} from "svelte-materialify"
 
   export let handleSave
   export let handleDelete = undefined
@@ -21,7 +21,7 @@
     display: flex;
     background-color: #D4F3EE;
     flex-basis: 270px;
-    height: 210px;
+    height: 230px;
     width: 250px;
     margin: 10px;
     padding: 10px;
@@ -46,6 +46,8 @@
     border-radius: 3px;
     width: 100%;
     height: 100%;
+    font-weight: normal;
+    padding: 2px;
   }
   .controls {
     display: flex;
@@ -73,18 +75,11 @@
     margin-top:5px;
   }
   .selected {
-    outline: 2px #000 solid;
+    outline: px #000 solid;
   }
 </style>
 
 <div class='sticky-editor' style:background-color={props.color}>
-  <div class="sticky-elements">
-  <textarea class='textarea' bind:value={text} />
-  <div class="color-buttons">
-    {#each colors as color}
-      <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
-    {/each}
-  </div>
   {#if groups.length > 1 && groupId !== undefined}
     <select bind:value={groupId}>
       {#each groups as group}
@@ -94,17 +89,24 @@
       {/each}
     </select>
   {/if}
+  <div class="sticky-elements">
+  <textarea class='textarea' bind:value={text} />
+  <div class="color-buttons">
+    {#each colors as color}
+      <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
+    {/each}
+  </div>
   </div>
   <div class='controls'>
     {#if handleDelete}
-      <Button on:click={handleDelete} class="secondary" style="align-self:flex-start">
+      <Button size="x-small" on:click={handleDelete} class="red white-text">
         Delete
       </Button>
     {/if}
-    <Button on:click={cancelEdit} class="secondary">
+    <Button style="margin-left:5px" size="x-small" on:click={cancelEdit}>
       Cancel
     </Button>
-    <Button on:click={() => handleSave(text, groupId, props) } class="primary">
+    <Button style="margin-left:5px" size="x-small" class="primary-color" on:click={() => handleSave(text, groupId, props) }>
       Save
     </Button>
   </div>

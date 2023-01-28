@@ -1,13 +1,10 @@
 <script lang="ts">
-  import ExIcon from './icons/ExIcon.svelte'
-  import TrashIcon from './icons/TrashIcon.svelte'
-  import CheckIcon from './icons/CheckIcon.svelte'
   import type { Dictionary } from "@holochain-open-dev/core-types";
   import MultiSelect from 'svelte-multiselect'
   import type { Option, ObjectOption } from 'svelte-multiselect'
   import type { Avatar } from './boardList';
   import type { Readable } from 'svelte/store';
-  import Button from "./Button.svelte"
+  import {Button} from "svelte-materialify"
 
   export let handleSave
   export let handleDelete = undefined
@@ -59,15 +56,15 @@
     on:change={(_event)=>setAgents()} />
   </div>
   <div class='controls'>
-    <Button on:click={cancelEdit}>
+    <Button size="x-small"on:click={cancelEdit}>
       Cancel
     </Button>
-    <Button on:click={() => handleSave(text, groupId, props)}>
+    <Button size="x-small"on:click={() => handleSave(text, groupId, props)}>
       Save
     </Button>
     {#if handleDelete}
-      <Button on:click={handleDelete}>
-        Archive
+      <Button size="x-small" on:click={handleDelete}>
+        Delete
       </Button>
     {/if}
   </div>

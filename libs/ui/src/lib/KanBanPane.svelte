@@ -126,7 +126,7 @@
     <ExportIcon />
   </div>
   <div class="top-bar">
-    <h1>{$state.name}</h1>
+    <h4>{$state.name}</h4>
     <SortSelector {setSortOption} {sortOption} />
   </div>
   {#if $state}

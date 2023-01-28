@@ -8,6 +8,7 @@
     import type { AppAgentClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import { BoardType } from './board';
+    import { MaterialApp } from 'svelte-materialify';
 
     export let boardType: BoardType = BoardType.Stickies
     export let roleName = ""
@@ -138,8 +139,10 @@
   <svelte:head>
     <script src='https://kit.fontawesome.com/80d72fa568.js' crossorigin='anonymous'></script>
   </svelte:head>
-  
+
   <div class='app'>
+    <MaterialApp>
+
     {#if tsStore}
       <Toolbar boardType={boardType}/>
       {#if boardList}
@@ -159,4 +162,5 @@
       {:else}
       Loading
     {/if}
+  </MaterialApp>
   </div>

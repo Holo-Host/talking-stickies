@@ -5,19 +5,17 @@
   import ImportIcon from './icons/ImportIcon.svelte';
   import PencilIcon from './icons/PencilIcon.svelte'
   import UnarchiveIcon from './icons/UnarchiveIcon.svelte'
-  import ReloadIcon from './icons/ReloadIcon.svelte'
   import AvatarIcon from './icons/AvatarIcon.svelte'
   import type { TalkingStickiesStore } from './talkingStickiesStore';
-  import BoardEditor from './BoardEditor.svelte'
-  import { isEqual } from 'lodash'
   import { cloneDeep } from "lodash";
-  import { Group, VoteType, DEFAULT_STICKIE_VOTE_TYPES, DEFAULT_KANBAN_VOTE_TYPES, Board, BoardType } from './board';
+  import { DEFAULT_STICKIE_VOTE_TYPES, DEFAULT_KANBAN_VOTE_TYPES, BoardType } from './board';
   import type { EntryHashB64 } from '@holochain/client';
-  import type { BoardState } from './board';
   import AvatarEditor from './AvatarEditor.svelte';
   import type { Avatar } from './boardList';
   import Participants from './Participants.svelte';
   import {HoloIdenticon} from "@holochain-open-dev/elements";
+  import NewBoardDialog from './NewBoardDialog.svelte';
+  import EditBoardDialog from './EditBoardDialog.svelte';
 
   export let boardType:BoardType = BoardType.Stickies
 
@@ -36,7 +34,7 @@
   $: participants = store.boardList.participants()
   $: avatars = store.boardList.avatars()
 
-  let editingBoardHash: EntryHashB64
+  let editingBoardHash: EntryHashB64|undefined
   let editName = ''
   let editGroups = []
   let editVoteTypes = []
@@ -66,80 +64,19 @@
     }, false);
     reader.readAsText(file);
   };
-
-  const addBoard = async (type: BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
-    const board = await store.boardList.makeBoard({type, name, groups, voteTypes})
-    console.log("ADD BOARD", board, groups)
-    selectBoard(board.hashB64())
-    creating = false
-  }
   
   const selectBoard = (hash: EntryHashB64) => {
     store.boardList.setActiveBoard(hash)
-  }
-
-  const archiveBoard = (hash: EntryHashB64) => () => {
-    store.boardList.archiveBoard(hash)
-    cancelEdit()
   }
 
   const unarchiveBoard = (hash: EntryHashB64) => () => {
     store.boardList.unarchiveBoard(hash)
   }
 
-  const editBoard = (hash: EntryHashB64) => async () => {
-    const board: Board | undefined = await store.boardList.getBoard(hash)
-    if (board) {
-      const state = board.state()
-      editingBoardHash = hash
-      editName = state.name
-      editGroups = cloneDeep(state.groups)
-      editVoteTypes = cloneDeep(state.voteTypes)
-    } else {
-      console.log("board not found:", hash)
-    }
+  const editBoard = (hash: EntryHashB64) => () => {
+    editingBoardHash = hash
   }
 
-  const updateBoard = (hash: EntryHashB64) => async (_type:BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
-    // ignore board type we don't update that.
-    const board: Board | undefined = await store.boardList.getBoard(hash)
-    if (board) {
-      let changes = []
-      const state: BoardState = board.state()
-      if (state.name != name) {
-        console.log("updating board name to ",name)
-        store.boardList.requestChanges([
-          {
-            type: 'set-name',
-            hash: board.hashB64(),
-            name: name
-          }
-        ])
-        changes.push(
-          {
-            type: 'set-name',
-            name: name
-          })
-      }
-      if (!isEqual(groups, state.groups)) {
-        console.log("with groups:", groups)
-        changes.push({type: 'set-groups',
-          groups: groups
-          })
-      }
-      if (!isEqual(voteTypes, state.voteTypes)) {
-        console.log("with voteTypes:", voteTypes)
-        changes.push({type: 'set-vote-types',
-          voteTypes: voteTypes
-          })
-      }
-      if (changes.length > 0) {
-        await store.boardList.requestBoardChanges(hash,changes)
-      }
-    }
-    cancelEdit()
-  }
-	
   const cancelEdit = () => {
     editingBoardHash = null
     editName = ""
@@ -163,12 +100,6 @@
 
   const closeEditAvatar = () => {
     editingAvatar = false
-  }
-
-  const reloadBoards = async () => {
-    loading = true
-    await store.loadBoards()
-    loading = false
   }
 
   const showParticpants = () => {
@@ -213,20 +144,19 @@
     </div>
     <div class='board-list'>
         {#if creating}
-        <BoardEditor handleSave={addBoard} {cancelEdit} boardType={boardType} voteTypes={editVoteTypes} />
+          <NewBoardDialog boardType={boardType} bind:active={creating}></NewBoardDialog>
         {/if}
-
+        {#if editingBoardHash}
+         <EditBoardDialog bind:boardHash={editingBoardHash} boardType={boardType}></EditBoardDialog>
+        {/if}
+  
         {#each $boardList.boards as board }
-          {#if editingBoardHash === board.hash}
-            <BoardEditor boardType={boardType} handleSave={updateBoard(board.hash)} handleDelete={archiveBoard(board.hash)} {cancelEdit} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
-          {:else}
             {#if board.status !== "archived" }
               <div class="board {$activeHash === board.hash? "selected":""}" on:click={() => selectBoard(board.hash)}>
                 {board.name}
                 <div class="board-button" on:click={editBoard(board.hash)}><PencilIcon /></div>
               </div>
             {/if}
-          {/if}
         {/each}
         {#if showArchived}
           {#each $boardList.boards as board, i }

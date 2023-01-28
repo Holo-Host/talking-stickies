@@ -1,18 +1,18 @@
 <script lang="ts">
   import { getContext } from "svelte";
   import StickyEditor from "./StickyEditor.svelte";
-  import PlusIcon from "./icons/PlusIcon.svelte";
-  import ExIcon from "./icons/ExIcon.svelte";
-  import ExportIcon from "./icons/ExportIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
   import type { v1 as uuidv1 } from "uuid";
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
   import SortSelector from "./SortSelector.svelte";
   import { Marked, Renderer } from "@ts-stack/markdown";
-  import { cloneDeep, isEqual } from "lodash";
+  import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
-  import { UngroupedId, type Sticky } from "./board";
+  import { BoardType, UngroupedId, type Sticky } from "./board";
+  import { mdiCog, mdiExport, mdiNotePlusOutline } from '@mdi/js';
+  import { Button, Icon } from "svelte-materialify"
+  import EditBoardDialog from "./EditBoardDialog.svelte";
 
   const pane = new Pane();
 
@@ -153,23 +153,29 @@
     }
     return 'fit-content'
   }
+  let editing = false
 </script>
 
 <div class="board">
-  <div class="close-board global-board-button" on:click={closeBoard} title="Close Board">
-    <ExIcon />
-  </div>
-  <div class="export-board global-board-button" on:click={() => pane.exportBoard($state)} title="Export Board">
-    <ExportIcon />
-  </div>
+  {#if editing}
+    <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.Stickies}></EditBoardDialog>
+  {/if}
+
   <div class="top-bar">
-    <h1>{$state.name}</h1>
     {#if $state.groups.length == 0}
-      <div class="add-sticky" on:click={newSticky(UngroupedId)} style="margin-left:5px" title="New Sticky">
-        <PlusIcon />
-      </div>
+      <Button size=small icon on:click={newSticky(UngroupedId)} title="New Sticky">
+        <Icon path={mdiNotePlusOutline} />
+      </Button>
     {/if}
-    <SortSelector {setSortOption} {sortOption} />
+    Sort By: <SortSelector {setSortOption} {sortOption} />
+    <div class="board-buttons">
+      <Button size=small icon on:click={()=>editing=true} title="Settings">
+        <Icon path={mdiCog} />
+      </Button>
+      <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export Board">
+        <Icon path={mdiExport} />
+      </Button>
+    </div>
   </div>
   {#if $state}
     <div class="groups">
@@ -178,10 +184,10 @@
         <div class="group" style:width={groupWidth(curGroup.id)}>
           {#if $state.groups.length > 0}
           <div class="group-title">
-            <h2>{#if curGroup.id === UngroupedId}Ungrouped{:else}{curGroup.name}{/if}</h2>
-              <div class="add-sticky" on:click={newSticky(curGroup.id)}>
-                <PlusIcon />
-              </div>
+            <b>{#if curGroup.id === UngroupedId}Ungrouped{:else}{curGroup.name}{/if}</b>
+              <Button size=small icon on:click={newSticky(curGroup.id)} title={`New Sticky in {curGroup.name}`}>
+                <Icon path={mdiNotePlusOutline} />
+              </Button>
           </div>
           {/if}
           <div class="stickies">
@@ -257,18 +263,12 @@
     flex-direction: row;
     align-items: center;
   }
-  .global-board-button {
+  .board-buttons {
     position: absolute;
     margin-top: -18px;
-    cursor: pointer;
+    right: 30px;
   }
-  .close-board {
-    right: 45px;
-  }
-  .export-board {
-    right: 70px;
-  }
-  .add-sticky, h2 {
+  .add-sticky, h5 {
     display: inline-block;
   }
   .groups {

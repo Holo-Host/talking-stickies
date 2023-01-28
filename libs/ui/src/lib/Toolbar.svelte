@@ -1,7 +1,9 @@
-<script type="ts">
+<script lang="ts">
   import { BoardType } from "./board";
   import TSLogoIcon from "./icons/TSLogoIcon.svelte";
   import KBLogoIcon from "./icons/KBLogoIcon.svelte";
+  import BoardMenu from "./BoardMenu.svelte";
+
   export let boardType : BoardType = BoardType.Stickies
 
 </script>
@@ -25,8 +27,9 @@
 
 <div class='toolbar'>
   {#if boardType === BoardType.Stickies}
-    <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div><h1 class="logo-text">TalkingStickies</h1>
+    <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div><h4 class="logo-text">TalkingStickies</h4>
   {:else}
-    <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h1 class="logo-text">KanBan</h1>
+    <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
   {/if}
+  <BoardMenu></BoardMenu>
 </div>

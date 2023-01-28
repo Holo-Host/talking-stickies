@@ -23,7 +23,6 @@
 
 <style>
   .sort-options {
-    margin-left: auto;
     display: flex;
   }
   .wrapper {
