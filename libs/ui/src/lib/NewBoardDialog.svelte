@@ -6,7 +6,7 @@
     import type { TalkingStickiesStore } from './talkingStickiesStore';
     import { getContext } from 'svelte';
 
-    export let boardType:BoardType = BoardType.Stickies
+    export let boardType
     let editVoteTypes = cloneDeep(boardType == BoardType.Stickies ? DEFAULT_STICKIE_VOTE_TYPES : DEFAULT_KANBAN_VOTE_TYPES)
     export let active = true
     const { getStore } :any = getContext('tsStore');

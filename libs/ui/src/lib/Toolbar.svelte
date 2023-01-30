@@ -4,7 +4,7 @@
   import KBLogoIcon from "./icons/KBLogoIcon.svelte";
   import BoardMenu from "./BoardMenu.svelte";
 
-  export let boardType : BoardType = BoardType.Stickies
+  export let boardType
 
 </script>
 

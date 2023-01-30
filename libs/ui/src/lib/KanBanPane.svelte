@@ -239,7 +239,6 @@
   }
   .columns {
     display: flex;
-    flex-wrap: wrap;
     flex: 0 1 auto;
     max-height: 100%;
   }
@@ -268,7 +267,6 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    flex: 1 1 auto;
   }
   .card {
     background-color: white;

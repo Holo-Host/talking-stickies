@@ -8,7 +8,7 @@
   export let groupId = undefined
   export let groups = []
   export let props = {}
-  const colors=["#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "yellow", "LightSkyBlue", "grey"]
+  const colors=["#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "grey"]
   const setColor = (color) => {
     // TODO fix later when there are more properties
     props = {color}
@@ -75,7 +75,7 @@
     margin-top:5px;
   }
   .selected {
-    outline: px #000 solid;
+    outline: 1px #000 solid;
   }
 </style>
 
@@ -90,12 +90,12 @@
     </select>
   {/if}
   <div class="sticky-elements">
-  <textarea class='textarea' bind:value={text} />
-  <div class="color-buttons">
-    {#each colors as color}
-      <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
-    {/each}
-  </div>
+    <textarea class='textarea' bind:value={text} />
+    <div class="color-buttons">
+      {#each colors as color}
+        <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
+      {/each}
+    </div>
   </div>
   <div class='controls'>
     {#if handleDelete}

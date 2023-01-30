@@ -18,7 +18,7 @@
     let editingAvatar = false
     let avatar: Avatar = {name:"", url:""}
 
-    export const boardType:BoardType = BoardType.Stickies
+    export let boardType
 
     const { getStore } :any = getContext('tsStore');
 

@@ -1,14 +1,14 @@
 <script lang="ts">
     import { Dialog } from 'svelte-materialify';
     import { cloneDeep } from "lodash";
-    import { Board, BoardType, Group, VoteType, type BoardState } from './board';
+    import type { Board, Group, VoteType, BoardState } from './board';
     import BoardEditor from './BoardEditor.svelte';
     import type { TalkingStickiesStore } from './talkingStickiesStore';
     import { getContext, onMount } from 'svelte';
     import { isEqual } from 'lodash'
     import type { EntryHashB64 } from '@holochain/client';
 
-    export let boardType:BoardType = BoardType.Stickies
+    export let boardType
     export let boardHash:EntryHashB64|undefined = undefined
     let editName = ''
     let editGroups = []

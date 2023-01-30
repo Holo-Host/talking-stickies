@@ -17,7 +17,7 @@
   import NewBoardDialog from './NewBoardDialog.svelte';
   import EditBoardDialog from './EditBoardDialog.svelte';
 
-  export let boardType:BoardType = BoardType.Stickies
+  export let boardType
 
   if (!customElements.get('holo-identicon')){
       customElements.define('holo-identicon', HoloIdenticon)

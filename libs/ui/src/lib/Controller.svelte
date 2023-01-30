@@ -10,7 +10,7 @@
     import { MaterialApp, Icon } from 'svelte-materialify';
     import { mdiShapeSquarePlus } from '@mdi/js';
 
-    export let boardType: BoardType = BoardType.Stickies
+    export let boardType
     export let roleName = ""
 
     // The debug drawer's ability to resized and hidden
@@ -156,7 +156,11 @@
       {#if boardList && $boardList.boards.length == 0}
         <div class="welcome-text">
           <h5>Welcome!</h5>
-          <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
+          {#if boardType == BoardType.Stickies}
+            <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
+          {:else}
+            <p>KanBan offers real-time collaborative Kan Ban boards for task and project management. </p>
+          {/if}
           <p>Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board. </p>
         </div>
       {/if}    

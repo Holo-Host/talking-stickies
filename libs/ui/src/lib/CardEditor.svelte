@@ -35,13 +35,6 @@
 
 
 <div class='card-editor' style:background-color={props.color}>
-  <div class="card-elements">
-  <textarea class='textarea' bind:value={text} />
-  <div class="color-buttons">
-    {#each colors as color}
-      <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
-    {/each}
-  </div>
   {#if groups.length > 1 && groupId !== undefined}
     <select bind:value={groupId}>
       {#each groups as group}
@@ -51,19 +44,26 @@
       {/each}
     </select>
   {/if}
-  Tagged: <MultiSelect 
-    bind:selected options={avatarNames()}
-    on:change={(_event)=>setAgents()} />
+  <div class="card-elements">
+    <textarea class='textarea' bind:value={text} />
+    <div class="color-buttons">
+      {#each colors as color}
+        <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
+      {/each}
+    </div>
+  </div>
+  <div>
+    Tagged: <MultiSelect bind:selected options={avatarNames()} on:change={(_event)=>setAgents()} />
   </div>
   <div class='controls'>
     <Button size="x-small"on:click={cancelEdit}>
       Cancel
     </Button>
-    <Button size="x-small"on:click={() => handleSave(text, groupId, props)}>
+    <Button style="margin-left:5px" size="x-small" class="primary-color" on:click={() => handleSave(text, groupId, props)}>
       Save
     </Button>
     {#if handleDelete}
-      <Button size="x-small" on:click={handleDelete}>
+      <Button style="margin-left:5px" size="x-small"  class="red white-text" on:click={handleDelete}>
         Delete
       </Button>
     {/if}
@@ -73,23 +73,22 @@
 <style>
   .card-editor {
     display: flex;
-    background-color: white;
+    background-color: #D4F3EE;
     flex-basis: 270px;
-    height: 200px;
-    width: 250px;
     margin: 10px;
     padding: 10px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 4px 5px 13px 0px rgba(0,0,0,0.38);
     font-style: normal;
     font-weight: 600;
     font-size: 12px;
     line-height: 16px;
     color: #000000;
     justify-content: space-between;
+    flex-direction: column;
   }
   .card-elements {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-basis: 100%;
   }
   .textarea {
@@ -98,34 +97,35 @@
     box-sizing: border-box;
     border-radius: 3px;
     width: 100%;
-    height: 100%;
+    font-weight: normal;
+    padding: 2px;
   }
   .controls {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding-left: 7px;
     padding-top: 5px;
-  }
-  select {
-    margin-top:5px;
   }
   .color-buttons {
     display: flex;
     justify-content: space-between;
-    flex-direction: row;
-    height: 19px;
+    flex-direction: column;
     align-items: center;
     cursor: pointer;
-    outline: 1px lightgray solid;
+    margin-left: 5px;
   }
   .color-button {
     width: 15px;
     height: 15px;
     margin: 2px;
+    outline: 1px lightgray solid;
+  }
+  select {
+    margin-top:5px;
   }
   .selected {
-    outline: 2px #000 solid;
+    outline: 1px #000 solid;
   }
 </style>
