@@ -36,8 +36,8 @@
     cursor: pointer;
   }
   .selected {
-    border: 3px solid black;
-    background-color: transparent;
+    border: 2px solid #eee;
+    background-color: #eee;
   }
 </style>
 
