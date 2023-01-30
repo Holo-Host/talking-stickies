@@ -56,17 +56,17 @@
     Tagged: <MultiSelect bind:selected options={avatarNames()} on:change={(_event)=>setAgents()} />
   </div>
   <div class='controls'>
-    <Button size="x-small"on:click={cancelEdit}>
+    {#if handleDelete}
+      <Button size="x-small"  class="red white-text" on:click={handleDelete}>
+        Delete
+      </Button>
+    {/if}
+    <Button style="margin-left:5px" size="x-small"on:click={cancelEdit}>
       Cancel
     </Button>
     <Button style="margin-left:5px" size="x-small" class="primary-color" on:click={() => handleSave(text, groupId, props)}>
       Save
     </Button>
-    {#if handleDelete}
-      <Button style="margin-left:5px" size="x-small"  class="red white-text" on:click={handleDelete}>
-        Delete
-      </Button>
-    {/if}
   </div>
 </div>
 

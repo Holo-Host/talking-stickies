@@ -1,9 +1,6 @@
 <script lang="ts">
   import { getContext } from "svelte";
   import CardEditor from "./CardEditor.svelte";
-  import PlusIcon from "./icons/PlusIcon.svelte";
-  import ExIcon from "./icons/ExIcon.svelte";
-  import ExportIcon from "./icons/ExportIcon.svelte";
   import EmojiIcon from "./icons/EmojiIcon.svelte";
   import { sortBy } from "lodash/fp";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
@@ -12,7 +9,10 @@
   import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
   import type { v1 as uuidv1 } from "uuid";
-  import type { Sticky } from "./board";
+  import { type Sticky, BoardType } from "./board";
+  import { mdiCog, mdiExport, mdiPlusCircle } from "@mdi/js";
+  import { Icon, Button } from "svelte-materialify";
+  import EditBoardDialog from "./EditBoardDialog.svelte";
 
   const pane = new Pane();
 
@@ -115,19 +115,24 @@
   const closeBoard = () => {
     tsStore.boardList.closeActiveBoard();
   };
+  let editing = false
 
 </script>
 
 <div class="board">
-  <div class="close-board global-board-button" on:click={closeBoard} title="Close Board">
-    <ExIcon />
-  </div>
-  <div class="export-board global-board-button" on:click={() => pane.exportBoard($state)} title="Export Board">
-    <ExportIcon />
+  {#if editing}
+    <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanBan}></EditBoardDialog>
+  {/if}
+  <div class="board-buttons">
+    <Button size=small icon on:click={()=>editing=true} title="Settings">
+      <Icon path={mdiCog} />
+    </Button>
+    <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export Board">
+      <Icon path={mdiExport} />
+    </Button>
   </div>
   <div class="top-bar">
-    <h4>{$state.name}</h4>
-    <SortSelector {setSortOption} {sortOption} />
+    Sort By: <SortSelector {setSortOption} {sortOption} />
   </div>
   {#if $state}
     <div class="columns">
@@ -197,9 +202,9 @@
           {:else}
           <div class="column-item column-footer">
             <div>Add Card</div>
-            <div class="add-card" on:click={newCard(column.id)}>
-              <PlusIcon />
-            </div>
+            <Button icon on:click={newCard(column.id)}>
+              <Icon path={mdiPlusCircle}/>
+            </Button>
           </div>
           {/if}
         </div>
@@ -222,20 +227,10 @@
     flex-direction: row;
     align-items: center;
   }
-  .global-board-button {
+  .board-buttons {
     position: absolute;
     margin-top: -18px;
-    cursor: pointer;
-  }
-  .close-board {
-    right: 45px;
-  }
-  .export-board {
-    right: 70px;
-  }
-  .add-card {
-    display: inline-block;
-    margin-left: 7px;
+    right: 30px;
   }
   .columns {
     display: flex;
@@ -281,10 +276,6 @@
   .card-content {
     overflow-y: auto;
     max-height: 200px;
-  }
-  .add-card :global(svg) {
-    margin-right: 6px;
-    width: 20px;
   }
   .votes {
     display: flex;

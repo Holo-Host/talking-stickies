@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {Button} from "svelte-materialify"
-    import PlusIcon from './icons/PlusIcon.svelte'
+    import {Button, Icon} from "svelte-materialify"
+    import { mdiPlusCircle, mdiDelete } from '@mdi/js';
     import TrashIcon from './icons/TrashIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
@@ -103,6 +103,7 @@
       padding: 5px;
       margin-right: 5px;
       margin-bottom: 5px;
+      font-weight: normal;
     }
     .emoji-input {
       width: 30px;
@@ -127,10 +128,6 @@
       flex-direction: row;
       align-items: center;
     }
-    .add-item {
-      display: inline-block;
-      height: 20px;
-    }
   </style>
   
   <div class='board-editor'>
@@ -139,9 +136,9 @@
     </div>
     <div class="edit-groups">
       {groupsTitle}:
-      <div class="add-item" on:click={() => addGroup()}>
-        <PlusIcon />
-      </div>
+      <Button icon on:click={() => addGroup()}>
+        <Icon path={mdiPlusCircle}/>
+      </Button>
 
       {#each groups as group, i}
       <div class="group">
@@ -156,17 +153,17 @@
           <DownIcon />
         </div>
         {/if}
-        <div on:click={deleteGroup(i)} style="margin-left:5px;width:24px">
-          <TrashIcon />
-        </div>
+        <Button icon on:click={deleteGroup(i)} style="margin-left:5px;">
+          <Icon path={mdiDelete}/>
+        </Button>
       </div>
       {/each}
     </div>
     <div class="edit-vote-types">
       Voting Types:
-      <div class="add-item" on:click={() => addVoteType()}>
-        <PlusIcon />
-      </div>
+      <Button icon on:click={() => addVoteType()}>
+        <Icon path={mdiPlusCircle}/>
+      </Button>
       {#each voteTypes as voteType, i}
       <div class="vote-type">
         <input class='textarea emoji-input' bind:value={voteType.emoji} title="emoji"/>

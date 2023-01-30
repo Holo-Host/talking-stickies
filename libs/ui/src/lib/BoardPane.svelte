@@ -268,9 +268,6 @@
     margin-top: -18px;
     right: 30px;
   }
-  .add-sticky, h5 {
-    display: inline-block;
-  }
   .groups {
     display: flex;
     flex-wrap: wrap;
@@ -306,11 +303,6 @@
   .sticky-content {
     overflow-y: auto;
     max-width: 300px;
-  }
-  .add-sticky :global(svg) {
-    margin-right: 6px;
-    height: 30px;
-    width: 30px;
   }
   .votes {
     display: flex;
