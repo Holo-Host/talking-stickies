@@ -127,14 +127,18 @@
       flex-direction: row;
       align-items: center;
     }
+    .title-text {
+      font-weight: normal;
+      font-size: 120%;
+    }
   </style>
   
   <div class='board-editor'>
     <div class="edit-title">
-      Title: <input class='textarea' bind:value={text} />
+      <span class="title-text">Title:</span> <input class='textarea' maxlength="60" bind:value={text} />
     </div>
     <div class="edit-groups">
-      {groupsTitle}:
+      <span class="title-text">{groupsTitle}:</span>
       <Button icon on:click={() => addGroup()}>
         <Icon path={mdiPlusCircle}/>
       </Button>
@@ -159,7 +163,7 @@
       {/each}
     </div>
     <div class="edit-vote-types">
-      Voting Types:
+      <span class="title-text">Voting Types:</span>
       <Button icon on:click={() => addVoteType()}>
         <Icon path={mdiPlusCircle}/>
       </Button>
