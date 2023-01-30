@@ -12,20 +12,29 @@
 
 </script>
 
-<Dialog bind:active>
-    <List>
-        {#each participants as folk}
-        <ListItem dense={true}>
-            <div style="margin-left:10px">
-            {#if avatars[encodeHashToBase64(folk)]}
-                {avatars[encodeHashToBase64(folk)].name}
-            {:else} <i>no-name</i>
-            {/if}
-            </div>
-            <span slot="prepend">
-                <holo-identicon hash={folk}></holo-identicon>
-            </span>
-        </ListItem>
-        {/each}
-    </List>
-</Dialog>
+<div class="participants">
+    <Dialog bind:active>
+        <h5> Participans Online</h5>
+        <List>
+            {#each participants as folk}
+            <ListItem dense={true}>
+                <div style="margin-left:10px">
+                {#if avatars[encodeHashToBase64(folk)]}
+                    {avatars[encodeHashToBase64(folk)].name}
+                {:else} <i>no-name</i>
+                {/if}
+                </div>
+                <span slot="prepend">
+                    <holo-identicon hash={folk}></holo-identicon>
+                </span>
+            </ListItem>
+            {/each}
+        </List>
+    </Dialog>
+</div>
+
+<style>
+    .participants {
+        padding: 10px;
+    }
+</style>

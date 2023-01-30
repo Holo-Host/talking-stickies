@@ -123,16 +123,18 @@
   {#if editing}
     <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanBan}></EditBoardDialog>
   {/if}
-  <div class="board-buttons">
-    <Button size=small icon on:click={()=>editing=true} title="Settings">
-      <Icon path={mdiCog} />
-    </Button>
-    <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export Board">
-      <Icon path={mdiExport} />
-    </Button>
-  </div>
   <div class="top-bar">
-    Sort By: <SortSelector {setSortOption} {sortOption} />
+    <div class="left-items">
+      Sort By: <SortSelector {setSortOption} {sortOption} />
+    </div>
+    <div class="right-items">
+      <Button size=small icon on:click={()=>editing=true} title="Settings">
+        <Icon path={mdiCog} />
+      </Button>
+      <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export Board">
+        <Icon path={mdiExport} />
+      </Button>
+    </div>
   </div>
   {#if $state}
     <div class="columns">
@@ -217,7 +219,7 @@
   .board {
     display: flex;
     flex-direction: column;
-    padding: 30px 60px;
+    padding: 10px;
     background-color: white;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
@@ -226,11 +228,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   }
-  .board-buttons {
-    position: absolute;
-    margin-top: -18px;
-    right: 30px;
+  .left-items {
+    display: flex;
+  }
+  .right-items {
+    display: flex;
   }
   .columns {
     display: flex;
@@ -257,6 +261,7 @@
     width: 300px;
     margin: 5px;
     border-radius: 5px;
+    min-width: 130px;
   }
   .cards {
     display: flex;

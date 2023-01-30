@@ -4,7 +4,7 @@
   const roleName = 'talking-stickies'
   const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
   const adminPort = process.env.SVELTE_APP_ADMIN_PORT
-  import { AppAgentWebsocket, AppWebsocket, AdminWebsocket } from '@holochain/client';
+  import { AppAgentWebsocket, AdminWebsocket } from '@holochain/client';
   const url = `ws://localhost:${appPort}`;
 
   let client: AppAgentWebsocket  
@@ -38,7 +38,7 @@
 <svelte:head>
 </svelte:head>
 {#if connected}
-  <Controller client={client} boardType={BoardType.TalkingStickies} roleName={roleName}></Controller>
+  <Controller fish={"dog"} client={client} boardType={BoardType.Stickies} roleName={roleName}></Controller>
 {:else}
   Loading
 {/if}

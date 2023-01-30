@@ -1,7 +1,6 @@
 <script lang="ts">
     import {Button, Icon} from "svelte-materialify"
     import { mdiPlusCircle, mdiDelete } from '@mdi/js';
-    import TrashIcon from './icons/TrashIcon.svelte'
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
     import { Group, VoteType, BoardType } from './board';
@@ -179,9 +178,9 @@
           <DownIcon />
         </div>
         {/if}
-        <div on:click={deleteVoteType(i)} style="margin-left:5px;width:24px">
-          <TrashIcon />
-        </div>
+        <Button icon on:click={deleteVoteType(i)} style="margin-left:5px;">
+          <Icon path={mdiDelete} />
+        </Button>
       </div>
       {/each}
     </div>

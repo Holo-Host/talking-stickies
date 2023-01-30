@@ -10,7 +10,7 @@
     import { MaterialApp, Icon } from 'svelte-materialify';
     import { mdiShapeSquarePlus } from '@mdi/js';
 
-    export let boardType
+    export let boardType:BoardType
     export let roleName = ""
 
     // The debug drawer's ability to resized and hidden
@@ -124,17 +124,6 @@
         max-width: none;
       }
     }
-    .issue {
-      position:absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px;
-      background-color: rgb(43, 198, 226);
-      color: white;
-      font-weight: bold;
-      border: solid 3px black;
-      border-radius: 10px;
-    }
     .welcome-text {
       border-radius: 5px;
       border: 1px solid black;
@@ -163,7 +152,7 @@
           {/if}
           <p>Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board. </p>
         </div>
-      {/if}    
+      {/if}
       {#if $activeBoardIndex !== undefined}
         {#if $activeBoardType === BoardType.Stickies}
           <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
@@ -172,7 +161,6 @@
           <KanBanPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
         {/if}
       {/if}
-      <a class="issue" target="github" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo">Report Issue</a>
     {:else}
       Loading
     {/if}

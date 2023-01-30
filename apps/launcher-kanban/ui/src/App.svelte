@@ -4,7 +4,7 @@
   const roleName = 'kanban'
   const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
   const adminPort = process.env.SVELTE_APP_ADMIN_PORT
-  import { AdminWebsocket, AppAgentWebsocket, AppWebsocket } from '@holochain/client';
+  import { AdminWebsocket, AppAgentWebsocket } from '@holochain/client';
   const url = `ws://localhost:${appPort}`;
 
   let client: AppAgentWebsocket  

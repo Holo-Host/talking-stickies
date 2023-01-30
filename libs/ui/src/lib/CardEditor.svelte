@@ -57,7 +57,7 @@
   </div>
   <div class='controls'>
     {#if handleDelete}
-      <Button size="x-small"  class="red white-text" on:click={handleDelete}>
+      <Button text size="x-small" class="red white-text" on:click={handleDelete}>
         Delete
       </Button>
     {/if}

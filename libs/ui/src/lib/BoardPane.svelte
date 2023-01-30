@@ -162,13 +162,15 @@
   {/if}
 
   <div class="top-bar">
-    {#if $state.groups.length == 0}
-      <Button size=small icon on:click={newSticky(UngroupedId)} title="New Sticky">
-        <Icon path={mdiNotePlusOutline} />
-      </Button>
-    {/if}
-    Sort By: <SortSelector {setSortOption} {sortOption} />
-    <div class="board-buttons">
+    <div class="left-items">
+      {#if $state.groups.length == 0}
+        <Button size=small icon on:click={newSticky(UngroupedId)} title="New Sticky">
+          <Icon path={mdiNotePlusOutline} />
+        </Button>
+      {/if}
+      Sort By: <SortSelector {setSortOption} {sortOption} />
+    </div>
+    <div class="right-items">
       <Button size=small icon on:click={()=>editing=true} title="Settings">
         <Icon path={mdiCog} />
       </Button>
@@ -252,7 +254,7 @@
     display: flex;
     flex-direction: column;
     min-height: 500px;
-    padding: 30px 60px;
+    padding: 10px;
     background-color: white;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
@@ -262,11 +264,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   }
-  .board-buttons {
-    position: absolute;
-    margin-top: -18px;
-    right: 30px;
+  .left-items {
+    display: flex;
+  }
+  .right-items {
+    display: flex;
   }
   .groups {
     display: flex;

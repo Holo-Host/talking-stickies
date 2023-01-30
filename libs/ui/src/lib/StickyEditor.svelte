@@ -99,7 +99,7 @@
   </div>
   <div class='controls'>
     {#if handleDelete}
-      <Button size="x-small" on:click={handleDelete} class="red white-text">
+      <Button text size="x-small" on:click={handleDelete} class="red white-text">
         Delete
       </Button>
     {/if}
