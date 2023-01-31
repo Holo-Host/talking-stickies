@@ -1,11 +1,12 @@
 <script lang="ts">
     import {Button, Icon} from "svelte-materialify"
-    import { mdiPlusCircle, mdiDelete } from '@mdi/js';
+    import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
     import UpIcon from './icons/UpIcon.svelte'
     import DownIcon from './icons/DownIcon.svelte'
     import { Group, VoteType, BoardType } from './board';
     import { onMount } from 'svelte';
-  
+  	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
+
     export let handleSave
     export let handleDelete = undefined
     export let cancelEdit
@@ -80,59 +81,22 @@
       setBoardType(boardType)
     })
 
+    const onDropGroups = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
+      if (!to || from === to) {
+        return;
+      }
+
+      groups = reorder(groups, from.index, to.index);
+    }
+    const onDropVoteTypes = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
+      if (!to || from === to) {
+        return;
+      }
+
+      voteTypes = reorder(voteTypes, from.index, to.index);
+    }
 </script>
-  
-  <style>
-    .board-editor {
-      display: flex;
-      flex-basis: 270px;
-      margin: 20px;
-      font-style: normal;
-      font-weight: 600;
-      color: #000000;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
-    .textarea {
-      background-color: rgba(255, 255, 255, 0.72);
-      border: 1px solid #C9C9C9;
-      box-sizing: border-box;
-      border-radius: 3px;
-      width: 100%;
-      padding: 5px;
-      margin-right: 5px;
-      margin-bottom: 5px;
-      font-weight: normal;
-    }
-    .emoji-input {
-      width: 30px;
-    }
-    .num-input {
-      width: 20px;
-    }
-    .controls {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-end;
-      padding-left: 7px;
-      padding-top: 10px;
-    }
-    .group {
-      display: flex;
-      flex-direction: row;
-    }
-    .vote-type {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-    .title-text {
-      font-weight: normal;
-      font-size: 120%;
-    }
-  </style>
-  
+
   <div class='board-editor'>
     <div class="edit-title">
       <span class="title-text">Title:</span> <input class='textarea' maxlength="60" bind:value={text} />
@@ -142,51 +106,46 @@
       <Button icon on:click={() => addGroup()}>
         <Icon path={mdiPlusCircle}/>
       </Button>
-
-      {#each groups as group, i}
-      <div class="group">
-        <input class='textarea' bind:value={group.name} />
-        {#if i > 0}
-        <div on:click={moveGroupUp(i)} style="margin-left:5px;width:30px">
-          <UpIcon />
+      <DragDropList
+        id="groups"
+        type={VerticalDropZone}
+	      itemSize={45}
+        itemCount={groups.length}
+        on:drop={onDropGroups}
+        let:index
+        >
+        <div class="group">
+          <Icon path={mdiDragVertical}/>
+          <input class='textarea' bind:value={groups[index].name} />
+          <Button icon on:click={deleteGroup(index)}>
+            <Icon path={mdiDelete}/>
+          </Button>
         </div>
-        {/if}
-        {#if i < groups.length-1}
-        <div on:click={moveGroupDown(i)} style="margin-left:5px;width:30px">
-          <DownIcon />
-        </div>
-        {/if}
-        <Button icon on:click={deleteGroup(i)} style="margin-left:5px;">
-          <Icon path={mdiDelete}/>
-        </Button>
-      </div>
-      {/each}
+      </DragDropList>
     </div>
     <div class="edit-vote-types">
       <span class="title-text">Voting Types:</span>
       <Button icon on:click={() => addVoteType()}>
         <Icon path={mdiPlusCircle}/>
       </Button>
-      {#each voteTypes as voteType, i}
-      <div class="vote-type">
-        <input class='textarea emoji-input' bind:value={voteType.emoji} title="emoji"/>
-        <input class='textarea num-input' bind:value={voteType.maxVotes} title="max votes on type per card" />
-        <input class='textarea' bind:value={voteType.toolTip} title="description"/>
-        {#if i > 0}
-        <div on:click={moveVoteTypeUp(i)} style="margin-left:5px;width:30px">
-          <UpIcon />
+      <DragDropList
+        id="voteTypes"
+        type={VerticalDropZone}
+	      itemSize={45}
+        itemCount={voteTypes.length}
+        on:drop={onDropVoteTypes}
+        let:index
+        >
+        <div class="vote-type">
+          <Icon path={mdiDragVertical}/>
+          <input class='textarea emoji-input' bind:value={voteTypes[index].emoji} title="emoji"/>
+          <input class='textarea num-input' bind:value={voteTypes[index].maxVotes} title="max votes on type per card" />
+          <input class='textarea' bind:value={voteTypes[index].toolTip} title="description"/>
+          <Button icon on:click={deleteVoteType(index)} >
+            <Icon path={mdiDelete} />
+          </Button>
         </div>
-        {/if}
-        {#if i < voteTypes.length-1}
-        <div on:click={moveVoteTypeDown(i)} style="margin-left:5px;width:30px">
-          <DownIcon />
-        </div>
-        {/if}
-        <Button icon on:click={deleteVoteType(i)} style="margin-left:5px;">
-          <Icon path={mdiDelete} />
-        </Button>
-      </div>
-      {/each}
+      </DragDropList> 
     </div>
     <div class='controls'>
       {#if handleDelete}
@@ -202,3 +161,56 @@
       </Button>
     </div>
  </div>
+
+
+   
+ <style>
+  .board-editor {
+    display: flex;
+    flex-basis: 270px;
+    margin: 20px;
+    font-style: normal;
+    font-weight: 600;
+    color: #000000;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .textarea {
+    background-color: rgba(255, 255, 255, 0.72);
+    border: 1px solid #C9C9C9;
+    box-sizing: border-box;
+    border-radius: 3px;
+    width: 100%;
+    padding: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-weight: normal;
+  }
+  .emoji-input {
+    width: 30px;
+  }
+  .num-input {
+    width: 20px;
+  }
+  .controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 7px;
+    padding-top: 10px;
+  }
+  .group {
+    display: flex;
+    flex-direction: row;
+  }
+  .vote-type {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .title-text {
+    font-weight: normal;
+    font-size: 120%;
+  }
+</style>

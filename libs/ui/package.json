@@ -46,7 +46,8 @@
     "svelte-fa": "^3.0.3",
     "svelte-materialify": "^0.3.11",
     "svelte-multiselect": "^8.2.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "svelte-dnd-list": "0.1.8"
   },
   "devDependencies": {
     "@open-wc/eslint-config": "^4.3.0",
