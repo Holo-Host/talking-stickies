@@ -1,8 +1,6 @@
 <script lang="ts">
     import {Button, Icon} from "svelte-materialify"
     import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
-    import UpIcon from './icons/UpIcon.svelte'
-    import DownIcon from './icons/DownIcon.svelte'
     import { Group, VoteType, BoardType } from './board';
     import { onMount } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
@@ -31,10 +29,6 @@
       }
     }
 
- 
-    const onTypeChange = (event) => {
-      setBoardType(event.currentTarget.value)
-    }
     const addVoteType = () => {
       voteTypes.push(new VoteType(`🙂`, `description: edit-me`, 1))
       voteTypes = voteTypes
@@ -43,19 +37,6 @@
       voteTypes.splice(index, 1)
       voteTypes = voteTypes
     }
-    const moveVoteTypeUp = (index) => () => {
-      const g = voteTypes[index] 
-      voteTypes.splice(index, 1)
-      voteTypes.splice(index-1,0,g)
-      voteTypes = voteTypes
-    }
-    const moveVoteTypeDown = (index) => () => {
-      const g = voteTypes[index] 
-      voteTypes.splice(index, 1)
-      voteTypes.splice(index+1,0,g)
-      voteTypes = voteTypes
-    }
-
     const addGroup = () => {
       groups.push(new Group(`${defaultGroupName} ${groups.length+1}`))
       groups = groups
@@ -63,33 +44,20 @@
     const deleteGroup = (index) => () => {
       groups.splice(index, 1)
       groups = groups
-    }
-    const moveGroupUp = (index) => () => {
-      const g = groups[index] 
-      groups.splice(index, 1)
-      groups.splice(index-1,0,g)
-      groups = groups
-    }
-    const moveGroupDown = (index) => () => {
-      const g = groups[index] 
-      groups.splice(index, 1)
-      groups.splice(index+1,0,g)
-      groups = groups
-    }
-    
+    }    
     onMount( async () => {
       setBoardType(boardType)
     })
 
     const onDropGroups = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
-      if (!to || from === to) {
+      if (!to || from === to || from.dropZoneID !== "groups") {
         return;
       }
 
       groups = reorder(groups, from.index, to.index);
     }
     const onDropVoteTypes = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
-      if (!to || from === to) {
+      if (!to || from === to || from.dropZoneID !== "voteTypes") {
         return;
       }
 

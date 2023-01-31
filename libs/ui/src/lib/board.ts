@@ -143,8 +143,6 @@ export type Sticky = {
         state.groups = delta.groups
       }
       if (delta.type == "add-group") {
-        console.log("PUSHING", delta.group)
-  
         state.groups.push(delta.group)
       }
       if (delta.type == "delete-group") {

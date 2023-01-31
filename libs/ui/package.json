@@ -21,11 +21,9 @@
     "./board": "./package/board.js",
     "./grammar": "./package/grammar.js",
     "./icon.svg": "./package/icon.svg",
-    "./icons/DownIcon.svelte": "./package/icons/DownIcon.svelte",
     "./icons/EmojiIcon.svelte": "./package/icons/EmojiIcon.svelte",
     "./icons/TSLogoIcon.svelte": "./package/icons/TSLogoIcon.svelte",
     "./icons/KBLogoIcon.svelte": "./package/icons/KBLogoIcon.svelte",
-    "./icons/UpIcon.svelte": "./package/icons/UpIcon.svelte",
     "./talkingStickiesStore": "./package/talkingStickiesStore.js"
   },
   "svelte": "./index.js",
