@@ -3,12 +3,30 @@
   import TSLogoIcon from "./icons/TSLogoIcon.svelte";
   import KBLogoIcon from "./icons/KBLogoIcon.svelte";
   import BoardMenu from "./BoardMenu.svelte";
+  import Folk from "./Folk.svelte";
   import { Icon, Button } from 'svelte-materialify';
   import { mdiBug } from '@mdi/js';
 
   export let boardType
 
 </script>
+
+<div class='toolbar'>
+  <div class="left-items">
+    {#if boardType === BoardType.Stickies}
+      <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div>
+    {:else}
+      <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
+    {/if}
+    <BoardMenu boardType={boardType}></BoardMenu>
+  </div>
+  <div class="right-items">
+    <Folk></Folk>
+    <Button icon title="Report a problem in our GitHub repo" on:click={()=>window.open("https://github.com/Holo-Host/talking-stickies/issues", '_blank')}>
+      <Icon path={mdiBug} color={"blue"} />
+    </Button>
+  </div>
+</div>
 
 <style>
   .toolbar {
@@ -40,19 +58,3 @@
     flex: 0 0 auto;
   }
 </style>
-
-<div class='toolbar'>
-  <div class="left-items">
-    {#if boardType === BoardType.Stickies}
-      <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div>
-    {:else}
-      <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
-    {/if}
-    <BoardMenu boardType={boardType}></BoardMenu>
-  </div>
-  <div class="right-items">
-    <Button title="Report a problem in our GitHub repo" on:click={()=>window.open("https://github.com/Holo-Host/talking-stickies/issues", '_blank')}>
-      <Icon path={mdiBug} />
-    </Button>
-  </div>
-</div>

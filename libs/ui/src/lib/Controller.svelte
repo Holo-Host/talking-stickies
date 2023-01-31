@@ -12,60 +12,6 @@
 
     export let boardType:BoardType
     export let roleName = ""
-
-    // The debug drawer's ability to resized and hidden
-    let resizeable
-    let resizeHandle
-    const minDrawerSize = 0
-    const maxDrawerSize = document.documentElement.clientHeight - 30 - 10
-    const initResizeable = (resizeableEl) => {
-      resizeableEl.style.setProperty('--max-height', `${maxDrawerSize}px`)
-      resizeableEl.style.setProperty('--min-height', `${minDrawerSize}px`)
-    }
-  
-    const setDrawerHeight = (height) => {
-      document.documentElement.style.setProperty('--resizeable-height', `${height}px`)
-    }
-    const getDrawerHeight = () => {
-      const pxHeight = getComputedStyle(resizeable)
-        .getPropertyValue('--resizeable-height')
-      return parseInt(pxHeight, 10)
-    }
-  
-    const startDragging = (event) => {
-      event.preventDefault()
-      const host = resizeable
-      const startingDrawerHeight = getDrawerHeight()
-      const yOffset = event.pageY
-  
-      const mouseDragHandler = (moveEvent) => {
-        moveEvent.preventDefault()
-        const primaryButtonPressed = moveEvent.buttons === 1
-        if (!primaryButtonPressed) {
-          setDrawerHeight(Math.min(Math.max(getDrawerHeight(), minDrawerSize), maxDrawerSize))
-          window.removeEventListener('pointermove', mouseDragHandler)
-          return
-        }
-        setDrawerHeight(Math.min(Math.max((yOffset - moveEvent.pageY ) + startingDrawerHeight, minDrawerSize), maxDrawerSize))
-      }
-      const remove = window.addEventListener('pointermove', mouseDragHandler)
-    }
-  
-    let drawerHidden = true
-    const hideDrawer = () => {
-      drawerHidden = true
-    }
-    const showDrawer = () => {
-      drawerHidden = false
-    }
-  
-    let tabShown = false;
-    const showTab = () => {
-      tabShown = true
-    }
-    const hideTab = () => {
-      tabShown = false
-    }
   
     let synStore: SynStore;
     let tsStore: TalkingStickiesStore;
@@ -112,6 +58,7 @@
       margin: 0;
       padding-bottom: 10px;
       background-color: lightgray;
+      height: 100vh;
     }
     :global(:root) {
       --resizeable-height: 200px;

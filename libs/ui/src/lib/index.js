@@ -9,6 +9,7 @@ export { default as ParticipantsDialog } from './ParticipantsDialog.svelte';
 export { default as BoardPane } from './BoardPane.svelte';
 export { default as KanBanPane } from './KanBanPane.svelte';
 export { default as BoardMenu} from './BoardMenu.svelte';
+export { default as Folk} from './Folk.svelte';
 export { default as NewBoardDialog} from './NewBoardDialog.svelte';
 export { default as EditBoardDialog} from './EditBoardDialog.svelte';
 export { default as SortSelector} from './SortSelector.svelte';
