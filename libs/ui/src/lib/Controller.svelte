@@ -8,7 +8,7 @@
     import type { SynStore } from '@holochain-syn/store';
     import { BoardType } from './board';
     import { MaterialApp, Icon } from 'svelte-materialify';
-    import { mdiShapeSquarePlus } from '@mdi/js';
+    import { mdiShapeSquarePlus, mdiCog } from '@mdi/js';
 
     export let boardType:BoardType
     export let roleName = ""
@@ -94,12 +94,37 @@
           <h5>Welcome!</h5>
           {#if boardType == BoardType.Stickies}
             <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
+            <p>
+              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board.
+              You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
+            </p>
           {:else}
             <p>KanBan offers real-time collaborative Kan Ban boards for task and project management. </p>
+            <p>
+              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board.
+              You can add columns for your board, customize voting categories and settings, and more in the board creation window.
+            </p>
           {/if}
-          <p>Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board. </p>
+          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
         </div>
       {/if}
+      {#if boardList && $boardList.boards.length > 0 && $activeBoardIndex === undefined}
+        <div class="welcome-text">
+          {#if boardType == BoardType.Stickies}
+            <p>
+              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> button.
+              You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
+            </p>
+          {:else}
+            <p>
+              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> button.
+              You can add columns for your board, customize voting categories and settings, and more in the board creation window.
+            </p>
+          {/if}
+          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+        </div>
+      {/if}
+    
       {#if $activeBoardIndex !== undefined}
         {#if $activeBoardType === BoardType.Stickies}
           <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>

@@ -2,21 +2,28 @@
   import { encodeHashToBase64 } from '@holochain/client';
   import { Dialog, List, ListItem } from 'svelte-materialify';
   import { HoloIdenticon } from "@holochain-open-dev/elements";
+  import { getContext } from "svelte";
+  import type { TalkingStickiesStore } from "./talkingStickiesStore";
+  import { get } from 'svelte/store';
+
+  const { getStore } :any = getContext('tsStore');
+  const store:TalkingStickiesStore = getStore();
+  $: participants = store.boardList.participants()
+  $: activeFolk = $participants.active
 
   if (!customElements.get('holo-identicon')){
       customElements.define('holo-identicon', HoloIdenticon)
     }
     export let active = false;
-    export let participants 
     export let avatars
 
 </script>
 
-<div class="participants">
-    <Dialog bind:active>
-        <h5> Participans Online</h5>
+<Dialog bind:active>
+    <div class="participants">
+        <h5>Participans Online</h5>
         <List>
-            {#each participants as folk}
+            {#each activeFolk as folk}
             <ListItem dense={true}>
                 <div style="margin-left:10px">
                 {#if avatars[encodeHashToBase64(folk)]}
@@ -30,8 +37,8 @@
             </ListItem>
             {/each}
         </List>
-    </Dialog>
-</div>
+    </div>
+</Dialog>
 
 <style>
     .participants {

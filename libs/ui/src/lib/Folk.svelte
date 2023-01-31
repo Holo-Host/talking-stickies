@@ -2,7 +2,6 @@
     import { Button, Icon } from 'svelte-materialify';
     import { mdiAccountGroup, mdiAccount } from '@mdi/js';
     import ParticipantsDialog from './ParticipantsDialog.svelte';
-    import { get } from 'svelte/store';
     import type { Avatar } from './boardList';
     import AvatarDialog from './AvatarDialog.svelte';
     import { getContext } from "svelte";
@@ -38,7 +37,7 @@
 <Button icon on:click={editAvatar} title={myName ? myName:"Edit Avatar"} style="margin-left:10px"><Icon path={mdiAccount} /></Button>
 
 {#if showParticipants}
-<ParticipantsDialog bind:active={showParticipants} participants={get(participants).active} avatars={$avatars} />
+<ParticipantsDialog bind:active={showParticipants} avatars={$avatars} />
 {/if}
 
 {#if editingAvatar}

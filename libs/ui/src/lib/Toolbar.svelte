@@ -14,7 +14,7 @@
 <div class='toolbar'>
   <div class="left-items">
     {#if boardType === BoardType.Stickies}
-      <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div>
+      <div class="logo" title="TalkingStickies UI v0.2.1"><TSLogoIcon /></div>
     {:else}
       <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
     {/if}
@@ -34,7 +34,7 @@
     align-items: center;
     justify-content: space-between;
     background-color: white;
-    padding-left: 10px;
+    padding-left: 19px;
     padding-right: 10px;
     padding-top: 20px;
     padding-bottom: 10px;
