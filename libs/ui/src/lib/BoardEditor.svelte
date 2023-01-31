@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Button, Icon} from "svelte-materialify"
     import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
-    import { Group, VoteType, BoardType } from './board';
+    import { Group, VoteType, BoardType, UngroupedId } from './board';
     import { onMount } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
 
@@ -9,8 +9,8 @@
     export let handleDelete = undefined
     export let cancelEdit
     export let text = ''
-    export let groups = []
-    export let voteTypes = []
+    export let groups: Array<Group>
+    export let voteTypes: Array<VoteType>
     export let boardType: BoardType
 
     let groupsTitle = "Groups"

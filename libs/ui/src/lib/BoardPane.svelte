@@ -9,10 +9,11 @@
   import { Marked, Renderer } from "@ts-stack/markdown";
   import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
-  import { BoardType, UngroupedId, type Sticky } from "./board";
+  import { BoardType, Group, UngroupedId, type Sticky } from "./board";
   import { mdiCog, mdiExport, mdiNotePlusOutline } from '@mdi/js';
   import { Button, Icon } from "svelte-materialify"
   import EditBoardDialog from "./EditBoardDialog.svelte";
+  import type { Dictionary } from "@holochain-open-dev/core-types";
 
   const pane = new Pane();
 
@@ -44,37 +45,30 @@
     ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)
     : (stickies) => stickies;
 
-  $: sortedStickies = sortStickies(stickies);
-  $: groupedStickies = groupStickies(sortedStickies);
-  $: totalStickies = stickies ? stickies.length : 0
-  $: stickesCounts = countStickies(sortedStickies)
+  //$: sortedStickies = sortStickies(stickies);
+  $: groupedStickies = groupStickies(stickies);
 
   let creatingInGroup: uuidv1 | undefined = undefined;
   let editText = "";
   let editingStickyId: uuidv1
 
-  let groupIds = []
-  let groups = []
-  let ungroupedStickies = 0
+  let groups:Dictionary<Group> = {}
+  let stickiesMap:Dictionary<Sticky> ={}
 
-  const countStickies = (stickies) : {} => {
-    let counts = {}
-    stickies.forEach((sticky: Sticky) => {
-      counts[sticky.group] = counts[sticky.group] != undefined ? counts[sticky.group]+1 : 1
-    })
-    return counts
+  const sorted = (itemIds, sortFn)=> {
+    var items = itemIds.map((id)=>stickiesMap[id])
+    if (sortOption) {
+      items = sortFn(items) 
+    }
+    return items
   }
     
   const groupStickies = (stickies) => {
-    ungroupedStickies = 0
     if ($state) {
-      groups = cloneDeep($state.groups);
-      groupIds = groups.map(c => c.id)
-
-      stickies.forEach((sticky) => {
-        if (!groupIds.includes(sticky.group)) ungroupedStickies += 1
-      });
-      groups.unshift({id:UngroupedId, name:""})
+      groups = {}
+      $state.groups.forEach(g => groups[g.id] = cloneDeep(g))
+      stickiesMap = {} 
+      stickies.forEach(s => stickiesMap[s.id] = cloneDeep(s))
     }
   };
 
@@ -123,12 +117,8 @@
   const closeBoard = () => {
     tsStore.boardList.closeActiveBoard();
   };
-
-  const inGroup = (curGroupId, groupId) => {
-    return curGroupId === groupId || (curGroupId === 0 && !groupIds.includes(groupId))
-  }
   const groupWidth = (groupId) : string => {
-    const len = groups.length > 0 ? (stickesCounts[UngroupedId] > 0 ? groups.length : groups.length - 1) : 1
+    const len = Object.keys($state.grouping).length // > 0 ? (stickesCounts[UngroupedId] > 0 ? $state.groups.length : $state.groups.length - 1) : 1
     // TODO: maybe set width dynamically by number of cards in group...
     if (len <= 4) {
       return 100/len+"%"
@@ -154,6 +144,7 @@
     return 'fit-content'
   }
   let editing = false
+
 </script>
 
 <div class="board">
@@ -163,14 +154,12 @@
 
   <div class="top-bar">
     <div class="left-items">
-      {#if $state.groups.length == 0}
-        <Button size=small icon on:click={newSticky(UngroupedId)} title="New Sticky">
-          <Icon path={mdiNotePlusOutline} />
-        </Button>
-      {/if}
-      Sort By: <SortSelector {setSortOption} {sortOption} />
+      <h5>{$state.name}</h5>
     </div>
     <div class="right-items">
+      <div class="sortby">
+        Sort: <SortSelector {setSortOption} {sortOption} />
+      </div>
       <Button size=small icon on:click={()=>editing=true} title="Settings">
         <Icon path={mdiCog} />
       </Button>
@@ -180,21 +169,21 @@
     </div>
   </div>
   {#if $state}
-    <div class="groups">
-      {#each groups as curGroup}
-        {#if (curGroup.id !== UngroupedId || ungroupedStickies > 0)}
-        <div class="group" style:width={groupWidth(curGroup.id)}>
-          {#if $state.groups.length > 0}
+  <div class="groups">
+      {#each Object.entries($state.grouping) as [groupId, stickyIds]}
+        {#if (groupId !== UngroupedId || stickyIds.length > 0 || $state.groups.length == 1)}
+        <div class="group" style:width={groupWidth(groupId)}>
           <div class="group-title">
-            <b>{#if curGroup.id === UngroupedId}Ungrouped{:else}{curGroup.name}{/if}</b>
-              <Button size=small icon on:click={newSticky(curGroup.id)} title={`New Sticky in {curGroup.name}`}>
+            {#if $state.groups.length > 1}  
+              <b>{#if groupId === UngroupedId}Ungrouped{:else}{groups[groupId].name}{/if}</b>
+            {/if}
+            <Button size=small icon on:click={newSticky(groupId)} title="New Sticky">
                 <Icon path={mdiNotePlusOutline} />
-              </Button>
+            </Button>
           </div>
-          {/if}
           <div class="stickies">
-          {#each sortedStickies as { id, text, votes, group, props } (id)}
-            {#if editingStickyId === id && inGroup(curGroup.id, group)}
+          {#each sorted(stickyIds, sortStickies) as { id, text, votes, props } (id)}
+            {#if editingStickyId === id}
               <StickyEditor
                 handleSave={
                   pane.updateSticky(stickies, id, clearEdit)
@@ -204,11 +193,11 @@
                 }
                 {cancelEdit}
                 text={editText}
-                groupId={group}
-                groups={groups}
+                groupId={groupId}
+                groups={$state.groups}
                 props={props}
               />
-            {:else if  inGroup(curGroup.id, group)}
+            {:else}
               <div class="sticky" on:click={editSticky(id, text)} 
                 style:background-color={props && props.color ? props.color : "#d4f3ee"}
                 >
@@ -236,13 +225,11 @@
               </div>
             {/if}
           {/each}
-          {#if creatingInGroup !==undefined && inGroup(curGroup.id, creatingInGroup)}
-            <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
+          {#if creatingInGroup !== undefined  && creatingInGroup == groupId}
+            <StickyEditor handleSave={createSticky} {cancelEdit} groups={$state.groups} />
           {/if}
           </div>
         </div>
-        {:else if groups.length===1 && creatingInGroup !==undefined}
-        <StickyEditor handleSave={createSticky} {cancelEdit} groups={groups} />
         {/if}
       {/each}
     </div>
@@ -254,27 +241,44 @@
     display: flex;
     flex-direction: column;
     min-height: 500px;
-    padding: 10px;
     background-color: white;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
-    flex: 1;
+    background-color: #f0f0f0;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 15px;
   }
   .top-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    background-color: white;
+    border-bottom: 2px solid #bbb;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 3px 3px 0 0;
   }
   .left-items {
     display: flex;
+    align-items: center;
   }
   .right-items {
     display: flex;
+    align-items: center;
+  }
+  .sortby {
+    border-right: 1px solid lightgray;
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    height: 47px;
   }
   .groups {
     display: flex;
     flex-wrap: wrap;
+    padding: 5px;
   }
   .group {
     display: block;
@@ -283,6 +287,7 @@
   .group-title {
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 10px;
     max-width: 270px;
   }
   .stickies {

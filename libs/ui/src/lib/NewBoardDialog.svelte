@@ -21,5 +21,5 @@
 
 </script>
 <Dialog persistent bind:active>
-    <BoardEditor handleSave={addBoard} cancelEdit={()=>active=false} boardType={boardType} voteTypes={editVoteTypes} />
+    <BoardEditor handleSave={addBoard} cancelEdit={()=>active=false} boardType={boardType} voteTypes={editVoteTypes} groups={[]} />
 </Dialog>

@@ -15,7 +15,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 70px;
+    background-color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #222;
   }
   .logo {
     width: 40px;
@@ -39,7 +44,7 @@
 <div class='toolbar'>
   <div class="left-items">
     {#if boardType === BoardType.Stickies}
-      <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div><h4 class="logo-text">TalkingStickies</h4>
+      <div class="logo" title="TalkingStickies UI v0.2.0"><TSLogoIcon /></div>
     {:else}
       <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
     {/if}

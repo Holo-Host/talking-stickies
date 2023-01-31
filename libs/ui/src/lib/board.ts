@@ -2,6 +2,7 @@ import type { RootStore, SynGrammar, WorkspaceStore } from "@holochain-syn/core"
 import { get } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
 import { type AgentPubKey, type EntryHash, type AgentPubKeyB64, type EntryHashB64, encodeHashToBase64 } from "@holochain/client";
+import type { Dictionary } from "@holochain-open-dev/core-types";
 
 export const DEFAULT_STICKIE_VOTE_TYPES = [
     {type: "1", emoji: "🗨", toolTip: "I want to talk about this one.", maxVotes: 3},
@@ -31,31 +32,39 @@ export class VoteType {
 export type Sticky = {
     id: uuidv1;
     text: string;
-    group: uuidv1;
     votes: Object;
     props: Object;
   };
   
+  export const UngroupedId = "_"
+  export class Group {
+      id: uuidv1
+      constructor(public name: string) {
+          this.id =  uuidv1()
+      }
+  }
   export interface BoardState {
     type: BoardType;
     status: string;
     name: string;
     groups: Group[];
+    grouping: Dictionary<Array<uuidv1>>;
     stickies: Sticky[];
     voteTypes: VoteType[];
   }
   
   export type BoardDelta =
     | {
-      type: "set-type";
-      boardType: BoardType;
+        type: "set-type";
+        boardType: BoardType;
       }
     | {
-      type: "set-status";
-      status: string;
+        type: "set-status";
+        status: string;
       }
     | {
         type: "add-sticky";
+        group: uuidv1;
         value: Sticky;
       }
     | {
@@ -71,17 +80,14 @@ export type Sticky = {
         voteTypes: VoteType[];
       }
     | {
-        type: "add-group";
-        group: Group;
-      }
-    | {
-        type: "delete-group";
-        id: number;
-      }
-    | {
-        type: "set-group-index";
+        type: "set-sticky-index";
         id: uuidv1;
         index: number;
+      }
+    | {
+        type: "set-group-order";
+        id: uuidv1;
+        order: Array<uuidv1>;
       }
     | {
         type: "update-sticky-group";
@@ -119,9 +125,11 @@ export type Sticky = {
     initState(state)  {
       state.status = ""
       state.name = "untitled"
-      state.groups = [{id:UngroupedId, name:"group1"}]
+      state.groups = [{id:UngroupedId, name:""}]
       state.stickies = []
       state.voteTypes = []
+      state.grouping = {}
+      state.grouping[UngroupedId] = []
     },
     applyDelta( 
       delta: BoardDelta,
@@ -141,29 +149,45 @@ export type Sticky = {
       }
       if (delta.type == "set-groups") {
         state.groups = delta.groups
-      }
-      if (delta.type == "add-group") {
-        state.groups.push(delta.group)
-      }
-      if (delta.type == "delete-group") {
-        const index = state.groups.findIndex((group) => group.id === delta.id)
-        if (index >= 0) {
-          state.groups.splice(index,1)
+        const idx = delta.groups.findIndex((group) => group.id === UngroupedId)
+        if (idx == -1) {
+          state.groups.unshift({id:UngroupedId, name:""})
         }
+        const idList = {}
+        delta.groups.forEach(group => {
+          idList[group.id] = true
+          // add an entry to the groupings for any new groups
+          if (state.grouping[group.id] === undefined) {
+            state.grouping[group.id] = []
+          }
+        })
+
+        // remove any non-existent grouping lists
+        Object.entries(state.grouping).forEach(([groupId, itemIds]) => {
+          if (groupId != UngroupedId) {
+            if (!idList[groupId]) {
+              delete state.grouping[groupId]
+              // move items from deleted groups to the ungrouped group
+              state.grouping[UngroupedId] = state.grouping[UngroupedId].concat(itemIds)
+            }
+          }
+        })
+
       }
-      if (delta.type == "set-group-index") {
-        const index = state.groups.findIndex((group) => group.id === delta.id)
-        if (index >= 0) {
-          const c = state.groups[index]
-          state.groups.splice(index,1)
-          state.groups.splice(index, 0, c)
-        }
+      if (delta.type == "set-group-order") {
+        state.grouping[delta.id] = delta.order
       }
       if (delta.type == "set-vote-types") {
         state.voteTypes = delta.voteTypes
       }
       else if (delta.type == "add-sticky") {
         state.stickies.push(delta.value)
+        if (state.grouping[delta.group] !== undefined) {
+          state.grouping[delta.group].push(delta.value.id)
+        }
+        else {
+          state.grouping[delta.group] = [delta.value.id]
+        }
       }
       else if (delta.type == "update-sticky-text") {
         state.stickies.forEach((sticky, i) => {
@@ -173,11 +197,20 @@ export type Sticky = {
         });
       }
       else if (delta.type == "update-sticky-group") {
-        state.stickies.forEach((sticky, i) => {
-          if (sticky.id === delta.id) {
-            state.stickies[i].group = delta.group;
+        // remove the item from the group it's in
+        Object.entries(state.grouping).forEach(([groupId, itemIds]) =>{
+          const index = itemIds.findIndex((id) => id === delta.id)
+          if (index >= 0) {
+            state.grouping[groupId].splice(index,1)
           }
-        });
+        })
+        // add it to the new group
+        if (state.grouping[delta.group] !== undefined) {
+          state.grouping[delta.group].push(delta.id)
+        }
+        else {
+          state.grouping[delta.group] = [delta.id]
+        }
       }
       else if (delta.type == "update-sticky-props") {
         state.stickies.forEach((sticky, i) => {
@@ -240,13 +273,5 @@ export class Board {
     }
     async commitChanges() {
         this.workspace.commitChanges()
-    }
-}
-
-export const UngroupedId = ""
-export class Group {
-    id: uuidv1
-    constructor(public name: string) {
-        this.id =  uuidv1()
     }
 }

@@ -79,7 +79,7 @@
   }
 </style>
 
-<div class='sticky-editor' style:background-color={props.color}>
+<div class='sticky-editor' style:background-color={props["color"]}>
   {#if groups.length > 1 && groupId !== undefined}
     <select bind:value={groupId}>
       {#each groups as group}
@@ -93,7 +93,7 @@
     <textarea class='textarea' bind:value={text} />
     <div class="color-buttons">
       {#each colors as color}
-        <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
+        <div class="color-button{props["color"] == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
       {/each}
     </div>
   </div>

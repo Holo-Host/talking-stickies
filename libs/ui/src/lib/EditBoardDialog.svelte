@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Dialog } from 'svelte-materialify';
     import { cloneDeep } from "lodash";
-    import type { Board, Group, VoteType, BoardState } from './board';
+    import { type Board, type Group, type VoteType, type BoardState, type BoardType, UngroupedId } from './board';
     import BoardEditor from './BoardEditor.svelte';
     import type { TalkingStickiesStore } from './talkingStickiesStore';
     import { getContext, onMount } from 'svelte';
@@ -11,7 +11,7 @@
     export let boardType
     export let boardHash:EntryHashB64|undefined = undefined
     let editName = ''
-    let editGroups = []
+    let editGroups: Array<Group> = []
     let editVoteTypes = []
 
     onMount(async () => {
@@ -21,6 +21,11 @@
             editName = state.name
             editGroups = cloneDeep(state.groups)
             editVoteTypes = cloneDeep(state.voteTypes)
+            // remove the ungrouped ID TODO find a better way.
+            const index = editGroups.findIndex((g)=>g.id == UngroupedId)
+            if (index != -1) {
+                editGroups.splice(index,1)
+            }
         } else {
             console.log("board not found:", boardHash)
         }

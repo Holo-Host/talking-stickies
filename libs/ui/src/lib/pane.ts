@@ -1,5 +1,5 @@
 import { createEventDispatcher } from "svelte";
-import type { BoardState } from "./board";
+import type { BoardState, Sticky } from "./board";
 import { v1 as uuidv1 } from "uuid";
 import { cloneDeep, isEqual } from "lodash";
 import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
@@ -31,15 +31,14 @@ export class Pane {
 
     addSticky = (text: string, group: uuidv1 , props: any) => {
         if (group === undefined) {group = 0}
-        const sticky = {
+        const sticky:Sticky = {
           id: uuidv1(),
           text,
-          group,
           props,
           votes: {
           },
         };
-        this.dispatch("requestChange", [{ type: "add-sticky", value: sticky }]);
+        this.dispatch("requestChange", [{ type: "add-sticky", value: sticky, group}]);
     };
 
     updateSticky = (stickies, id: uuidv1, closeFn) => (text:string, groupId: uuidv1, props:any) => {

@@ -9,11 +9,11 @@
   import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
   import type { v1 as uuidv1 } from "uuid";
-  import { type Sticky, BoardType } from "./board";
+  import { type Sticky, BoardType, Group } from "./board";
   import { mdiCog, mdiExport, mdiPlusCircle } from "@mdi/js";
   import { Icon, Button } from "svelte-materialify";
   import EditBoardDialog from "./EditBoardDialog.svelte";
-
+  import type { Dictionary } from "@holochain-open-dev/core-types";
   const pane = new Pane();
 
   Marked.setOptions
@@ -45,30 +45,33 @@
     : (items) => items;
 
   $: sortedCards = sortCards(items);
-  $: groupedCards = groupCards(sortedCards);
+  $: unused = groupCards(sortedCards);
   $: avatars = tsStore.boardList.avatars()
 
   let creatingInColumn: uuidv1 | undefined = undefined;
   let editText = "";
   let editingCardId: uuidv1
 
-  let columnIds = []
-  let columns = []
+  let columns:Dictionary<Group> = {}
+  let columnCards: Dictionary<Array<Sticky>>
+  let cardsMap:Dictionary<Sticky> ={}
 
-  const countCards = (items) : {} => {
-    let counts = {}
-    items.forEach((card) => {
-      counts[card.group] = counts[card.group] != undefined ? counts[card.group]+1 : 0
-    })
-    return counts
-  }
-    
   const groupCards = (items) => {
     if ($state) {
-      columns = cloneDeep($state.groups);
-      columnIds = columns.map(c => c.id)
+      columnCards = {}
+      columns = {}
+      $state.groups.forEach(g => columns[g.id] = cloneDeep(g))
+      cardsMap = {} 
+      items.forEach(c => cardsMap[c.id] = cloneDeep(c))
+      items.forEach((card) => {
+        if (columnCards[card.group] === undefined) {
+          columnCards[card.group] = [card]
+        } else {
+          columnCards[card.group].push(card)
+        }
+      })
     }
-  };
+  }
 
   const newCard = (group: uuidv1) => () => {
       creatingInColumn = group;
@@ -138,14 +141,13 @@
   </div>
   {#if $state}
     <div class="columns">
-      {#each columns as column}
+      {#each Object.entries($state.grouping) as [columnId, cardIds]}
         <div class="column">
           <div class="column-item column-title">
-            <div>{column.name}</div>
+            <div>{columns[columnId].name}</div>
           </div>
           <div class="cards">
-          {#each sortedCards as { id:cardId, text, votes, group:columnId, props }}
-            {#if column.id === columnId}
+          {#each cardIds.map((id)=>cardsMap[id]) as { id:cardId, text, votes, props }}
               {#if editingCardId === cardId}
                 <CardEditor
                   handleSave={
@@ -163,7 +165,7 @@
                 />
               {:else}
                 <div class="card" on:click={editCard(cardId, text)} 
-                  style:background-color={props && props.color ? props.color : "white"}
+                  style:background-color={props && props["color"] ? props["color"] : "white"}
                   >
                   <div class="card-content">
                     {@html Marked.parse(text)}
@@ -194,17 +196,16 @@
                   </div>
                 </div>
               {/if}
-            {/if}
           {/each}
           </div>
-          {#if creatingInColumn !==undefined && column.id === creatingInColumn}
+          {#if creatingInColumn !==undefined}
           <div class="new-card">
-            <CardEditor handleSave={createCard} {cancelEdit} groups={columns} avatars={avatars}/>
+            <CardEditor handleSave={createCard} {cancelEdit} groups={$state.groups} avatars={avatars}/>
           </div>
           {:else}
           <div class="column-item column-footer">
             <div>Add Card</div>
-            <Button icon on:click={newCard(column.id)}>
+            <Button icon on:click={newCard(columnId)}>
               <Icon path={mdiPlusCircle}/>
             </Button>
           </div>

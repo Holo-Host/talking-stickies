@@ -109,10 +109,9 @@
   
   <style>
     .app {
-      grid-column: 1/3;
-      grid-row: 1/2;
-      /* width: 100%; */
-      margin: 20px;
+      margin: 0;
+      padding-bottom: 10px;
+      background-color: lightgray;
     }
     :global(:root) {
       --resizeable-height: 200px;
@@ -126,10 +125,11 @@
     }
     .welcome-text {
       border-radius: 5px;
-      border: 1px solid black;
+      border: 1px solid #222;
       margin: 50px;
       padding: 26px;
       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+      background-color: white;
     }
   </style>
   
@@ -137,8 +137,8 @@
     <script src='https://kit.fontawesome.com/80d72fa568.js' crossorigin='anonymous'></script>
   </svelte:head>
 
-  <div class='app'>
-    <MaterialApp>
+  <MaterialApp>
+    <div class='app'>
 
     {#if tsStore}
       <Toolbar boardType={boardType}/>
@@ -164,5 +164,5 @@
     {:else}
       Loading
     {/if}
-  </MaterialApp>
   </div>
+</MaterialApp>
