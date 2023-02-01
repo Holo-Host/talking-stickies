@@ -23,6 +23,7 @@ export class Pane {
     constructor() {
         this.dispatch = createEventDispatcher()
     }
+    
     exportBoard = (state: BoardState) => {
         const fileName = `ts_${state.name}.json`
         download(fileName, JSON.stringify(state))

@@ -9,7 +9,7 @@
   import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
   import type { v1 as uuidv1 } from "uuid";
-  import { type Sticky, BoardType, Group } from "./board";
+  import { type Sticky, BoardType, Group, UngroupedId } from "./board";
   import { mdiCog, mdiExport, mdiPlusCircle } from "@mdi/js";
   import { Icon, Button } from "svelte-materialify";
   import EditBoardDialog from "./EditBoardDialog.svelte";
@@ -44,8 +44,7 @@
     ? sortBy((sticky: Sticky) => countVotes(sticky.votes, sortOption) * -1)
     : (items) => items;
 
-  $: sortedCards = sortCards(items);
-  $: unused = groupCards(sortedCards);
+  $: unused = groupCards(items);
   $: avatars = tsStore.boardList.avatars()
 
   let creatingInColumn: uuidv1 | undefined = undefined;
@@ -53,23 +52,23 @@
   let editingCardId: uuidv1
 
   let columns:Dictionary<Group> = {}
-  let columnCards: Dictionary<Array<Sticky>>
   let cardsMap:Dictionary<Sticky> ={}
 
+  const sorted = (itemIds, sortFn)=> {
+    var items = itemIds.map((id)=>cardsMap[id])
+    if (sortOption) {
+      items = sortFn(items) 
+    }
+    return items
+  }
+
+  // TODO refactor into pane?
   const groupCards = (items) => {
     if ($state) {
-      columnCards = {}
       columns = {}
       $state.groups.forEach(g => columns[g.id] = cloneDeep(g))
       cardsMap = {} 
-      items.forEach(c => cardsMap[c.id] = cloneDeep(c))
-      items.forEach((card) => {
-        if (columnCards[card.group] === undefined) {
-          columnCards[card.group] = [card]
-        } else {
-          columnCards[card.group].push(card)
-        }
-      })
+      items.forEach(s => cardsMap[s.id] = cloneDeep(s))
     }
   }
 
@@ -128,9 +127,12 @@
   {/if}
   <div class="top-bar">
     <div class="left-items">
-      Sort By: <SortSelector {setSortOption} {sortOption} />
+      <h5>{$state.name}</h5>
     </div>
     <div class="right-items">
+      <div class="sortby">
+        Sort: <SortSelector {setSortOption} {sortOption} />
+      </div>
       <Button size=small icon on:click={()=>editing=true} title="Settings">
         <Icon path={mdiCog} />
       </Button>
@@ -141,13 +143,13 @@
   </div>
   {#if $state}
     <div class="columns">
-      {#each Object.entries($state.grouping) as [columnId, cardIds]}
+      {#each Object.entries($state.grouping).filter(([columnId, _])=> columnId!=UngroupedId) as [columnId, cardIds]}
         <div class="column">
           <div class="column-item column-title">
             <div>{columns[columnId].name}</div>
           </div>
           <div class="cards">
-          {#each cardIds.map((id)=>cardsMap[id]) as { id:cardId, text, votes, props }}
+          {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }}
               {#if editingCardId === cardId}
                 <CardEditor
                   handleSave={
@@ -159,7 +161,7 @@
                   {cancelEdit}
                   text={editText}
                   groupId={columnId}
-                  groups={columns}
+                  groups={$state.groups}
                   props={props}
                   avatars={avatars}
                 />
@@ -198,7 +200,7 @@
               {/if}
           {/each}
           </div>
-          {#if creatingInColumn !==undefined}
+          {#if creatingInColumn !==undefined  && creatingInColumn == columnId}
           <div class="new-card">
             <CardEditor handleSave={createCard} {cancelEdit} groups={$state.groups} avatars={avatars}/>
           </div>
@@ -220,22 +222,38 @@
   .board {
     display: flex;
     flex-direction: column;
-    padding: 10px;
     background-color: white;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 15px;
   }
   .top-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    background-color: white;
+    border-bottom: 2px solid #bbb;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 3px 3px 0 0;
   }
   .left-items {
     display: flex;
+    align-items: center;
   }
   .right-items {
     display: flex;
+    align-items: center;
+  }
+  .sortby {
+    border-right: 1px solid lightgray;
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    height: 47px;
   }
   .columns {
     display: flex;

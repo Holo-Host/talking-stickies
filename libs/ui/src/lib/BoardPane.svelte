@@ -45,8 +45,7 @@
     ? sortBy((sticky) => countVotes(sticky.votes, sortOption) * -1)
     : (stickies) => stickies;
 
-  //$: sortedStickies = sortStickies(stickies);
-  $: groupedStickies = groupStickies(stickies);
+  $: unused = groupStickies(stickies);
 
   let creatingInGroup: uuidv1 | undefined = undefined;
   let editText = "";
@@ -63,6 +62,7 @@
     return items
   }
     
+  // TODO refactor into pane?
   const groupStickies = (stickies) => {
     if ($state) {
       groups = {}
