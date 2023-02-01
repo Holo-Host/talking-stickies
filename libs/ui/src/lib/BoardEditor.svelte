@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Button, Icon} from "svelte-materialify"
     import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
-    import { Group, VoteType, BoardType, UngroupedId } from './board';
+    import { Group, VoteType, BoardType } from './board';
     import { onMount } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
 
