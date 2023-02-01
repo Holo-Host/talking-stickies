@@ -41,6 +41,8 @@
 </script>
 
 <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+<Button icon on:click={()=>creating = true} style="margin-left:10px" title="New Board"><Icon path={mdiShapeSquarePlus} /></Button>
+<Button icon on:click={()=>{fileinput.click();}} style="margin-left:10px" title="Import Board"><Icon path={mdiImport} /></Button>
 {#if $boardList.boards.length > 0}
 <Menu>
     <div slot="activator">
@@ -67,8 +69,6 @@
     </List>
 </Menu>
 {/if}
-<Button icon on:click={()=>creating = true} style="margin-left:10px" title="New Board"><Icon path={mdiShapeSquarePlus} /></Button>
-<Button icon on:click={()=>{fileinput.click();}} style="margin-left:10px" title="Import Board"><Icon path={mdiImport} /></Button>
 
 {#if creating}
     <NewBoardDialog boardType={boardType} bind:active={creating}></NewBoardDialog>

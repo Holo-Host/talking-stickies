@@ -241,7 +241,6 @@
     display: flex;
     flex-direction: column;
     min-height: 500px;
-    background-color: white;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
     background-color: #f0f0f0;

@@ -58,9 +58,11 @@
   .right-items {
     display: flex;
     flex: 0 0 auto;
+    align-items: center;
   }
   .left-items {
     display: flex;
     flex: 0 0 auto;
+    align-items: center;
   }
 </style>
