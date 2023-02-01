@@ -6,24 +6,29 @@
   import Folk from "./Folk.svelte";
   import { Icon, Button } from 'svelte-materialify';
   import { mdiBug } from '@mdi/js';
+  import AboutDialog from "./AboutDialog.svelte";
 
-  export let boardType
+  export let boardType: BoardType
+  let showAbout = false
 
 </script>
 
+{#if showAbout}
+  <AboutDialog boardType={boardType} bind:active={showAbout} />
+{/if}
 <div class='toolbar'>
   <div class="left-items">
     {#if boardType === BoardType.Stickies}
-      <div class="logo" title="TalkingStickies UI v0.2.2"><TSLogoIcon /></div>
+      <div class="logo" title="About TalkingStickies" on:click={()=>showAbout=true}><TSLogoIcon /></div>
     {:else}
-      <div class="logo" title="KanBan UI v0.2.0"><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
+      <div class="logo" title="About KanBan" on:click={()=>showAbout=true}><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
     {/if}
     <BoardMenu boardType={boardType}></BoardMenu>
   </div>
   <div class="right-items">
     <Folk></Folk>
     <Button icon title="Report a problem in our GitHub repo" on:click={()=>window.open("https://github.com/Holo-Host/talking-stickies/issues", '_blank')}>
-      <Icon path={mdiBug} color={"blue"} />
+      <Icon path={mdiBug} style={"color: #3672b9"} />
     </Button>
   </div>
 </div>
@@ -44,6 +49,7 @@
     width: 40px;
     margin-right: 10px;
     display: contents;
+    cursor: pointer;
   }
   .logo-text {
     padding-bottom: 5px;

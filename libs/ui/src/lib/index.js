@@ -5,6 +5,7 @@ export * from './boardList';
 export { default as Controller } from './Controller.svelte';
 export { default as BoardEditor } from './BoardEditor.svelte';
 export { default as AvatarDialog } from './AvatarDialog.svelte';
+export { default as AboutDialog } from './AboutDialog.svelte';
 export { default as ParticipantsDialog } from './ParticipantsDialog.svelte';
 export { default as BoardPane } from './BoardPane.svelte';
 export { default as KanBanPane } from './KanBanPane.svelte';

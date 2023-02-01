@@ -4,7 +4,6 @@
   import { HoloIdenticon } from "@holochain-open-dev/elements";
   import { getContext } from "svelte";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
-  import { get } from 'svelte/store';
 
   const { getStore } :any = getContext('tsStore');
   const store:TalkingStickiesStore = getStore();
@@ -13,9 +12,9 @@
 
   if (!customElements.get('holo-identicon')){
       customElements.define('holo-identicon', HoloIdenticon)
-    }
-    export let active = false;
-    export let avatars
+  }
+  export let active = false;
+  export let avatars
 
 </script>
 

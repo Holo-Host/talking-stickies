@@ -78,6 +78,10 @@
       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
       background-color: white;
     }
+    .loading {
+      text-align: center;
+      padding-top: 100px;
+    }
   </style>
   
   <svelte:head>
@@ -95,33 +99,33 @@
           {#if boardType == BoardType.Stickies}
             <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
             <p>
-              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board.
+              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
               You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
             </p>
           {:else}
             <p>KanBan offers real-time collaborative Kan Ban boards for task and project management. </p>
             <p>
-              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> above to create your first board.
+              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
               You can add columns for your board, customize voting categories and settings, and more in the board creation window.
             </p>
           {/if}
-          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
         </div>
       {/if}
       {#if boardList && $boardList.boards.length > 0 && $activeBoardIndex === undefined}
         <div class="welcome-text">
           {#if boardType == BoardType.Stickies}
             <p>
-              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> button.
+              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
               You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
             </p>
           {:else}
             <p>
-              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiShapeSquarePlus}></Icon> button.
+              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
               You can add columns for your board, customize voting categories and settings, and more in the board creation window.
             </p>
           {/if}
-          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;"; path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
         </div>
       {/if}
     
@@ -134,7 +138,7 @@
         {/if}
       {/if}
     {:else}
-      Loading
+      <div class="loading">Loading...</div>
     {/if}
   </div>
 </MaterialApp>
