@@ -21,7 +21,7 @@
     {#if boardType === BoardType.Stickies}
       <div class="logo" title="About TalkingStickies" on:click={()=>showAbout=true}><TSLogoIcon /></div>
     {:else}
-      <div class="logo" title="About KanBan" on:click={()=>showAbout=true}><KBLogoIcon /></div><h4 class="logo-text">KanBan</h4>
+      <div class="logo" title="About CanDo!" on:click={()=>showAbout=true}><KBLogoIcon /></div><h4 class="logo-text">CanDo!</h4>
     {/if}
     <BoardMenu boardType={boardType}></BoardMenu>
   </div>

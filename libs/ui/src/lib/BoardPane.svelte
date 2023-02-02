@@ -150,55 +150,79 @@
   let dragTarget = ""
   function handleDragStart(e) {
     draggingHandled = false
-    console.log("handleDragStart", e)
+    //console.log("handleDragStart", e)
     e.dataTransfer.dropEffect = "move";
     draggedItemId = e.target.getAttribute('id')
     e.dataTransfer
       .setData("text", e.target.getAttribute('id'));
   }
   function handleDragEnd(e) {
-    dragTarget = ""
-    draggingHandled = true
-    console.log("handleDragEnd",e )
+    clearDrag()
+    //console.log("handleDragEnd",e )
   }
+
+  const findDropParentElement = (element: HTMLElement):HTMLElement => {
+    while (element && !(element.classList.contains("sticky") || element.classList.contains("group"))) {
+      element = element.parentElement
+    }
+    return element
+  }
+  const findDropGroupParentElement = (element: HTMLElement):HTMLElement => {
+    while (element && !element.classList.contains("group")) {
+      element = element.parentElement
+    }
+    return element
+  }
+  const findDropCardParentElement = (element: HTMLElement):HTMLElement => {
+    while (element && !element.classList.contains("sticky")) {
+      element = element.parentElement
+    }
+    return element
+  }
+
   function handleDragEnter(e) {
-   // const target = e.target as HTMLElement
+    const elem = findDropParentElement(e.target as HTMLElement)
+    dragTarget = elem ? elem.id : ""
   }
 
   function handleDragLeave(e) {
     const target = e.target as HTMLElement
-    dragTarget = ""
+    if (target.id == dragTarget) {
+      dragTarget = ""
+    }
   }
+
   function handleDragOver(e) {
-    const target = e.target as HTMLElement
-    dragTarget = target.id //(draggedItemId != target.id) ? target.id : ""
     e.preventDefault()
   }
   function handleDragDropGroup(e:DragEvent) {
     e.preventDefault();
     if (draggingHandled) {
-      console.log("ignoring because it was handled")
+      //console.log("ignoring because it was handled")
       return
     }
-    const target = e.target as HTMLElement
+    const target = findDropGroupParentElement(e.target as HTMLElement)
     var srcId = e.dataTransfer.getData("text");
     if (target.id) {
       pane.dispatch("requestChange",[{ type: "update-sticky-group", id:srcId, group:target.id  }])
     }
-    draggingHandled = true
-    dragTarget = ""
-    console.log("handleDragDropGroup",e, target )
+    clearDrag()
+    //console.log("handleDragDropGroup",e, target )
   }
   function handleDragDropCard(e:DragEvent) {
     e.preventDefault();
-    const target = e.target as HTMLElement
-    var srcId = e.dataTransfer.getData("text");
-    console.log("handleDragDropCard",e, target )
+    const target = findDropCardParentElement(e.target as HTMLElement)
+    //console.log("handleDragDropCard",e, target )
     var srcId = e.dataTransfer.getData("text");
     if (target.id && (srcId != target.id) && confirm("Merge stickies?")) {
       pane.dispatch("requestChange",[{ type: "merge-stickies", dstId: target.id, srcId }])
     }
+    clearDrag()
+  }
+  const clearDrag = () => {
     draggingHandled = true
+    draggedItemId = ""
+    dragTarget = ""
   }
   let dragDuration = 300
 </script>
@@ -263,6 +287,7 @@
             {:else}
               <div 
                 class="sticky"
+                class:tilted={draggedItemId == id}
                 class:glowing={dragTarget == id}
                 id={id}
                 on:dragenter={handleDragEnter} 
@@ -372,6 +397,10 @@
     outline: none;
     border-color: #9ecaed;
     box-shadow: 0 0 10px #9ecaed !important;
+  }
+  .tilted {
+    transform: rotate(3deg);
+    box-shadow: 6px 6px 10px rgba(0, 0, 0, 0.5) !important;
   }
   .sticky {
     background-color: #d4f3ee;

@@ -118,52 +118,69 @@
     tsStore.boardList.closeActiveBoard();
   };
   let editing = false
-  let status = ""
+  let draggingHandled = true
+  let draggedItemId = ""
   let dragOn = true
+  let dragTarget = ""
   function handleDragStart(e) {
+    draggingHandled = false
     console.log("handleDragStart", e)
-    status = "Dragging the element " + e
-      .target
-      .getAttribute('id');
     e.dataTransfer.dropEffect = "move";
+//    e.dataTransfer.setDragImage(e.target)
+    draggedItemId = e.target.getAttribute('id')
     e.dataTransfer
       .setData("text", e.target.getAttribute('id'));
   }
 
   function handleDragEnd(e) {
-    console.log("handleDragEnd",e )
-    // if (dropped_in == false) {
-    //   status = "You let the " + e
-    //     .target
-    //     .getAttribute('id') + " go.";
-    // }
-    // dropped_in = false;
+    clearDrag()
+    //console.log("handleDragEnd",e )
+  }
+  const findColumnElement = (element: HTMLElement):HTMLElement => {
+    while (element && !element.classList.contains("column")) {
+      element = element.parentElement
+    }
+    return element
   }
   function handleDragEnter(e) {
-        status = "You are dragging over the " + e
-            .target
-            .getAttribute('id');
-    }
-
+   const column = findColumnElement(e.target as HTMLElement)
+   //console.log("handleDragEnter", column )
+   dragTarget = column ? column.id : ""
+  }
   function handleDragLeave(e) {
-      status = "You left the " + e
-          .target
-          .getAttribute('id');
+    const target = e.target as HTMLElement
+    //console.log("handleDragLeave", target )
+
+    if (target.id == dragTarget) {
+      dragTarget = ""
+    }
+  }
+  function handleDragOver(e) {
+    e.preventDefault()
+    return
   }
   function handleDragDropColumn(e:DragEvent) {
     e.preventDefault();
-    const target = e.target as HTMLElement
-    console.log("handleDragDropColumn",e, target )
-
-      var element_id = e
-          .dataTransfer
-          .getData("text");
-      status = "You droped " + element_id + " into colum "+target.id;
+    if (draggingHandled) {
+      console.log("ignoring because it was handled")
+      return
+    }
+    const column = findColumnElement(e.target as HTMLElement)
+    var srcId = e.dataTransfer.getData("text");
+    if (column.id) {
+      pane.dispatch("requestChange",[{ type: "update-sticky-group", id:srcId, group:column.id  }])
+    }
+    clearDrag()
+    //console.log("handleDragDropColumn",e, column )
+  }
+  const clearDrag = () => {
+    draggingHandled = true
+    draggedItemId = ""
+    dragTarget = ""
   }
 </script>
 
 <div class="board">
-  DragStatus: {status}
   {#if editing}
     <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanBan}></EditBoardDialog>
   {/if}
@@ -186,16 +203,18 @@
   {#if $state}
     <div class="columns">
       {#each Object.entries($state.grouping).filter(([columnId, _])=> columnId!=UngroupedId) as [columnId, cardIds]}
-        <div class="column">
+        <div class="column"
+          class:glowing={dragTarget == columnId}
+          id={columnId}
+          on:dragenter={handleDragEnter} 
+          on:dragleave={handleDragLeave}  
+          on:drop={handleDragDropColumn}
+          on:dragover={handleDragOver}
+          >
           <div class="column-item column-title">
             <div>{columns[columnId].name}</div>
           </div>
-          <div class="cards"
-            on:dragenter={handleDragEnter} 
-            on:dragleave={handleDragLeave}  
-            on:drop={handleDragDropColumn}
-            on:dragover={()=>false}
-          >
+          <div class="cards">
           {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }}
               {#if editingCardId === cardId}
                 <CardEditor
@@ -215,13 +234,11 @@
               {:else}
                 <div 
                   class="card"
+                  class:tilted={draggedItemId == cardId}
                   id={cardId}
-                  on:dragenter={handleDragEnter} 
-                  on:dragleave={handleDragLeave}  
-                  on:dragover={()=>false}
                   draggable={dragOn}
                   on:dragstart={handleDragStart}
-                  on:dragend={handleDragEnd}              
+                  on:dragend={handleDragEnd}
 
 
                   on:click={editCard(cardId, text)} 
@@ -344,6 +361,15 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+  }
+  .glowing {
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed !important;
+  }
+  .tilted {
+    transform: rotate(3deg);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5) !important;
   }
   .card {
     background-color: white;

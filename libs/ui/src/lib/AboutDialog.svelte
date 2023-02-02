@@ -20,7 +20,7 @@
 
         </p>
     {:else}
-        <h5>KanBan: UI v0.2.0 for DNA v0.2.x</h5>
+        <h5>CanDo!: UI v0.2.0 for DNA v0.2.x</h5>
         <p>KanBan is a demonstration Holochain hApp built by Holo.</p>
         <p>
             This project's real-time syncronization is powered by <a href="https://github.com/holochain/syn">Syn</a>, 
