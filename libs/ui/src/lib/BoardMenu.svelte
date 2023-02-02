@@ -18,6 +18,8 @@
     $: boardList = store.boardList.stateStore()
     $: activeHash = store.boardList.activeBoardHash;
     $: state = store.boardList.getReadableBoardState($activeHash);
+    $: archivedBoards = $boardList.boards.findIndex((board)=>board.status === "archived") >= 0
+    $: activeBoards = $boardList.boards.findIndex((board)=>board.status !== "archived") >= 0
 
     const selectBoard = (hash: EntryHashB64) => {
         store.boardList.setActiveBoard(hash)
@@ -40,14 +42,15 @@
     }
 </script>
 
+<div class="board-menu">
 <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
 <Button icon on:click={()=>creating = true} style="margin-left:10px" title="New Board"><Icon path={mdiShapeSquarePlus} /></Button>
 <Button icon on:click={()=>{fileinput.click();}} style="margin-left:10px" title="Import Board"><Icon path={mdiImport} /></Button>
-{#if $boardList.boards.length > 0}
+{#if activeBoards}
 <Menu>
     <div slot="activator">
         <Button style="margin-left:10px">
-            {#if $state}
+            {#if $activeHash}
                 {$state.name}
             {:else}
                 <i>Select Board</i>
@@ -61,9 +64,20 @@
                 <ListItem dense={true} on:click={()=>selectBoard(board.hash)}>{board.name}</ListItem>
             {/if}
         {/each}
+    </List>
+</Menu>
+{/if}
+{#if archivedBoards}
+<Menu>
+    <div slot="activator">
+        <Button icon style="margin-left:10px" title="Archived Boards">
+            <Icon path={mdiArchiveArrowUp}></Icon>
+        </Button>
+    </div>
+    <List>
         {#each $boardList.boards as board }
             {#if board.status === "archived" }
-                <ListItem dense={true} on:click={unarchiveBoard(board.hash)}>{board.name}<Icon path={mdiArchiveArrowUp}/></ListItem>
+                <ListItem on:click={unarchiveBoard(board.hash)}>{board.name}</ListItem>
             {/if}
         {/each}
     </List>
@@ -73,3 +87,12 @@
 {#if creating}
     <NewBoardDialog boardType={boardType} bind:active={creating}></NewBoardDialog>
 {/if}
+</div>
+<style>
+  .board-menu {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+  }
+
+</style>
