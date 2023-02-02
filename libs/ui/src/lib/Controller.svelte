@@ -73,7 +73,9 @@
     .welcome-text {
       border-radius: 5px;
       border: 1px solid #222;
-      margin: 50px;
+      margin: auto;
+      margin-top: 50px;
+      max-width: 650px;
       padding: 26px;
       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
       background-color: white;

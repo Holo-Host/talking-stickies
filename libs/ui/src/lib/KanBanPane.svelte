@@ -118,10 +118,52 @@
     tsStore.boardList.closeActiveBoard();
   };
   let editing = false
+  let status = ""
+  let dragOn = true
+  function handleDragStart(e) {
+    console.log("handleDragStart", e)
+    status = "Dragging the element " + e
+      .target
+      .getAttribute('id');
+    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer
+      .setData("text", e.target.getAttribute('id'));
+  }
 
+  function handleDragEnd(e) {
+    console.log("handleDragEnd",e )
+    // if (dropped_in == false) {
+    //   status = "You let the " + e
+    //     .target
+    //     .getAttribute('id') + " go.";
+    // }
+    // dropped_in = false;
+  }
+  function handleDragEnter(e) {
+        status = "You are dragging over the " + e
+            .target
+            .getAttribute('id');
+    }
+
+  function handleDragLeave(e) {
+      status = "You left the " + e
+          .target
+          .getAttribute('id');
+  }
+  function handleDragDropColumn(e:DragEvent) {
+    e.preventDefault();
+    const target = e.target as HTMLElement
+    console.log("handleDragDropColumn",e, target )
+
+      var element_id = e
+          .dataTransfer
+          .getData("text");
+      status = "You droped " + element_id + " into colum "+target.id;
+  }
 </script>
 
 <div class="board">
+  DragStatus: {status}
   {#if editing}
     <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanBan}></EditBoardDialog>
   {/if}
@@ -148,7 +190,12 @@
           <div class="column-item column-title">
             <div>{columns[columnId].name}</div>
           </div>
-          <div class="cards">
+          <div class="cards"
+            on:dragenter={handleDragEnter} 
+            on:dragleave={handleDragLeave}  
+            on:drop={handleDragDropColumn}
+            on:dragover={()=>false}
+          >
           {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }}
               {#if editingCardId === cardId}
                 <CardEditor
@@ -166,7 +213,18 @@
                   avatars={avatars}
                 />
               {:else}
-                <div class="card" on:click={editCard(cardId, text)} 
+                <div 
+                  class="card"
+                  id={cardId}
+                  on:dragenter={handleDragEnter} 
+                  on:dragleave={handleDragLeave}  
+                  on:dragover={()=>false}
+                  draggable={dragOn}
+                  on:dragstart={handleDragStart}
+                  on:dragend={handleDragEnd}              
+
+
+                  on:click={editCard(cardId, text)} 
                   style:background-color={props && props["color"] ? props["color"] : "white"}
                   >
                   <div class="card-content">

@@ -80,11 +80,6 @@ export type Sticky = {
         voteTypes: VoteType[];
       }
     | {
-        type: "set-sticky-index";
-        id: uuidv1;
-        index: number;
-      }
-    | {
         type: "set-group-order";
         id: uuidv1;
         order: Array<uuidv1>;
@@ -112,6 +107,11 @@ export type Sticky = {
         count: number
       }
     | {
+        type: "merge-stickies";
+        srcId: uuidv1;
+        dstId: uuidv1;
+    }
+    | {
         type: "delete-sticky";
         id: string;
       };
@@ -121,6 +121,24 @@ export type Sticky = {
   BoardState
   >;
   
+  const _removeStickyFromGroups = (state: BoardState, stickyId: uuidv1) => {
+    // remove the item from the group it's in
+    Object.entries(state.grouping).forEach(([groupId, itemIds]) =>{
+      const index = itemIds.findIndex((id) => id === stickyId)
+      if (index >= 0) {
+        state.grouping[groupId].splice(index,1)
+      }
+    })
+  }
+  const _addStickyToGroup = (state: BoardState, groupId: uuidv1, stickyId: uuidv1) => {
+    // add it to the new group
+    if (state.grouping[groupId] !== undefined) {
+      state.grouping[groupId].push(stickyId)
+    }
+    else {
+      state.grouping[groupId] = [stickyId]
+    }
+  }
   export const boardGrammar: BoardGrammar = {
     initState(state)  {
       state.status = ""
@@ -197,20 +215,8 @@ export type Sticky = {
         });
       }
       else if (delta.type == "update-sticky-group") {
-        // remove the item from the group it's in
-        Object.entries(state.grouping).forEach(([groupId, itemIds]) =>{
-          const index = itemIds.findIndex((id) => id === delta.id)
-          if (index >= 0) {
-            state.grouping[groupId].splice(index,1)
-          }
-        })
-        // add it to the new group
-        if (state.grouping[delta.group] !== undefined) {
-          state.grouping[delta.group].push(delta.id)
-        }
-        else {
-          state.grouping[delta.group] = [delta.id]
-        }
+        _removeStickyFromGroups(state, delta.id)
+        _addStickyToGroup(state, delta.group, delta.id)
       }
       else if (delta.type == "update-sticky-props") {
         state.stickies.forEach((sticky, i) => {
@@ -229,9 +235,21 @@ export type Sticky = {
           }
         });
       }
+      else if (delta.type == "merge-stickies") {
+        const srcIdx = state.stickies.findIndex((sticky) => sticky.id === delta.srcId)
+        const dstIdx = state.stickies.findIndex((sticky) => sticky.id === delta.dstId)
+        if (srcIdx >= 0 && dstIdx >= 0) {
+          _removeStickyFromGroups(state, delta.srcId)
+          const src = state.stickies[srcIdx]
+          const dst = state.stickies[dstIdx]
+          dst.text = `${dst.text}\n\n-----------\n\n${src.text}`
+          state.stickies.splice(srcIdx,1)
+        }
+      }
       else if (delta.type == "delete-sticky") {
         const index = state.stickies.findIndex((sticky) => sticky.id === delta.id)
         state.stickies.splice(index,1)
+        _removeStickyFromGroups(state, delta.id)
       }
     },
   };

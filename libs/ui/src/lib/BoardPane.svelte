@@ -144,14 +144,69 @@
     return 'fit-content'
   }
   let editing = false
+  let draggingHandled = true
+  let draggedItemId = ""
+  let dragOn = true
+  let dragTarget = ""
+  function handleDragStart(e) {
+    draggingHandled = false
+    console.log("handleDragStart", e)
+    e.dataTransfer.dropEffect = "move";
+    draggedItemId = e.target.getAttribute('id')
+    e.dataTransfer
+      .setData("text", e.target.getAttribute('id'));
+  }
+  function handleDragEnd(e) {
+    dragTarget = ""
+    draggingHandled = true
+    console.log("handleDragEnd",e )
+  }
+  function handleDragEnter(e) {
+   // const target = e.target as HTMLElement
+  }
 
+  function handleDragLeave(e) {
+    const target = e.target as HTMLElement
+    dragTarget = ""
+  }
+  function handleDragOver(e) {
+    const target = e.target as HTMLElement
+    dragTarget = target.id //(draggedItemId != target.id) ? target.id : ""
+    e.preventDefault()
+  }
+  function handleDragDropGroup(e:DragEvent) {
+    e.preventDefault();
+    if (draggingHandled) {
+      console.log("ignoring because it was handled")
+      return
+    }
+    const target = e.target as HTMLElement
+    var srcId = e.dataTransfer.getData("text");
+    if (target.id) {
+      pane.dispatch("requestChange",[{ type: "update-sticky-group", id:srcId, group:target.id  }])
+    }
+    draggingHandled = true
+    dragTarget = ""
+    console.log("handleDragDropGroup",e, target )
+  }
+  function handleDragDropCard(e:DragEvent) {
+    e.preventDefault();
+    const target = e.target as HTMLElement
+    var srcId = e.dataTransfer.getData("text");
+    console.log("handleDragDropCard",e, target )
+    var srcId = e.dataTransfer.getData("text");
+    if (target.id && (srcId != target.id) && confirm("Merge stickies?")) {
+      pane.dispatch("requestChange",[{ type: "merge-stickies", dstId: target.id, srcId }])
+    }
+    draggingHandled = true
+  }
+  let dragDuration = 300
 </script>
 
 <div class="board">
   {#if editing}
     <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.Stickies}></EditBoardDialog>
   {/if}
-
   <div class="top-bar">
     <div class="left-items">
       <h5>{$state.name}</h5>
@@ -172,7 +227,14 @@
   <div class="groups">
       {#each Object.entries($state.grouping) as [groupId, stickyIds]}
         {#if (groupId !== UngroupedId || stickyIds.length > 0 || $state.groups.length == 1)}
-        <div class="group" style:width={groupWidth(groupId)}>
+        <div class="group" style:width={groupWidth(groupId)}
+        class:glowing={dragTarget == groupId}
+        id={groupId}
+        on:dragenter={handleDragEnter} 
+        on:dragleave={handleDragLeave}  
+        on:drop={handleDragDropGroup}
+        on:dragover={handleDragOver}
+      >
           <div class="group-title">
             {#if $state.groups.length > 1}  
               <b>{#if groupId === UngroupedId}Ungrouped{:else}{groups[groupId].name}{/if}</b>
@@ -181,7 +243,8 @@
                 <Icon path={mdiNotePlusOutline} />
             </Button>
           </div>
-          <div class="stickies">
+          <div class="stickies"
+            >
           {#each sorted(stickyIds, sortStickies) as { id, text, votes, props } (id)}
             {#if editingStickyId === id}
               <StickyEditor
@@ -198,7 +261,19 @@
                 props={props}
               />
             {:else}
-              <div class="sticky" on:click={editSticky(id, text)} 
+              <div 
+                class="sticky"
+                class:glowing={dragTarget == id}
+                id={id}
+                on:dragenter={handleDragEnter} 
+                on:dragover={handleDragOver}
+                on:dragleave={handleDragLeave}  
+                on:drop={handleDragDropCard}
+                draggable={dragOn}
+                on:dragstart={handleDragStart}
+                on:dragend={handleDragEnd}              
+
+                on:click={editSticky(id, text)} 
                 style:background-color={props && props.color ? props.color : "#d4f3ee"}
                 >
                 <div class="sticky-content">
@@ -292,6 +367,11 @@
   .stickies {
     display: flex;
     flex-wrap: wrap;
+  }
+  .glowing {
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed !important;
   }
   .sticky {
     background-color: #d4f3ee;

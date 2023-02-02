@@ -6,25 +6,40 @@
     export let boardType:BoardType
 </script>
   
-<Dialog bind:active>
+<Dialog bind:active width={600}>
     <div class="about">
     {#if boardType == BoardType.Stickies}
-        <h5>TalkingStickies: UI v0.2.2 for DNA v0.2.x</h5>
+        <h5>TalkingStickies: UI v0.2.3 for DNA v0.2.x</h5>
         <p>TalkingStickies is a demonstration Holochain hApp built by Holo.</p>
-        <p>We use it regularly ourselves to coordinate our meetings, agendas, brain-storming sessions and retros. We acknowledge inspriation of <a href="https://ideaboardz.com/">IdeaBoardz</a> </p>
+        <p>
+            We use TalkingStickies internally for meetings, agendas, brain-storming sessions and retros. 
+            This project's real-time syncronization is powered by <a href="https://github.com/holochain/syn">Syn</a>, 
+            a library that makes it really easy to build this kind of real-time collaboaration into Holochain hApps.
+        </p>
+        <p> TalkingStickies was originally inspired by <a href="https://ideaboardz.com/">IdeaBoardz</a> 
+
+        </p>
     {:else}
         <h5>KanBan: UI v0.2.0 for DNA v0.2.x</h5>
         <p>KanBan is a demonstration Holochain hApp built by Holo.</p>
+        <p>
+            This project's real-time syncronization is powered by <a href="https://github.com/holochain/syn">Syn</a>, 
+            a library that makes it really easy to build this kind of real-time collaboaration into Holochain hApps.
+        </p>
     {/if}
-    <p>This project's real-time syncronization is powered by <a href="https://github.com/holochain/syn">syn</a>, 
-        a library that makes it really easy to build this kind of real-time collaboaration into Holochain hApps.
-    </p>
+    <p class="small">Copyright © 2023 Holo, LTD.  This software is distributed under the <a href="https://opensource.org/licenses/CAL-1.0">CAL-1.0 License</a></p>
     </div>
 </Dialog>
 
 <style>
     .about {
-        padding: 10px;
+        padding: 40px;
+    }
+    .about h5 {
+        margin-bottom: 40px;
+    }
+    .small {
+        font-size: 80%;
     }
 </style>
   

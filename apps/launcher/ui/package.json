@@ -1,6 +1,6 @@
 {
   "name": "talking-stickies-app",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "scripts": {
     "build": "npm run build:happ && npm run build:ui",
     "build:happ": "npm run build:dna && hc app pack ../workdir",
