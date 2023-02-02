@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Dictionary } from "@holochain-open-dev/core-types";
   import MultiSelect from 'svelte-multiselect'
-  import type { Option, ObjectOption } from 'svelte-multiselect'
+  import type { ObjectOption } from 'svelte-multiselect'
   import type { Avatar } from './boardList';
   import type { Readable } from 'svelte/store';
   import {Button} from "svelte-materialify"
@@ -11,7 +11,6 @@
   export let cancelEdit
   export let text = ''
   export let groupId = undefined
-  export let groups = []
   export let props = {color: "white", agents:[]}
   export let avatars: Readable<Dictionary<Avatar>> 
 
@@ -35,15 +34,6 @@
 
 
 <div class='card-editor' style:background-color={props.color}>
-  {#if groups.length > 1 && groupId !== undefined}
-    <select bind:value={groupId}>
-      {#each groups as group}
-        <option value={group.id}>
-          {group.name}
-        </option>
-      {/each}
-    </select>
-  {/if}
   <div class="card-elements">
     <textarea class='textarea' bind:value={text} />
     <div class="color-buttons">
@@ -121,9 +111,6 @@
     height: 15px;
     margin: 2px;
     outline: 1px lightgray solid;
-  }
-  select {
-    margin-top:5px;
   }
   .selected {
     outline: 1px #000 solid;

@@ -249,7 +249,7 @@
   </div>
   {#if $state}
   <div class="groups">
-      {#each Object.entries($state.grouping) as [groupId, stickyIds]}
+      {#each $state.grouping ? Object.entries($state.grouping) : [] as [groupId, stickyIds]}
         {#if (groupId !== UngroupedId || stickyIds.length > 0 || $state.groups.length == 1)}
         <div class="group" style:width={groupWidth(groupId)}
         class:glowing={dragTarget == groupId}
@@ -281,7 +281,6 @@
                 {cancelEdit}
                 text={editText}
                 groupId={groupId}
-                groups={$state.groups}
                 props={props}
               />
             {:else}
@@ -326,7 +325,7 @@
             {/if}
           {/each}
           {#if creatingInGroup !== undefined  && creatingInGroup == groupId}
-            <StickyEditor handleSave={createSticky} {cancelEdit} groups={$state.groups} />
+            <StickyEditor handleSave={createSticky} {cancelEdit} />
           {/if}
           </div>
         </div>

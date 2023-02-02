@@ -62,7 +62,6 @@ export const boardListGrammar: BoardListGrammar = {
     initState(state)  {
         state.avatars = {}
         state.boards = []
-        console.log("INITIALIZING TO:", state)
     },
     applyDelta( 
         delta: BoardListDelta,

@@ -227,7 +227,6 @@
                   {cancelEdit}
                   text={editText}
                   groupId={columnId}
-                  groups={$state.groups}
                   props={props}
                   avatars={avatars}
                 />
@@ -277,7 +276,7 @@
           </div>
           {#if creatingInColumn !==undefined  && creatingInColumn == columnId}
           <div class="new-card">
-            <CardEditor handleSave={createCard} {cancelEdit} groups={$state.groups} avatars={avatars}/>
+            <CardEditor handleSave={createCard} {cancelEdit} avatars={avatars}/>
           </div>
           {:else}
           <div class="column-item column-footer">

@@ -6,7 +6,6 @@
   export let cancelEdit
   export let text = ''
   export let groupId = undefined
-  export let groups = []
   export let props = {}
   const colors=["#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "grey"]
   const setColor = (color) => {
@@ -71,24 +70,12 @@
     margin: 2px;
     outline: 1px lightgray solid;
   }
-  select {
-    margin-top:5px;
-  }
   .selected {
     outline: 1px #000 solid;
   }
 </style>
 
 <div class='sticky-editor' style:background-color={props["color"]}>
-  {#if groups.length > 1 && groupId !== undefined}
-    <select bind:value={groupId}>
-      {#each groups as group}
-        <option value={group.id}>
-          {group.name}
-        </option>
-      {/each}
-    </select>
-  {/if}
   <div class="sticky-elements">
     <textarea class='textarea' bind:value={text} />
     <div class="color-buttons">

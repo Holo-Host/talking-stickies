@@ -122,6 +122,7 @@ export type Sticky = {
   >;
   
   const _removeStickyFromGroups = (state: BoardState, stickyId: uuidv1) => {
+    _initGrouping(state)
     // remove the item from the group it's in
     Object.entries(state.grouping).forEach(([groupId, itemIds]) =>{
       const index = itemIds.findIndex((id) => id === stickyId)
@@ -131,12 +132,21 @@ export type Sticky = {
     })
   }
   const _addStickyToGroup = (state: BoardState, groupId: uuidv1, stickyId: uuidv1) => {
+    _initGrouping(state)
     // add it to the new group
     if (state.grouping[groupId] !== undefined) {
       state.grouping[groupId].push(stickyId)
     }
     else {
       state.grouping[groupId] = [stickyId]
+    }
+  }
+  const _initGrouping = (state) => {
+    if (state.grouping === undefined) {
+      state.grouping = {}
+      const ungrouped = []
+      state.stickies.forEach((sticky)=>ungrouped.push(sticky.id))
+      state.grouping[UngroupedId] = ungrouped
     }
   }
   export const boardGrammar: BoardGrammar = {
@@ -146,8 +156,7 @@ export type Sticky = {
       state.groups = [{id:UngroupedId, name:""}]
       state.stickies = []
       state.voteTypes = []
-      state.grouping = {}
-      state.grouping[UngroupedId] = []
+      _initGrouping(state)
     },
     applyDelta( 
       delta: BoardDelta,
@@ -166,6 +175,7 @@ export type Sticky = {
         state.name = delta.name
       }
       if (delta.type == "set-groups") {
+        _initGrouping(state)    
         state.groups = delta.groups
         const idx = delta.groups.findIndex((group) => group.id === UngroupedId)
         if (idx == -1) {
@@ -193,12 +203,14 @@ export type Sticky = {
 
       }
       if (delta.type == "set-group-order") {
+        _initGrouping(state)
         state.grouping[delta.id] = delta.order
       }
       if (delta.type == "set-vote-types") {
         state.voteTypes = delta.voteTypes
       }
       else if (delta.type == "add-sticky") {
+        _initGrouping(state)    
         state.stickies.push(delta.value)
         if (state.grouping[delta.group] !== undefined) {
           state.grouping[delta.group].push(delta.value.id)
