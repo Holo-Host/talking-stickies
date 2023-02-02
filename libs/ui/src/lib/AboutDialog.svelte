@@ -10,7 +10,7 @@
     <div class="about">
     {#if boardType == BoardType.Stickies}
         <h5>TalkingStickies: UI v0.2.6 for DNA v0.2.x</h5>
-        <p>TalkingStickies is a demonstration Holochain hApp built by Holo.</p>
+        <p>TalkingStickies is a demonstration Holochain app built by Holo.</p>
         <p>
             We use TalkingStickies internally for meetings, agendas, brain-storming sessions and retros.
         </p>
@@ -19,12 +19,12 @@
         </p>
     {:else}
         <h5>CanDo!: UI v0.2.1 for DNA v0.2.x</h5>
-        <p>CanDo! is a demonstration Holochain hApp built by Holo.</p>
+        <p>CanDo! is a demonstration Holochain app built by Holo.</p>
     {/if}
     <p> <b>Developers:</b>
         Check out this hApp's source-code <a href="https://github.com/Holo-Host/talking-stickies">in our github repo</a>.
         This project's real-time syncronization is powered by <a href="https://github.com/holochain/syn">Syn</a>, 
-        a library that makes it really easy to build this kind of real-time collaboaration into Holochain hApps.
+        a library that makes it really easy to build this kind of real-time collaboaration into Holochain apps.
     </p>
     <p class="small">Copyright © 2023 Holo, LTD.  This software is distributed under the <a href="https://opensource.org/licenses/CAL-1.0">CAL-1.0 License</a></p>
     </div>

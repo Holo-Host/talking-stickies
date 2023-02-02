@@ -88,6 +88,7 @@ export type Sticky = {
         type: "update-sticky-group";
         id: uuidv1;
         group: uuidv1;
+        index: undefined | number
       }
       | {
         type: "update-sticky-props";
@@ -131,11 +132,15 @@ export type Sticky = {
       }
     })
   }
-  const _addStickyToGroup = (state: BoardState, groupId: uuidv1, stickyId: uuidv1) => {
+  const _addStickyToGroup = (state: BoardState, groupId: uuidv1, stickyId: uuidv1, index: undefined|number) => {
     _initGrouping(state)
     // add it to the new group
     if (state.grouping[groupId] !== undefined) {
-      state.grouping[groupId].push(stickyId)
+      if (index === undefined || index >= state.grouping[groupId].length) {
+        state.grouping[groupId].push(stickyId)
+      } else {
+        state.grouping[groupId].splice(index, 0, stickyId)
+      }
     }
     else {
       state.grouping[groupId] = [stickyId]
@@ -228,7 +233,7 @@ export type Sticky = {
       }
       else if (delta.type == "update-sticky-group") {
         _removeStickyFromGroups(state, delta.id)
-        _addStickyToGroup(state, delta.group, delta.id)
+        _addStickyToGroup(state, delta.group, delta.id, delta.index)
       }
       else if (delta.type == "update-sticky-props") {
         state.stickies.forEach((sticky, i) => {

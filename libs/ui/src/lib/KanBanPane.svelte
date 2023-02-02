@@ -10,7 +10,7 @@
   import { Pane } from "./pane";
   import type { v1 as uuidv1 } from "uuid";
   import { type Sticky, BoardType, Group, UngroupedId } from "./board";
-  import { mdiCog, mdiExport, mdiPlusCircle } from "@mdi/js";
+  import { mdiArrowRightThick, mdiCog, mdiExport, mdiPlusCircle } from "@mdi/js";
   import { Icon, Button } from "svelte-materialify";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import type { Dictionary } from "@holochain-open-dev/core-types";
@@ -118,10 +118,12 @@
     tsStore.boardList.closeActiveBoard();
   };
   let editing = false
+  let dragOn = true
   let draggingHandled = true
   let draggedItemId = ""
-  let dragOn = true
+  let dragWithSelf = false
   let dragTarget = ""
+  let dragOrder : undefined|number = undefined
   function handleDragStart(e) {
     draggingHandled = false
     console.log("handleDragStart", e)
@@ -153,11 +155,27 @@
 
     if (target.id == dragTarget) {
       dragTarget = ""
+      dragOrder = undefined
     }
   }
   function handleDragOver(e) {
     e.preventDefault()
-    return
+    const target = e.target as HTMLElement
+    const column = findColumnElement(target)
+    const cardsInColumn = $state.grouping[column.id]
+    dragOrder = 0
+    dragWithSelf = false
+    for (const cardId of cardsInColumn) {
+      const rect = document.getElementById(cardId).getBoundingClientRect()
+      // if we are over ourself ingore!
+      if (cardId == draggedItemId) {
+        dragWithSelf = true
+      }
+      if (e.y < rect.y+rect.height/2) {
+        break
+      }
+      dragOrder += 1
+    }
   }
   function handleDragDropColumn(e:DragEvent) {
     e.preventDefault();
@@ -168,7 +186,10 @@
     const column = findColumnElement(e.target as HTMLElement)
     var srcId = e.dataTransfer.getData("text");
     if (column.id) {
-      pane.dispatch("requestChange",[{ type: "update-sticky-group", id:srcId, group:column.id  }])
+      if (dragWithSelf) {
+        dragOrder-=1
+      }
+      pane.dispatch("requestChange",[{ type: "update-sticky-group", id:srcId, group:column.id, index: dragOrder }])
     }
     clearDrag()
     //console.log("handleDragDropColumn",e, column )
@@ -177,6 +198,8 @@
     draggingHandled = true
     draggedItemId = ""
     dragTarget = ""
+    dragOrder = undefined
+    dragWithSelf = false
   }
 </script>
 
@@ -215,7 +238,7 @@
             <div>{columns[columnId].name}</div>
           </div>
           <div class="cards">
-          {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }}
+          {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }, i}
               {#if editingCardId === cardId}
                 <CardEditor
                   handleSave={
@@ -231,6 +254,13 @@
                   avatars={avatars}
                 />
               {:else}
+                {#if 
+                  dragTarget == columnId && 
+                  cardId!=draggedItemId && 
+                  dragOrder == i && 
+                  (!dragWithSelf || $state.grouping[columnId][dragOrder-1] != draggedItemId) }
+                 <div> <Icon path={mdiArrowRightThick} /> </div>
+                {/if}
                 <div 
                   class="card"
                   class:tilted={draggedItemId == cardId}
@@ -273,6 +303,10 @@
                 </div>
               {/if}
           {/each}
+          {#if dragTarget == columnId && dragOrder == $state.grouping[columnId].length}
+            <div> <Icon path={mdiArrowRightThick} /> </div>
+          {/if}
+
           </div>
           {#if creatingInColumn !==undefined  && creatingInColumn == columnId}
           <div class="new-card">
