@@ -126,7 +126,7 @@
   let dragOrder : undefined|number = undefined
   function handleDragStart(e) {
     draggingHandled = false
-    console.log("handleDragStart", e)
+    //console.log("handleDragStart", e)
     e.dataTransfer.dropEffect = "move";
 //    e.dataTransfer.setDragImage(e.target)
     draggedItemId = e.target.getAttribute('id')
@@ -180,7 +180,6 @@
   function handleDragDropColumn(e:DragEvent) {
     e.preventDefault();
     if (draggingHandled) {
-      console.log("ignoring because it was handled")
       return
     }
     const column = findColumnElement(e.target as HTMLElement)
