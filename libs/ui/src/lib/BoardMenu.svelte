@@ -77,7 +77,7 @@
     <List>
         {#each $boardList.boards as board }
             {#if board.status === "archived" }
-                <ListItem on:click={unarchiveBoard(board.hash)}>{board.name}</ListItem>
+                <ListItem dense={true} on:click={unarchiveBoard(board.hash)}>{board.name}</ListItem>
             {/if}
         {/each}
     </List>
