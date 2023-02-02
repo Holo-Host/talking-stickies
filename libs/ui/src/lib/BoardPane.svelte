@@ -10,7 +10,7 @@
   import { cloneDeep } from "lodash";
   import { Pane } from "./pane";
   import { BoardType, Group, UngroupedId, type Sticky } from "./board";
-  import { mdiCog, mdiExport, mdiNotePlusOutline } from '@mdi/js';
+  import { mdiCloseBox, mdiCloseBoxOutline, mdiCog, mdiExport, mdiNotePlusOutline } from '@mdi/js';
   import { Button, Icon } from "svelte-materialify"
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import type { Dictionary } from "@holochain-open-dev/core-types";
@@ -242,8 +242,11 @@
       <Button size=small icon on:click={()=>editing=true} title="Settings">
         <Icon path={mdiCog} />
       </Button>
-      <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export Board">
+      <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export">
         <Icon path={mdiExport} />
+      </Button>
+      <Button size=small icon on:click={closeBoard} title="Close">
+        <Icon path={mdiCloseBoxOutline} />
       </Button>
     </div>
   </div>

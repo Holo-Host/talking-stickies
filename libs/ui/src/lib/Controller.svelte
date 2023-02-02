@@ -8,7 +8,7 @@
     import type { SynStore } from '@holochain-syn/store';
     import { BoardType } from './board';
     import { MaterialApp, Icon } from 'svelte-materialify';
-    import { mdiShapeSquarePlus, mdiCog } from '@mdi/js';
+    import { mdiShapeSquarePlus, mdiCog, mdiArchiveArrowUp } from '@mdi/js';
 
     export let boardType:BoardType
     export let roleName = ""
@@ -117,6 +117,7 @@
       {#if boardList && $boardList.boards.length > 0 && $activeBoardIndex === undefined}
         <div class="welcome-text">
           {#if boardType == BoardType.Stickies}
+            <p>Total Boards: {$boardList.boards.length}</p>
             <p>
               Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
               You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
@@ -128,6 +129,7 @@
             </p>
           {/if}
           <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+          <p>Any boards that you have archived will appear under the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiArchiveArrowUp}></Icon> button, and you can un-archive them by selecting them from the list.</p>
         </div>
       {/if}
     
