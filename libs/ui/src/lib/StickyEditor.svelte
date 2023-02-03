@@ -12,8 +12,40 @@
     // TODO fix later when there are more properties
     props = {color}
   }
-  // let text = textA
+  const handleKeydown = (e) => {
+    if (e.key === "Enter" && e.ctrlKey) {
+      handleSave(text, groupId, props)
+    }
+    if (e.key === "Escape") {
+      cancelEdit()
+    }
+  }
 </script>
+
+<div class='sticky-editor' style:background-color={props["color"]} on:keydown={handleKeydown}>
+  <div class="sticky-elements">
+    <textarea class='textarea' bind:value={text} />
+    <div class="color-buttons">
+      {#each colors as color}
+        <div class="color-button{props["color"] == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
+      {/each}
+    </div>
+  </div>
+  <div class='controls'>
+    {#if handleDelete}
+      <Button text size="x-small" on:click={handleDelete} class="red white-text">
+        Delete
+      </Button>
+    {/if}
+    <Button style="margin-left:5px" size="x-small" on:click={cancelEdit}>
+      Cancel
+    </Button>
+    <Button style="margin-left:5px" size="x-small" class="primary-color" on:click={() => handleSave(text, groupId, props) }>
+      Save
+    </Button>
+  </div>
+</div>
+
 
 <style>
   .sticky-editor {
@@ -74,27 +106,3 @@
     outline: 1px #000 solid;
   }
 </style>
-
-<div class='sticky-editor' style:background-color={props["color"]}>
-  <div class="sticky-elements">
-    <textarea class='textarea' bind:value={text} />
-    <div class="color-buttons">
-      {#each colors as color}
-        <div class="color-button{props["color"] == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
-      {/each}
-    </div>
-  </div>
-  <div class='controls'>
-    {#if handleDelete}
-      <Button text size="x-small" on:click={handleDelete} class="red white-text">
-        Delete
-      </Button>
-    {/if}
-    <Button style="margin-left:5px" size="x-small" on:click={cancelEdit}>
-      Cancel
-    </Button>
-    <Button style="margin-left:5px" size="x-small" class="primary-color" on:click={() => handleSave(text, groupId, props) }>
-      Save
-    </Button>
-  </div>
-</div>

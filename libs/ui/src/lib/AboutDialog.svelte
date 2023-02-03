@@ -1,15 +1,33 @@
 <script lang="ts">
     import { Dialog } from 'svelte-materialify';
     import { BoardType } from './board';
-  
+    import { onMount, onDestroy } from 'svelte';
+
     export let active = false;
     export let boardType:BoardType
+
+    onMount(() => {
+        document.addEventListener('keydown', handleKeydown, {
+                capture: true
+            });
+    })
+	
+	onDestroy(() => {
+        document.removeEventListener('keydown', handleKeydown, {
+                capture: true
+            });
+    })
+    const handleKeydown = (e) => {
+        if (e.key === "Escape") {
+            active=false
+        }
+    }
 </script>
   
-<Dialog bind:active width={600}>
+<Dialog bind:active width={600} >
     <div class="about">
     {#if boardType == BoardType.Stickies}
-        <h5>TalkingStickies: UI v0.2.6 for DNA v0.2.x</h5>
+        <h5>TalkingStickies: UI v0.2.7 for DNA v0.2.x</h5>
         <p>TalkingStickies is a demonstration Holochain app built by Holo.</p>
         <p>
             We use TalkingStickies internally for meetings, agendas, brain-storming sessions and retros.
@@ -18,7 +36,7 @@
 
         </p>
     {:else}
-        <h5>CanDo!: UI v0.2.1 for DNA v0.2.x</h5>
+        <h5>CanDo!: UI v0.2.2 for DNA v0.2.x</h5>
         <p>CanDo! is a demonstration Holochain app built by Holo.</p>
     {/if}
     <p> <b>Developers:</b>

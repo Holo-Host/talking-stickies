@@ -70,8 +70,9 @@
 {#if archivedBoards}
 <Menu>
     <div slot="activator">
-        <Button icon style="margin-left:10px" title="Archived Boards">
+        <Button style="margin-left:10px" title="Archived Boards">
             <Icon path={mdiArchiveArrowUp}></Icon>
+            <Icon path={mdiChevronDown}></Icon>
         </Button>
     </div>
     <List>

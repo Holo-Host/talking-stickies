@@ -53,39 +53,6 @@
   
   </script>
   
-  <style>
-    .app {
-      margin: 0;
-      padding-bottom: 10px;
-      background-color: lightgray;
-      height: 100vh;
-    }
-    :global(:root) {
-      --resizeable-height: 200px;
-      --tab-width: 60px;
-    }
-  
-    @media (min-width: 640px) {
-      .app {
-        max-width: none;
-      }
-    }
-    .welcome-text {
-      border-radius: 5px;
-      border: 1px solid #222;
-      margin: auto;
-      margin-top: 50px;
-      max-width: 650px;
-      padding: 26px;
-      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-      background-color: white;
-    }
-    .loading {
-      text-align: center;
-      padding-top: 100px;
-    }
-  </style>
-  
   <svelte:head>
     <script src='https://kit.fontawesome.com/80d72fa568.js' crossorigin='anonymous'></script>
   </svelte:head>
@@ -142,7 +109,57 @@
         {/if}
       {/if}
     {:else}
-      <div class="loading">Loading...</div>
+      <div class="loading"><div class="loader"></div></div>
     {/if}
   </div>
 </MaterialApp>
+<style>
+  .app {
+    margin: 0;
+    padding-bottom: 10px;
+    background-color: lightgray;
+    height: 100vh;
+  }
+  :global(:root) {
+    --resizeable-height: 200px;
+    --tab-width: 60px;
+  }
+
+  @media (min-width: 640px) {
+    .app {
+      max-width: none;
+    }
+  }
+  .welcome-text {
+    border-radius: 5px;
+    border: 1px solid #222;
+    margin: auto;
+    margin-top: 50px;
+    max-width: 650px;
+    padding: 26px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    background-color: white;
+  }
+  .loading {
+    text-align: center;
+    padding-top: 100px;
+  }
+  .loader {
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    width: 50px;
+    height: 50px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    display: inline-block;
+  }
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>

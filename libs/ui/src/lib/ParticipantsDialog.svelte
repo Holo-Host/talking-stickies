@@ -2,7 +2,7 @@
   import { encodeHashToBase64 } from '@holochain/client';
   import { Dialog, List, ListItem } from 'svelte-materialify';
   import { HoloIdenticon } from "@holochain-open-dev/elements";
-  import { getContext } from "svelte";
+  import { getContext, onDestroy, onMount } from "svelte";
   import type { TalkingStickiesStore } from "./talkingStickiesStore";
 
   const { getStore } :any = getContext('tsStore');
@@ -15,6 +15,22 @@
   }
   export let active = false;
   export let avatars
+  onMount( async () => {
+      document.addEventListener('keydown', handleKeydown, {
+          capture: true
+      });
+
+  })
+  onDestroy(() => {
+    document.removeEventListener('keydown', handleKeydown, {
+            capture: true
+        });
+  })
+  const handleKeydown = (e) => {
+    if (e.key === "Escape") {
+        active=false
+    }
+  }
 
 </script>
 

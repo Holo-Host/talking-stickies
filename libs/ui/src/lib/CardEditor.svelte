@@ -30,12 +30,21 @@
     return options
   }
   let selected = []
+
+  const handleKeydown = (e) => {
+    if (e.key === "Enter" && e.ctrlKey) {
+      handleSave(text, groupId, props)
+    }
+    if (e.key === "Escape") {
+      cancelEdit()
+    }
+  }
 </script>
 
 
-<div class='card-editor' style:background-color={props.color}>
+<div class='card-editor' style:background-color={props.color} on:keydown={handleKeydown}>
   <div class="card-elements">
-    <textarea class='textarea' bind:value={text} />
+    <textarea class='textarea' bind:value={text}/>
     <div class="color-buttons">
       {#each colors as color}
         <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>

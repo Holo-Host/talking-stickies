@@ -2,7 +2,7 @@
     import {Button, Icon} from "svelte-materialify"
     import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
     import { Group, VoteType, BoardType } from './board';
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
 
     export let handleSave
@@ -44,10 +44,26 @@
     const deleteGroup = (index) => () => {
       groups.splice(index, 1)
       groups = groups
-    }    
+    }
     onMount( async () => {
       setBoardType(boardType)
+      document.addEventListener('keydown', handleKeydown, {
+          capture: true
+      });
+
     })
+    onDestroy(() => {
+        document.removeEventListener('keydown', handleKeydown, {
+                capture: true
+            });
+    })
+    const handleKeydown = (e) => {
+      if (e.key === "Escape") {
+        cancelEdit()
+      } else if (e.key === "Enter" && e.ctrlKey) {
+        handleSave(boardType, text, groups, voteTypes)
+      }
+    }
 
     const onDropGroups = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
       if (!to || from === to || from.dropZoneID !== "groups") {

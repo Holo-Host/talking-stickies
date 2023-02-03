@@ -15,6 +15,7 @@
     let editVoteTypes = []
 
     onMount(async () => {
+
         const board: Board | undefined = await store.boardList.getBoard(boardHash)
         if (board) {
             const state = board.state()
@@ -43,7 +44,6 @@
         let changes = []
         const state: BoardState = board.state()
         if (state.name != name) {
-            console.log("updating board name to ",name)
             store.boardList.requestChanges([
             {
                 type: 'set-name',
@@ -58,13 +58,11 @@
             })
         }
         if (!isEqual(groups, state.groups)) {
-            console.log("with groups:", groups)
             changes.push({type: 'set-groups',
             groups: groups
             })
         }
         if (!isEqual(voteTypes, state.voteTypes)) {
-            console.log("with voteTypes:", voteTypes)
             changes.push({type: 'set-vote-types',
             voteTypes: voteTypes
             })
