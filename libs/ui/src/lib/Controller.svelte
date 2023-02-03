@@ -32,6 +32,8 @@
     });
 
     $: boardList = tsStore? tsStore.boardList.stateStore() : undefined
+    $: archivedBoards = boardList ? $boardList.boards.filter((board)=>board.status === "archived") : []
+    $: activeBoards = boardList ? $boardList.boards.filter((board)=>board.status !== "archived") : []
 
     async function initialize() : Promise<void> {
       const store = createStore()
@@ -83,8 +85,8 @@
       {/if}
       {#if boardList && $boardList.boards.length > 0 && $activeBoardIndex === undefined}
         <div class="welcome-text">
+          <p>Active Boards: {activeBoards.length}, Archived Boards: {archivedBoards.length}</p>
           {#if boardType == BoardType.Stickies}
-            <p>Total Boards: {$boardList.boards.length}</p>
             <p>
               Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
               You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
