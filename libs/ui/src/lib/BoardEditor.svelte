@@ -2,7 +2,7 @@
     import {Button, Icon} from "svelte-materialify"
     import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
     import { Group, VoteType, BoardType } from './board';
-    import { onMount, onDestroy } from 'svelte';
+    import { onMount } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
 
     export let handleSave
@@ -13,6 +13,7 @@
     export let voteTypes: Array<VoteType>
     export let boardType: BoardType
 
+    let titleElement
     let groupsTitle = "Groups"
     let defaultGroupName = "group"
 
@@ -47,21 +48,28 @@
     }
     onMount( async () => {
       setBoardType(boardType)
-      document.addEventListener('keydown', handleKeydown, {
-          capture: true
-      });
+      titleElement.focus()
+    })
 
-    })
-    onDestroy(() => {
-        document.removeEventListener('keydown', handleKeydown, {
-                capture: true
-            });
-    })
     const handleKeydown = (e) => {
       if (e.key === "Escape") {
         cancelEdit()
       } else if (e.key === "Enter" && e.ctrlKey) {
         handleSave(boardType, text, groups, voteTypes)
+      } else  if (e.key === 'Tab') {
+        // trap focus
+        const tabbable = Array.from(document.querySelectorAll('input'))
+
+        let index = tabbable.findIndex((elem)=>elem == document.activeElement)
+  
+        if (index === -1 && e.shiftKey) index = 0;
+
+        index += tabbable.length + (e.shiftKey ? -1 : 1);
+        index %= tabbable.length;
+
+        //@ts-ignore
+        tabbable[index].focus();
+        e.preventDefault();
       }
     }
 
@@ -81,9 +89,10 @@
     }
 </script>
 
+<svelte:window on:keydown={handleKeydown}/>
   <div class='board-editor'>
     <div class="edit-title">
-      <span class="title-text">Title:</span> <input class='textarea' maxlength="60" bind:value={text} />
+      <span class="title-text">Title:</span> <input class='textarea' maxlength="60" bind:value={text} bind:this={titleElement} />
     </div>
     <div class="edit-groups unselectable">
       <span class="title-text">{groupsTitle}:</span>

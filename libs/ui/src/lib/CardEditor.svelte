@@ -5,6 +5,7 @@
   import type { Avatar } from './boardList';
   import type { Readable } from 'svelte/store';
   import {Button} from "svelte-materialify"
+  import { onMount } from "svelte";
 
   export let handleSave
   export let handleDelete = undefined
@@ -13,6 +14,9 @@
   export let groupId = undefined
   export let props = {color: "white", agents:[]}
   export let avatars: Readable<Dictionary<Avatar>> 
+
+  let inputElement
+  onMount(() => inputElement.focus())
 
   const colors=["white","#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "yellow", "LightSkyBlue", "grey"]
   const setColor = (color) => {
@@ -41,10 +45,9 @@
   }
 </script>
 
-
 <div class='card-editor' style:background-color={props.color} on:keydown={handleKeydown}>
   <div class="card-elements">
-    <textarea class='textarea' bind:value={text}/>
+    <textarea class='textarea' bind:value={text} bind:this={inputElement} />
     <div class="color-buttons">
       {#each colors as color}
         <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>

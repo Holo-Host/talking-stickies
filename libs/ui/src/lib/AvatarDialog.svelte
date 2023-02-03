@@ -1,22 +1,10 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
     import { Dialog, Button } from 'svelte-materialify';
   
     export let active = false;
     export let avatar
     export let handleSave
 
-    onMount( async () => {
-      document.addEventListener('keydown', handleKeydown, {
-          capture: true
-      });
-
-    })
-    onDestroy(() => {
-        document.removeEventListener('keydown', handleKeydown, {
-                capture: true
-            });
-    })
     const handleKeydown = (e) => {
       if (e.key === "Escape") {
         active=false
@@ -26,6 +14,7 @@
     }
 
 </script>
+<svelte:window on:keydown={handleKeydown}/>
 
 <Dialog persistent bind:active>
     <div class="avatar-editor">

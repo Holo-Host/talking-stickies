@@ -1,29 +1,19 @@
 <script lang="ts">
     import { Dialog } from 'svelte-materialify';
     import { BoardType } from './board';
-    import { onMount, onDestroy } from 'svelte';
 
     export let active = false;
     export let boardType:BoardType
 
-    onMount(() => {
-        document.addEventListener('keydown', handleKeydown, {
-                capture: true
-            });
-    })
-	
-	onDestroy(() => {
-        document.removeEventListener('keydown', handleKeydown, {
-                capture: true
-            });
-    })
     const handleKeydown = (e) => {
         if (e.key === "Escape") {
             active=false
         }
     }
 </script>
-  
+
+<svelte:window on:keydown={handleKeydown}/>
+
 <Dialog bind:active width={600} >
     <div class="about">
     {#if boardType == BoardType.Stickies}

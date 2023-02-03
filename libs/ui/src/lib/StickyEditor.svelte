@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import { onMount } from "svelte";
   import {Button} from "svelte-materialify"
 
   export let handleSave
@@ -7,6 +8,10 @@
   export let text = ''
   export let groupId = undefined
   export let props = {}
+
+  let inputElement
+  onMount(() => inputElement.focus())
+
   const colors=["#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "grey"]
   const setColor = (color) => {
     // TODO fix later when there are more properties
@@ -24,7 +29,7 @@
 
 <div class='sticky-editor' style:background-color={props["color"]} on:keydown={handleKeydown}>
   <div class="sticky-elements">
-    <textarea class='textarea' bind:value={text} />
+    <textarea class='textarea' bind:value={text} bind:this={inputElement} />
     <div class="color-buttons">
       {#each colors as color}
         <div class="color-button{props["color"] == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
