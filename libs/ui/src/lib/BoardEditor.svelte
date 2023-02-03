@@ -85,7 +85,7 @@
     <div class="edit-title">
       <span class="title-text">Title:</span> <input class='textarea' maxlength="60" bind:value={text} />
     </div>
-    <div class="edit-groups">
+    <div class="edit-groups unselectable">
       <span class="title-text">{groupsTitle}:</span>
       <Button icon on:click={() => addGroup()}>
         <Icon path={mdiPlusCircle}/>
@@ -97,6 +97,7 @@
         itemCount={groups.length}
         on:drop={onDropGroups}
         let:index
+        itemClass="unselectable"
         >
         <div class="group">
           <Icon path={mdiDragVertical}/>
@@ -107,7 +108,7 @@
         </div>
       </DragDropList>
     </div>
-    <div class="edit-vote-types">
+    <div class="edit-vote-types unselectable">
       <span class="title-text">Voting Types:</span>
       <Button icon on:click={() => addVoteType()}>
         <Icon path={mdiPlusCircle}/>
@@ -119,6 +120,7 @@
         itemCount={voteTypes.length}
         on:drop={onDropVoteTypes}
         let:index
+        itemClass="unselectable"
         >
         <div class="vote-type">
           <Icon path={mdiDragVertical}/>
@@ -197,4 +199,12 @@
     font-weight: normal;
     font-size: 120%;
   }
+  .unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 </style>

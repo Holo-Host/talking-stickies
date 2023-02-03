@@ -252,7 +252,7 @@
   </div>
   {#if $state}
   <div class="groups">
-      {#each $state.grouping ? Object.entries($state.grouping) : [] as [groupId, stickyIds]}
+      {#each $state.groups.map((group)=> [group.id, $state.grouping[group.id]]) as [groupId, stickyIds]}
         {#if (groupId !== UngroupedId || stickyIds.length > 0 || $state.groups.length == 1)}
         <div class="group" style:width={groupWidth(groupId)}
         class:glowing={dragTarget == groupId}

@@ -227,7 +227,7 @@
   </div>
   {#if $state}
     <div class="columns">
-      {#each Object.entries($state.grouping).filter(([columnId, _])=> columnId!=UngroupedId) as [columnId, cardIds]}
+      {#each $state.groups.filter(g=>g.id != UngroupedId).map((group)=> [group.id, $state.grouping[group.id]]) as [columnId, cardIds]}
         <div class="column"
           class:glowing={dragTarget == columnId}
           id={columnId}
