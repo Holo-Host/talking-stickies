@@ -1,7 +1,7 @@
 <script lang="ts">
   import { BoardType } from "./board";
   import TSLogoIcon from "./icons/TSLogoIcon.svelte";
-  import KBLogoIcon from "./icons/KBLogoIcon.svelte";
+  import KDLogoIcon from "./icons/KDLogoIcon.svelte";
   import BoardMenu from "./BoardMenu.svelte";
   import Folk from "./Folk.svelte";
   import { Icon, Button } from 'svelte-materialify';
@@ -21,7 +21,7 @@
     {#if boardType === BoardType.Stickies}
       <div class="logo" title="About TalkingStickies" on:click={()=>showAbout=true}><TSLogoIcon /></div>
     {:else}
-      <div class="logo" title="About CanDo!" on:click={()=>showAbout=true}><KBLogoIcon /></div><h4 class="logo-text">CanDo!</h4>
+      <div class="logo" title="About KanDo!" on:click={()=>showAbout=true}><KDLogoIcon /></div>
     {/if}
     <BoardMenu boardType={boardType}></BoardMenu>
   </div>
@@ -46,7 +46,7 @@
     border-bottom: 1px solid #222;
   }
   .logo {
-    width: 40px;
+    height: 40px;
     margin-right: 10px;
     display: contents;
     cursor: pointer;

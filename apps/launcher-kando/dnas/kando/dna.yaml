@@ -1,11 +1,11 @@
 ---
 manifest_version: "1"
-name: kanban
+name: kando
 
 integrity:
   network_seed: ~
   properties: 
-    type: "KanBan"
+    type: "KanDo"
   origin_time: 2022-10-03T23:05:19.470323Z
   zomes:
     - name: syn_integrity

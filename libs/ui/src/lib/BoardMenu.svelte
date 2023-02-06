@@ -5,7 +5,7 @@
     import type { EntryHashB64 } from '@holochain/client';
     import type { BoardType } from './board';
     import NewBoardDialog from './NewBoardDialog.svelte';
-    import { mdiChevronDown, mdiImport, mdiShapeSquarePlus, mdiArchiveArrowUp, mdiAccountGroup, mdiAccount } from '@mdi/js';
+    import { mdiChevronDown, mdiImport, mdiShapeSquarePlus, mdiArchiveArrowUp } from '@mdi/js';
 
 
     let creating = false

@@ -1,14 +1,14 @@
 ---
 manifest_version: "1"
-name: kanban
+name: kando
 description: ~
 roles:
-  - name: kanban
+  - name: kando
     provisioning:
       strategy: create
       deferred: false
     dna:
-      bundled: "../dnas/kanban/kanban.dna"
+      bundled: "../dnas/kando/kando.dna"
       properties: ~
       uuid: ~
       version: ~

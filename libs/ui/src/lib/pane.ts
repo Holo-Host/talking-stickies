@@ -1,8 +1,10 @@
 import { createEventDispatcher } from "svelte";
-import type { BoardState, Sticky } from "./board";
+import { BoardType, type BoardState, type Sticky } from "./board";
 import { v1 as uuidv1 } from "uuid";
 import { cloneDeep, isEqual } from "lodash";
 import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
+import { BoardEditor } from "$lib";
+import sanitize from "sanitize-filename";
 
 const download = (filename: string, text: string) => {
     var element = document.createElement('a');
@@ -24,8 +26,9 @@ export class Pane {
         this.dispatch = createEventDispatcher()
     }
     
-    exportBoard = (state: BoardState) => {
-        const fileName = `ts_${state.name}.json`
+    exportBoard = (boardType: BoardType, state: BoardState) => {
+        const prefix = boardType == BoardType.Stickies ? "ts" : "kando"
+        const fileName = sanitize(`${prefix}_export_${state.name}.json`)
         download(fileName, JSON.stringify(state))
         alert(`Your board was exported to your Downloads folder as: '${fileName}'`)
     }

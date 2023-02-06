@@ -17,7 +17,7 @@
 <Dialog bind:active width={600} >
     <div class="about">
     {#if boardType == BoardType.Stickies}
-        <h5>TalkingStickies: UI v0.2.8 for DNA v0.2.x</h5>
+        <h5>TalkingStickies: UI v0.3.0 for DNA v0.2.x</h5>
         <p>TalkingStickies is a demonstration Holochain app built by Holo.</p>
         <p>
             We use TalkingStickies internally for meetings, agendas, brain-storming sessions and retros.
@@ -26,8 +26,8 @@
 
         </p>
     {:else}
-        <h5>CanDo!: UI v0.2.3 for DNA v0.2.x</h5>
-        <p>CanDo! is a demonstration Holochain app built by Holo.</p>
+        <h5>KanDo!: UI v0.3.0 for DNA v0.2.x</h5>
+        <p>KanDo! is a demonstration Holochain app built by Holo.</p>
     {/if}
     <p> <b>Developers:</b>
         Check out this hApp's source-code <a href="https://github.com/Holo-Host/talking-stickies">in our github repo</a>.

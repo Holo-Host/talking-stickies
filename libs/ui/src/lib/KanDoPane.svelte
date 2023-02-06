@@ -204,7 +204,7 @@
 
 <div class="board">
   {#if editing}
-    <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanBan}></EditBoardDialog>
+    <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanDo}></EditBoardDialog>
   {/if}
   <div class="top-bar">
     <div class="left-items">
@@ -217,7 +217,7 @@
       <Button size=small icon on:click={()=>editing=true} title="Settings">
         <Icon path={mdiCog} />
       </Button>
-      <Button size=small icon on:click={() => pane.exportBoard($state)} title="Export">
+      <Button size=small icon on:click={() => pane.exportBoard(BoardType.KanDo, $state)} title="Export">
         <Icon path={mdiExport} />
       </Button>
       <Button size=small icon on:click={closeBoard} title="Close">
@@ -377,16 +377,16 @@
     flex: 0 1 auto;
   }
   .column-title {
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid #cccccc;
     font-weight: bold;
   }
   .column-footer {
-    border-top: 1px solid gray;
+    border-top: 1px solid #cccccc;
   }
   .column {
     display: flex;
     flex-direction: column;
-    background-color: #d6d7d7;
+    background-color: #eeeeee;
     width: 300px;
     margin: 5px;
     border-radius: 5px;

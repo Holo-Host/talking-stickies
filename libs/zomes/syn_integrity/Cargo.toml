@@ -12,4 +12,4 @@ chrono = { version = "0.4.22", default-features = false, features = ["clock", "s
 derive_more = "0"
 serde = "1"
 
-hc_zome_syn_integrity = {git = "https://github.com/holochain/syn", branch = "for-hdk-v0.1.0-beta-rc.3"}
+hc_zome_syn_integrity = {git = "https://github.com/holochain/syn", branch = "for-hdk-v0.1.0"}

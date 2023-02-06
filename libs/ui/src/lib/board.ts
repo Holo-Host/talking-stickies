@@ -18,7 +18,7 @@ export const DEFAULT_KANBAN_VOTE_TYPES = [
 ]
 
 export const enum BoardType {
-  KanBan = 'KanBan',
+  KanDo = 'KanDo',
   Stickies = 'Stickies'
 }
 

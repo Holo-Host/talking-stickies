@@ -1,7 +1,7 @@
 <script lang="ts">
   import {Controller, BoardType} from '@holo-host/boardz'
-  const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'kanban'
-  const roleName = 'kanban'
+  const appId = process.env.SVELTE_APP_APP_ID ? process.env.SVELTE_APP_APP_ID : 'kando'
+  const roleName = 'kando'
   const appPort = process.env.SVELTE_APP_APP_PORT ? process.env.SVELTE_APP_APP_PORT : 8888
   const adminPort = process.env.SVELTE_APP_ADMIN_PORT
   import { AdminWebsocket, AppAgentWebsocket } from '@holochain/client';
@@ -38,7 +38,7 @@
 <svelte:head>
 </svelte:head>
 {#if connected}
-  <Controller client={client} boardType={BoardType.KanBan} roleName={roleName}></Controller>
+  <Controller client={client} boardType={BoardType.KanDo} roleName={roleName}></Controller>
 {:else}
   Loading
 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Toolbar from './Toolbar.svelte'
     import BoardPane from './BoardPane.svelte'
-    import KanBanPane from './KanBanPane.svelte'
+    import KanDoPane from './KanDoPane.svelte'
     import { TalkingStickiesStore } from './talkingStickiesStore'
     import { setContext } from 'svelte';
     import type { AppAgentClient } from '@holochain/client';
@@ -74,7 +74,7 @@
               You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
             </p>
           {:else}
-            <p>KanBan offers real-time collaborative Kan Ban boards for task and project management. </p>
+            <p>KanDo offers real-time collaborative Kanban boards for task and project management. </p>
             <p>
               Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
               You can add columns for your board, customize voting categories and settings, and more in the board creation window.
@@ -106,8 +106,8 @@
         {#if $activeBoardType === BoardType.Stickies}
           <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
         {/if}
-        {#if $activeBoardType === BoardType.KanBan}
-          <KanBanPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+        {#if $activeBoardType === BoardType.KanDo}
+          <KanDoPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
         {/if}
       {/if}
     {:else}

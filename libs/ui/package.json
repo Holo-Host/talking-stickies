@@ -1,7 +1,7 @@
 {
   "name": "@holo-host/boardz",
   "version": "0.1.0",
-  "description": "web components and more for talking-stickies and kanban app",
+  "description": "web components and more for talking-stickies and kando app",
   "license": "MIT",
   "author": "holochaindev",
   "main": "package/index.js",
@@ -13,7 +13,7 @@
     "./BoardEditor.svelte": "./package/BoardEditor.svelte",
     ".": "./package/index.js",
     "./BoardPane.svelte": "./package/BoardPane.svelte",
-    "./KanBanPane.svelte": "./package/KanBanPane.svelte",
+    "./KanDoPane.svelte": "./package/KanDoPane.svelte",
     "./BoardMenu.svelte": "./package/BoardMenu.svelte",
     "./SortSelector.svelte": "./package/SortSelector.svelte",
     "./StickyEditor.svelte": "./package/StickyEditor.svelte",
@@ -23,7 +23,7 @@
     "./icon.svg": "./package/icon.svg",
     "./icons/EmojiIcon.svelte": "./package/icons/EmojiIcon.svelte",
     "./icons/TSLogoIcon.svelte": "./package/icons/TSLogoIcon.svelte",
-    "./icons/KBLogoIcon.svelte": "./package/icons/KBLogoIcon.svelte",
+    "./icons/KDLogoIcon.svelte": "./package/icons/KDLogoIcon.svelte",
     "./talkingStickiesStore": "./package/talkingStickiesStore.js"
   },
   "svelte": "./index.js",
@@ -45,7 +45,8 @@
     "svelte-materialify": "^0.3.11",
     "svelte-multiselect": "^8.2.0",
     "uuid": "^8.3.2",
-    "svelte-dnd-list": "0.1.8"
+    "svelte-dnd-list": "0.1.8",
+    "sanitize-filename": "1.6.3"
   },
   "devDependencies": {
     "@open-wc/eslint-config": "^4.3.0",

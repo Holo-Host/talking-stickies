@@ -1,7 +1,7 @@
 ---
 manifest_version: "1"
-name: kanban
+name: kando
 ui:
   bundled: "../ui/ui.zip"
 happ_manifest:
-  bundled: "./kanban.happ"
+  bundled: "./kando.happ"
