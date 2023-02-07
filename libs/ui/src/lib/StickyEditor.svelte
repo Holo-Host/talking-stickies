@@ -12,7 +12,7 @@
   let inputElement
   onMount(() => inputElement.focus())
 
-  const colors=["#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "grey"]
+  const colors=["#D7EEFF", "#FAFFC7", "#D4F3EE","#E0D7FF","#FFCCE1", "red", "green", "grey"]
   const setColor = (color) => {
     // TODO fix later when there are more properties
     props = {color}
@@ -55,7 +55,7 @@
 <style>
   .sticky-editor {
     display: flex;
-    background-color: #D4F3EE;
+    background-color: #D7EEFF;
     flex-basis: 270px;
     height: 230px;
     width: 250px;

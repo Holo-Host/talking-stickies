@@ -32,11 +32,9 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 5px solid white;
     cursor: pointer;
   }
   .selected {
-    border: 2px solid #eee;
     background-color: #eee;
   }
 </style>

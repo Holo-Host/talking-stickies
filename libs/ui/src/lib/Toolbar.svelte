@@ -10,7 +10,7 @@
 
   export let boardType: BoardType
   let showAbout = false
-
+  $:bugColor = boardType==BoardType.Stickies ? "color: #3672b9" : "color: #5536f9"
 </script>
 
 {#if showAbout}
@@ -28,7 +28,7 @@
   <div class="right-items">
     <Folk></Folk>
     <Button icon title="Report a problem in our GitHub repo" on:click={()=>window.open("https://github.com/Holo-Host/talking-stickies/issues", '_blank')}>
-      <Icon path={mdiBug} style={"color: #3672b9"} />
+      <Icon path={mdiBug} style={bugColor} />
     </Button>
   </div>
 </div>
@@ -38,11 +38,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
-    padding-left: 19px;
+    background-color: #eeeeee;
+    padding-left: 15px;
     padding-right: 10px;
-    padding-top: 20px;
-    padding-bottom: 10px;
+    padding-top: 16px;
+    padding-bottom: 16px;
     border-bottom: 1px solid #222;
   }
   .logo {

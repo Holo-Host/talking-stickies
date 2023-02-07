@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Button, Icon} from "svelte-materialify"
-    import { mdiPlusCircle, mdiDelete, mdiDragVertical } from '@mdi/js';
-    import { Group, VoteType, BoardType } from './board';
+    import { mdiDelete, mdiDragVertical, mdiPlusCircleOutline } from '@mdi/js';
+    import { Group, VoteType, BoardType, type BoardProps } from './board';
     import { onMount } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
 
@@ -9,6 +9,7 @@
     export let handleDelete = undefined
     export let cancelEdit
     export let text = ''
+    export let props:BoardProps = {bgUrl: ""}
     export let groups: Array<Group>
     export let voteTypes: Array<VoteType>
     export let boardType: BoardType
@@ -55,7 +56,7 @@
       if (e.key === "Escape") {
         cancelEdit()
       } else if (e.key === "Enter" && e.ctrlKey) {
-        handleSave(boardType, text, groups, voteTypes)
+        handleSave(boardType, text, groups, voteTypes, props)
       } else  if (e.key === 'Tab') {
         // trap focus
         const tabbable = Array.from(document.querySelectorAll('input'))
@@ -92,13 +93,14 @@
 <svelte:window on:keydown={handleKeydown}/>
   <div class='board-editor'>
     <div class="edit-title">
-      <span class="title-text">Title:</span> <input class='textarea' maxlength="60" bind:value={text} bind:this={titleElement} />
+      <div class="title-text">Title:</div> <input class='textarea' maxlength="60" bind:value={text} bind:this={titleElement} />
     </div>
     <div class="edit-groups unselectable">
-      <span class="title-text">{groupsTitle}:</span>
-      <Button icon on:click={() => addGroup()}>
-        <Icon path={mdiPlusCircle}/>
-      </Button>
+      <div class="title-text">{groupsTitle}:
+        <Button icon on:click={() => addGroup()}>
+          <Icon size="20px" path={mdiPlusCircleOutline}/>
+        </Button>
+      </div>
       <DragDropList
         id="groups"
         type={VerticalDropZone}
@@ -118,10 +120,11 @@
       </DragDropList>
     </div>
     <div class="edit-vote-types unselectable">
-      <span class="title-text">Voting Types:</span>
-      <Button icon on:click={() => addVoteType()}>
-        <Icon path={mdiPlusCircle}/>
-      </Button>
+      <div class="title-text">Voting Types:
+        <Button icon on:click={() => addVoteType()}>
+          <Icon size="20px" path={mdiPlusCircleOutline}/>
+        </Button>
+      </div>
       <DragDropList
         id="voteTypes"
         type={VerticalDropZone}
@@ -142,6 +145,10 @@
         </div>
       </DragDropList> 
     </div>
+    <div class="edit-title">
+      <div class="title-text">Background Image:</div> <input class='textarea' maxlength="255" bind:value={props.bgUrl} />
+    </div>
+
     <div class='controls'>
       {#if handleDelete}
         <Button on:click={handleDelete} size="small">
@@ -151,7 +158,7 @@
       <Button on:click={cancelEdit} style="margin-left:10px" size="small">
         Cancel
       </Button>
-      <Button style="margin-left:10px" size="small" on:click={() => handleSave(boardType, text, groups, voteTypes)} class="primary-color">
+      <Button style="margin-left:10px" size="small" on:click={() => handleSave(boardType, text, groups, voteTypes, props)} class="primary-color">
         Save
       </Button>
     </div>
@@ -205,6 +212,9 @@
     align-items: center;
   }
   .title-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     font-weight: normal;
     font-size: 120%;
   }

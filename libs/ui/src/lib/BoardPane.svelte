@@ -226,7 +226,6 @@
   }
   let dragDuration = 300
 </script>
-
 <div class="board">
   {#if editing}
     <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.Stickies}></EditBoardDialog>
@@ -301,7 +300,7 @@
                 on:dragend={handleDragEnd}              
 
                 on:click={editSticky(id, text)} 
-                style:background-color={props && props.color ? props.color : "#d4f3ee"}
+                style:background-color={props && props.color ? props.color : "#D7EEFF"}
                 >
                 <div class="sticky-content">
                   {@html Marked.parse(text)}
@@ -337,15 +336,12 @@
     </div>
   {/if}
 </div>
-
 <style>
   .board {
     display: flex;
     flex-direction: column;
     min-height: 500px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
-    background-color: #f0f0f0;
     margin-left: 15px;
     margin-right: 15px;
     margin-top: 15px;
@@ -355,11 +351,10 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
-    border-bottom: 2px solid #bbb;
+    background-color: #ffffffaa;;
     padding-left: 10px;
     padding-right: 10px;
-    border-radius: 3px 3px 0 0;
+    border-radius: 5px 5px 0 0;
   }
   .left-items {
     display: flex;
@@ -375,11 +370,11 @@
     align-items: center;
     margin-right: 8px;
     height: 47px;
+    padding-right: 10px;
   }
   .groups {
     display: flex;
     flex-wrap: wrap;
-    padding: 5px;
   }
   .group {
     display: block;
@@ -390,6 +385,7 @@
     padding-right: 10px;
     padding-top: 10px;
     max-width: 270px;
+    color: white;
   }
   .stickies {
     display: flex;

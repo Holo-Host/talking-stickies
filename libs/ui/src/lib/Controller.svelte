@@ -18,7 +18,7 @@
     
     export let client : AppAgentClient
 
-    $: activeBoardIndex = tsStore ? tsStore.boardList.activeBoardHash : undefined
+    $: activeBoardHash = tsStore ? tsStore.boardList.activeBoardHash : undefined
     $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
 
     initialize()
@@ -30,10 +30,16 @@
     setContext('tsStore', {
       getStore: () => tsStore,
     });
-
+    const DEFAULT_KD_BG_IMG = "https://img.freepik.com/free-photo/studio-background-concept-abstract-empty-light-gradient-purple-studio-room-background-product-plain-studio-background_1258-54461.jpg"
+    const DEFAULT_TS_BG_IMG = "https://img.freepik.com/free-photo/fading-blue-background_53876-88684.jpg"
+    //const DEFAULT_TS_BG_IMG = "https://ceptr.org/images/banner.jpg"
+    const NO_BOARD_IMG = "https://holochain.org/img/big_logo.png"
     $: boardList = tsStore? tsStore.boardList.stateStore() : undefined
     $: archivedBoards = boardList ? $boardList.boards.filter((board)=>board.status === "archived") : []
     $: activeBoards = boardList ? $boardList.boards.filter((board)=>board.status !== "archived") : []
+    $: boardState = tsStore ? tsStore.boardList.getReadableBoardState($activeBoardHash) :  undefined
+    $: bgUrl = boardState ?  ($boardState.props && $boardState.props.bgUrl) ? $boardState.props.bgUrl : (boardType == BoardType.Stickies? DEFAULT_TS_BG_IMG:DEFAULT_KD_BG_IMG ) : NO_BOARD_IMG
+    $: bgImage = `background-image: url("`+ bgUrl+`");`
 
     async function initialize() : Promise<void> {
       const store = createStore()
@@ -60,7 +66,7 @@
   </svelte:head>
 
   <MaterialApp>
-    <div class='app'>
+    <div class='app' style={bgImage}>
 
     {#if tsStore}
       <Toolbar boardType={boardType}/>
@@ -83,7 +89,7 @@
           <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
         </div>
       {/if}
-      {#if boardList && $boardList.boards.length > 0 && $activeBoardIndex === undefined}
+      {#if boardList && $boardList.boards.length > 0 && $activeBoardHash === undefined}
         <div class="welcome-text">
           <p>Active Boards: {activeBoards.length}, Archived Boards: {archivedBoards.length}</p>
           {#if boardType == BoardType.Stickies}
@@ -101,13 +107,12 @@
           <p>Any boards that you have archived will appear under the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiArchiveArrowUp}></Icon> button, and you can un-archive them by selecting them from the list.</p>
         </div>
       {/if}
-    
-      {#if $activeBoardIndex !== undefined}
+      {#if $activeBoardHash !== undefined}
         {#if $activeBoardType === BoardType.Stickies}
-          <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+          <BoardPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardHash,event.detail)}}/>
         {/if}
         {#if $activeBoardType === BoardType.KanDo}
-          <KanDoPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardIndex,event.detail)}}/>
+          <KanDoPane on:requestChange={(event) => {tsStore.boardList.requestBoardChanges($activeBoardHash,event.detail)}}/>
         {/if}
       {/if}
     {:else}
@@ -119,7 +124,8 @@
   .app {
     margin: 0;
     padding-bottom: 10px;
-    background-color: lightgray;
+    background-image: var(--bg-img, url(""));
+    background-size: cover;
     height: 100vh;
   }
   :global(:root) {

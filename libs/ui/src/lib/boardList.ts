@@ -1,6 +1,6 @@
 import { RootStore, type Commit, type SynGrammar, type SynStore, type Workspace, type WorkspaceStore } from "@holochain-syn/core";
 import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from "@holochain-open-dev/core-types";
-import { Board, BoardType, CommitTypeBoard } from "./board";
+import { Board, BoardType, CommitTypeBoard, UngroupedId } from "./board";
 import type { EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
@@ -237,7 +237,7 @@ export class BoardList {
         this.setActiveBoard(undefined)
     }
 
-    async makeBoard(options: any, fromHash?: EntryHashB64) : Promise<Board> {
+    async makeBoard(options: BoardState, fromHash?: EntryHashB64) : Promise<Board> {
         const board = await Board.Create(this.boardsRootStore)
         const workspaceStore = board.workspace
         const boardHash = board.hashB64()
@@ -245,41 +245,56 @@ export class BoardList {
         if (options.type === undefined) {
             options.type = BoardType.Stickies
         }
+        if (!options.name) {
+            options.name = "untitled"
+        }
         if (options !== undefined) {
-            let changes = []
-            if (options.type) {
-                changes.push({
-                    type: "set-type",
-                    boardType: options.type
-                })
-            }
-            if (options.name) {
-                changes.push({
-                    type: "set-name",
-                    name: options.name
-                })
-            }
-            if (options.groups) {
-                changes.push({
-                    type: "set-groups",
-                    groups: options.groups
-                })
-            }
-            if (options.stickies) {
-                options.stickies.forEach((sticky)=>{
-                    changes.push({
-                        type: "add-sticky",
-                        value: sticky
-                    })
+            // let changes = []
+            // if (options.type) {
+            //     changes.push({
+            //         type: "set-type",
+            //         boardType: options.type
+            //     })
+            // }
+            // if (options.name) {
+            //     changes.push({
+            //         type: "set-name",
+            //         name: options.name
+            //     })
+            // }
+            // if (options.props) {
+            //     changes.push({
+            //         type: "set-props",
+            //         props: options.props
+            //     })
+            // }
+            // if (options.stickies) {
+            //     options.stickies.forEach((sticky)=>{
+            //         changes.push({
+            //             type: "add-sticky",
+            //             value: sticky,
+            //             group: UngroupedId
+            //         })
                         
-                })
-            }
-            if (options.voteTypes) {
-                changes.push({
-                    type: "set-vote-types",
-                    voteTypes: options.voteTypes
-                })
-            }
+            //     })
+            // }
+            // if (options.groups) {
+            //     changes.push({
+            //         type: "set-groups",
+            //         groups: options.groups
+            //     })
+            // }
+            // if (options.voteTypes) {
+            //     changes.push({
+            //         type: "set-vote-types",
+            //         voteTypes: options.voteTypes
+            //     })
+            // }
+            let changes = [{
+                type: "set-state",
+                state: options
+                }
+            ]
             if (changes.length > 0) {
                 workspaceStore.requestChanges(changes)
                 await workspaceStore.commitChanges()

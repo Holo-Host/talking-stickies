@@ -10,7 +10,7 @@
   import { Pane } from "./pane";
   import type { v1 as uuidv1 } from "uuid";
   import { type Sticky, BoardType, Group, UngroupedId } from "./board";
-  import { mdiArrowRightThick, mdiCloseBox, mdiCloseBoxOutline, mdiCog, mdiExport, mdiPlusCircle } from "@mdi/js";
+  import { mdiArrowRightThick, mdiCloseBoxOutline, mdiCog, mdiExport, mdiPlusCircleOutline } from "@mdi/js";
   import { Icon, Button } from "svelte-materialify";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import type { Dictionary } from "@holochain-open-dev/core-types";
@@ -201,7 +201,6 @@
     dragWithSelf = false
   }
 </script>
-
 <div class="board">
   {#if editing}
     <EditBoardDialog bind:active={editing} boardHash={cloneDeep($activeHash)} boardType={BoardType.KanDo}></EditBoardDialog>
@@ -226,10 +225,12 @@
     </div>
   </div>
   {#if $state}
+
     <div class="columns">
-      {#each $state.groups.filter(g=>g.id != UngroupedId).map((group)=> [group.id, $state.grouping[group.id]]) as [columnId, cardIds]}
+      {#each $state.groups.filter(g=>g.id != UngroupedId).map((group)=> [group.id, $state.grouping[group.id]]) as [columnId, cardIds], i}
         <div class="column"
           class:glowing={dragTarget == columnId}
+          class:last-column={i==$state.groups.length-2}
           id={columnId}
           on:dragenter={handleDragEnter} 
           on:dragleave={handleDragLeave}  
@@ -318,7 +319,7 @@
           <div class="column-item column-footer">
             <div>Add Card</div>
             <Button icon on:click={newCard(columnId)}>
-              <Icon path={mdiPlusCircle}/>
+              <Icon size="20px" path={mdiPlusCircleOutline}/>
             </Button>
           </div>
           {/if}
@@ -327,13 +328,11 @@
     </div>
   {/if}
 </div>
-
 <style>
   .board {
     display: flex;
     flex-direction: column;
-    background-color: white;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
+    background: transparent;
     border-radius: 3px;
     margin-left: 15px;
     margin-right: 15px;
@@ -344,11 +343,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
-    border-bottom: 2px solid #bbb;
+    background-color: #cccccc99;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 3px 3px 0 0;
+    color: white
   }
   .left-items {
     display: flex;
@@ -364,33 +363,41 @@
     align-items: center;
     margin-right: 8px;
     height: 47px;
+    padding-right: 10px;
   }
   .columns {
     display: flex;
     flex: 0 1 auto;
     max-height: 100%;
+    background: transparent;
   }
   .column-item {
-    padding: 10px 5px 0px 5px;
+    padding: 10px 10px 0px 10px;
     display: flex;
     align-items: center;
     flex: 0 1 auto;
   }
   .column-title {
-    border-bottom: 1px solid #cccccc;
     font-weight: bold;
   }
   .column-footer {
-    border-top: 1px solid #cccccc;
+    border-top: 1px solid #999;
+    padding: 0 0 0 10px;
+    font-size: 90%;
   }
   .column {
     display: flex;
     flex-direction: column;
-    background-color: #eeeeee;
+    background-color: #eeeeeecc;
     width: 300px;
-    margin: 5px;
+    margin-top: 10px;
+    margin-right: 5px;
     border-radius: 5px;
     min-width: 130px;
+    height: fit-content;
+  }
+  .last-column {
+    margin-right: 0px;
   }
   .cards {
     display: flex;
@@ -415,6 +422,7 @@
     line-height: 16px;
     color: #000000;
     overflow: hidden;
+    border-radius: 3px;
   }
   .card-content {
     overflow-y: auto;

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Dialog } from 'svelte-materialify';
     import { cloneDeep } from "lodash";
-    import { type Board, type Group, type VoteType, type BoardState, type BoardType, UngroupedId } from './board';
+    import { type Board, type Group, type VoteType, type BoardState, type BoardType, UngroupedId, type BoardProps } from './board';
     import BoardEditor from './BoardEditor.svelte';
     import type { TalkingStickiesStore } from './talkingStickiesStore';
     import { getContext, onMount } from 'svelte';
@@ -13,6 +13,7 @@
     let editName = ''
     let editGroups: Array<Group> = []
     let editVoteTypes = []
+    let editProps:BoardProps = {bgUrl:""}
 
     onMount(async () => {
 
@@ -22,6 +23,7 @@
             editName = state.name
             editGroups = cloneDeep(state.groups)
             editVoteTypes = cloneDeep(state.voteTypes)
+            editProps = state.props ? cloneDeep(state.props) : {bgUrl:""}
             // remove the ungrouped ID TODO find a better way.
             const index = editGroups.findIndex((g)=>g.id == UngroupedId)
             if (index != -1) {
@@ -37,7 +39,7 @@
 
     const store:TalkingStickiesStore = getStore();
 
-    const updateBoard = (hash: EntryHashB64) => async (_type:BoardType, name: string, groups: Group[], voteTypes: VoteType[]) => {
+    const updateBoard = (hash: EntryHashB64) => async (_type:BoardType, name: string, groups: Group[], voteTypes: VoteType[], props: BoardProps) => {
         // ignore board type we don't update that.
         const board: Board | undefined = await store.boardList.getBoard(hash)
         if (board) {
@@ -62,6 +64,11 @@
             groups: groups
             })
         }
+        if (!isEqual(props, state.props)) {
+            changes.push({type: 'set-props',
+            props: props
+            })
+        }
         if (!isEqual(voteTypes, state.voteTypes)) {
             changes.push({type: 'set-vote-types',
             voteTypes: voteTypes
@@ -84,5 +91,5 @@
 
 </script>
 <Dialog persistent bind:active>
-    <BoardEditor handleSave={updateBoard(boardHash)} handleDelete={archiveBoard(boardHash)} cancelEdit={close} boardType={boardType} text={editName} groups={editGroups} voteTypes={editVoteTypes} />
+    <BoardEditor handleSave={updateBoard(boardHash)} handleDelete={archiveBoard(boardHash)} cancelEdit={close} boardType={boardType} text={editName} groups={editGroups} voteTypes={editVoteTypes} props={editProps}/>
 </Dialog>

@@ -31,9 +31,9 @@
         let reader = new FileReader();
 
         reader.addEventListener("load", async () => {
-        const b = JSON.parse(reader.result as string)
-        const board = await store.boardList.makeBoard(b)
-        selectBoard(board.hashB64())
+            const b = JSON.parse(reader.result as string)
+            const board = await store.boardList.makeBoard(b)
+            selectBoard(board.hashB64())
         }, false);
         reader.readAsText(file);
     };
@@ -45,7 +45,7 @@
 <div class="board-menu">
 <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
 <Button icon on:click={()=>creating = true} style="margin-left:10px" title="New Board"><Icon path={mdiShapeSquarePlus} /></Button>
-<Button icon on:click={()=>{fileinput.click();}} style="margin-left:10px" title="Import Board"><Icon path={mdiImport} /></Button>
+<Button icon on:click={()=>{fileinput.click();}} title="Import Board"><Icon path={mdiImport} /></Button>
 {#if activeBoards}
 <Menu>
     <div slot="activator">

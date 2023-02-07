@@ -34,29 +34,38 @@ export type Sticky = {
     text: string;
     votes: Object;
     props: Object;
-  };
+};
   
-  export const UngroupedId = "_"
-  export class Group {
+export const UngroupedId = "_"
+export class Group {
       id: uuidv1
       constructor(public name: string) {
           this.id =  uuidv1()
       }
-  }
-  export interface BoardState {
-    type: BoardType;
-    status: string;
-    name: string;
-    groups: Group[];
-    grouping: Dictionary<Array<uuidv1>>;
-    stickies: Sticky[];
-    voteTypes: VoteType[];
-  }
+}
+export type BoardProps = {
+  bgUrl: string
+}
+
+export interface BoardState {
+  type: BoardType;
+  status: string;
+  name: string;
+  groups: Group[];
+  grouping: Dictionary<Array<uuidv1>>;
+  stickies: Sticky[];
+  voteTypes: VoteType[];
+  props: BoardProps;
+}
   
   export type BoardDelta =
     | {
         type: "set-type";
         boardType: BoardType;
+      }
+    | {
+        type: "set-state";
+        state: BoardState;
       }
     | {
         type: "set-status";
@@ -76,6 +85,10 @@ export type Sticky = {
         groups: Group[];
       }
     | {
+        type: "set-props";
+        props: BoardProps;
+      }
+    | {
         type: "set-vote-types";
         voteTypes: VoteType[];
       }
@@ -90,7 +103,7 @@ export type Sticky = {
         group: uuidv1;
         index: undefined | number
       }
-      | {
+    | {
         type: "update-sticky-props";
         id: uuidv1;
         props: Object;
@@ -154,6 +167,34 @@ export type Sticky = {
       state.grouping[UngroupedId] = ungrouped
     }
   }
+  const _setGroups = (newGroups, state) => {
+    state.groups = newGroups
+    if (state.groups === undefined) state.groups = []
+    const idx = newGroups.findIndex((group) => group.id === UngroupedId)
+    if (idx == -1) {
+      state.groups.unshift({id:UngroupedId, name:""})
+    }
+    const idList = {}
+    newGroups.forEach(group => {
+      idList[group.id] = true
+      // add an entry to the groupings for any new groups
+      if (state.grouping[group.id] === undefined) {
+        state.grouping[group.id] = []
+      }
+    })
+
+    // remove any non-existent grouping lists
+    Object.entries(state.grouping).forEach(([groupId, itemIds]) => {
+      if (groupId != UngroupedId) {
+        if (!idList[groupId]) {
+          delete state.grouping[groupId]
+          // move items from deleted groups to the ungrouped group
+          state.grouping[UngroupedId] = state.grouping[UngroupedId].concat(itemIds)
+        }
+      }
+    })
+  }
+
   export const boardGrammar: BoardGrammar = {
     initState(state)  {
       state.status = ""
@@ -161,6 +202,7 @@ export type Sticky = {
       state.groups = [{id:UngroupedId, name:""}]
       state.stickies = []
       state.voteTypes = []
+      state.props = {bgUrl:""}
       _initGrouping(state)
     },
     applyDelta( 
@@ -169,104 +211,99 @@ export type Sticky = {
       _ephemeralState: any,
       _author: AgentPubKey
     ) {
-
-      if (delta.type == "set-type") {
-        state.type = delta.boardType
-      }      
-      if (delta.type == "set-status") {
-        state.status = delta.status
-      }
-      if (delta.type == "set-name") {
-        state.name = delta.name
-      }
-      if (delta.type == "set-groups") {
-        _initGrouping(state)    
-        state.groups = delta.groups
-        const idx = delta.groups.findIndex((group) => group.id === UngroupedId)
-        if (idx == -1) {
-          state.groups.unshift({id:UngroupedId, name:""})
-        }
-        const idList = {}
-        delta.groups.forEach(group => {
-          idList[group.id] = true
-          // add an entry to the groupings for any new groups
-          if (state.grouping[group.id] === undefined) {
-            state.grouping[group.id] = []
+      switch (delta.type) {
+        case "set-type":
+          state.type = delta.boardType
+          break;
+        case "set-status":
+          state.status = delta.status
+          break;
+        case "set-state":
+          if (delta.state.type !== undefined) state.type = delta.state.type
+          if (delta.state.status !== undefined) state.status = delta.state.status
+          if (delta.state.name !== undefined) state.name = delta.state.name
+          if (delta.state.groups !== undefined) state.groups = delta.state.groups
+          _setGroups(delta.state.groups, state)
+          if (delta.state.stickies !== undefined) state.stickies = delta.state.stickies
+          if (delta.state.voteTypes !== undefined) state.voteTypes = delta.state.voteTypes
+          if (delta.state.props !== undefined) state.props = delta.state.props
+          if (delta.state.grouping !== undefined) {
+            state.grouping = delta.state.grouping
+          } else if (state.grouping === undefined) {
+            _initGrouping(state)
           }
-        })
-
-        // remove any non-existent grouping lists
-        Object.entries(state.grouping).forEach(([groupId, itemIds]) => {
-          if (groupId != UngroupedId) {
-            if (!idList[groupId]) {
-              delete state.grouping[groupId]
-              // move items from deleted groups to the ungrouped group
-              state.grouping[UngroupedId] = state.grouping[UngroupedId].concat(itemIds)
+          break;
+        case "set-name":
+          state.name = delta.name
+          break;
+        case "set-props":
+          state.props = delta.props
+          break;
+        case "set-groups":
+          _initGrouping(state)
+          _setGroups(delta.groups, state)
+          break;
+        case "set-group-order":
+          _initGrouping(state)
+          state.grouping[delta.id] = delta.order
+          break;
+        case "set-vote-types":
+          state.voteTypes = delta.voteTypes
+          break;
+        case "add-sticky":
+          _initGrouping(state)    
+          state.stickies.push(delta.value)
+          if (state.grouping[delta.group] !== undefined) {
+            state.grouping[delta.group].push(delta.value.id)
+          }
+          else {
+            state.grouping[delta.group] = [delta.value.id]
+          }
+          break;
+        case "update-sticky-text":
+          state.stickies.forEach((sticky, i) => {
+            if (sticky.id === delta.id) {
+              state.stickies[i].text = delta.text;
             }
-          }
-        })
-
-      }
-      if (delta.type == "set-group-order") {
-        _initGrouping(state)
-        state.grouping[delta.id] = delta.order
-      }
-      if (delta.type == "set-vote-types") {
-        state.voteTypes = delta.voteTypes
-      }
-      else if (delta.type == "add-sticky") {
-        _initGrouping(state)    
-        state.stickies.push(delta.value)
-        if (state.grouping[delta.group] !== undefined) {
-          state.grouping[delta.group].push(delta.value.id)
-        }
-        else {
-          state.grouping[delta.group] = [delta.value.id]
-        }
-      }
-      else if (delta.type == "update-sticky-text") {
-        state.stickies.forEach((sticky, i) => {
-          if (sticky.id === delta.id) {
-            state.stickies[i].text = delta.text;
-          }
-        });
-      }
-      else if (delta.type == "update-sticky-group") {
-        _removeStickyFromGroups(state, delta.id)
-        _addStickyToGroup(state, delta.group, delta.id, delta.index)
-      }
-      else if (delta.type == "update-sticky-props") {
-        state.stickies.forEach((sticky, i) => {
-          if (sticky.id === delta.id) {
-            state.stickies[i].props = delta.props;
-          }
-        });
-      }
-      else if (delta.type == "update-sticky-votes") {
-        state.stickies.forEach((sticky, i) => {
-          if (sticky.id === delta.id) {
-            if (!state.stickies[i].votes[delta.voteType]) {
-              state.stickies[i].votes[delta.voteType] = {}
+          });
+          break;
+        case "update-sticky-group":
+          _removeStickyFromGroups(state, delta.id)
+          _addStickyToGroup(state, delta.group, delta.id, delta.index)
+          break;
+        case "update-sticky-props":
+          state.stickies.forEach((sticky, i) => {
+            if (sticky.id === delta.id) {
+              state.stickies[i].props = delta.props;
             }
-            state.stickies[i].votes[delta.voteType][delta.voter] = delta.count;
+          });
+          break;
+        case "update-sticky-votes":
+          state.stickies.forEach((sticky, i) => {
+            if (sticky.id === delta.id) {
+              if (!state.stickies[i].votes[delta.voteType]) {
+                state.stickies[i].votes[delta.voteType] = {}
+              }
+              state.stickies[i].votes[delta.voteType][delta.voter] = delta.count;
+            }
+          });
+          break;
+        case "merge-stickies":
+          const srcIdx = state.stickies.findIndex((sticky) => sticky.id === delta.srcId)
+          const dstIdx = state.stickies.findIndex((sticky) => sticky.id === delta.dstId)
+          if (srcIdx >= 0 && dstIdx >= 0) {
+            _removeStickyFromGroups(state, delta.srcId)
+            const src = state.stickies[srcIdx]
+            const dst = state.stickies[dstIdx]
+            dst.text = `${dst.text}\n\n-----------\n\n${src.text}`
+            state.stickies.splice(srcIdx,1)
           }
-        });
-      }
-      else if (delta.type == "merge-stickies") {
-        const srcIdx = state.stickies.findIndex((sticky) => sticky.id === delta.srcId)
-        const dstIdx = state.stickies.findIndex((sticky) => sticky.id === delta.dstId)
-        if (srcIdx >= 0 && dstIdx >= 0) {
-          _removeStickyFromGroups(state, delta.srcId)
-          const src = state.stickies[srcIdx]
-          const dst = state.stickies[dstIdx]
-          dst.text = `${dst.text}\n\n-----------\n\n${src.text}`
-          state.stickies.splice(srcIdx,1)
-        }
-      }
-      else if (delta.type == "delete-sticky") {
-        const index = state.stickies.findIndex((sticky) => sticky.id === delta.id)
-        state.stickies.splice(index,1)
-        _removeStickyFromGroups(state, delta.id)
+          break;
+        case "delete-sticky":
+          const index = state.stickies.findIndex((sticky) => sticky.id === delta.id)
+          state.stickies.splice(index,1)
+          _removeStickyFromGroups(state, delta.id)
+          break;
       }
     },
   };

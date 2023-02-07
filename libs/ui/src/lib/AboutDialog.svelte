@@ -26,7 +26,7 @@
 
         </p>
     {:else}
-        <h5>KanDo!: UI v0.3.0 for DNA v0.2.x</h5>
+        <h5>KanDo!: UI v0.3.2 for DNA v0.2.x</h5>
         <p>KanDo! is a demonstration Holochain app built by Holo.</p>
     {/if}
     <p> <b>Developers:</b>
