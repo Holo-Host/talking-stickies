@@ -345,6 +345,7 @@
     margin-left: 15px;
     margin-right: 15px;
     margin-top: 15px;
+    box-shadow: 0 0 2px gray;
   }
   .top-bar {
     display: flex;
@@ -375,6 +376,7 @@
   .groups {
     display: flex;
     flex-wrap: wrap;
+    overflow-y: auto;
   }
   .group {
     display: block;
