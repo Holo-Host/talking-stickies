@@ -7,7 +7,7 @@
     import type { AppAgentClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import { BoardType } from './board';
-    import { MaterialApp, Icon } from 'svelte-materialify';
+    import { MaterialAppMin, Icon } from 'svelte-materialify';
     import { mdiShapeSquarePlus, mdiCog, mdiArchiveArrowUp } from '@mdi/js';
 
     export let boardType:BoardType
@@ -30,7 +30,8 @@
     setContext('tsStore', {
       getStore: () => tsStore,
     });
-    const DEFAULT_KD_BG_IMG = "https://img.freepik.com/free-photo/studio-background-concept-abstract-empty-light-gradient-purple-studio-room-background-product-plain-studio-background_1258-54461.jpg"
+    const DEFAULT_KD_BG_IMG = "https://images.unsplash.com/photo-1557682250-33bd709cbe85"
+    //const DEFAULT_KD_BG_IMG = "https://img.freepik.com/free-photo/studio-background-concept-abstract-empty-light-gradient-purple-studio-room-background-product-plain-studio-background_1258-54461.jpg"
     const DEFAULT_TS_BG_IMG = "https://img.freepik.com/free-photo/fading-blue-background_53876-88684.jpg"
     //const DEFAULT_TS_BG_IMG = "https://ceptr.org/images/banner.jpg"
     const NO_BOARD_IMG = "https://holochain.org/img/big_logo.png"
@@ -65,7 +66,7 @@
     <script src='https://kit.fontawesome.com/80d72fa568.js' crossorigin='anonymous'></script>
   </svelte:head>
 
-  <MaterialApp>
+  <MaterialAppMin >
     <div class='app' style={bgImage}>
 
     {#if tsStore}
@@ -119,14 +120,17 @@
       <div class="loading"><div class="loader"></div></div>
     {/if}
   </div>
-</MaterialApp>
+</MaterialAppMin>
 <style>
   .app {
     margin: 0;
     padding-bottom: 10px;
     background-image: var(--bg-img, url(""));
     background-size: cover;
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
   }
   :global(:root) {
     --resizeable-height: 200px;

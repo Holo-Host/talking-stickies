@@ -228,6 +228,7 @@
 
     <div class="columns">
       {#each $state.groups.filter(g=>g.id != UngroupedId).map((group)=> [group.id, $state.grouping[group.id]]) as [columnId, cardIds], i}
+        <div class="column-wrap">
         <div class="column"
           class:glowing={dragTarget == columnId}
           class:last-column={i==$state.groups.length-2}
@@ -267,6 +268,7 @@
                 <div 
                   class="card"
                   class:tilted={draggedItemId == cardId}
+                  class:last-card={i==cardIds.length-1}
                   id={cardId}
                   draggable={dragOn}
                   on:dragstart={handleDragStart}
@@ -324,6 +326,7 @@
           </div>
           {/if}
         </div>
+        </div>
       {/each}
     </div>
   {/if}
@@ -337,6 +340,7 @@
     margin-left: 15px;
     margin-right: 15px;
     margin-top: 15px;
+    min-height: 0;
   }
   .top-bar {
     display: flex;
@@ -370,6 +374,7 @@
     flex: 0 1 auto;
     max-height: 100%;
     background: transparent;
+    min-height: 0;
   }
   .column-item {
     padding: 10px 10px 0px 10px;
@@ -385,6 +390,10 @@
     padding: 0 0 0 10px;
     font-size: 90%;
   }
+  .column-wrap {
+    display: flex;
+    flex-direction: column;
+  }
   .column {
     display: flex;
     flex-direction: column;
@@ -394,15 +403,19 @@
     margin-right: 5px;
     border-radius: 5px;
     min-width: 130px;
-    height: fit-content;
+    min-height: 0;
   }
   .last-column {
-    margin-right: 0px;
+    margin-right: 0px !important;
+  }
+  .last-card {
+    margin-bottom: 10px !important;
   }
   .cards {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    min-height: 0;
   }
   .glowing {
     outline: none;
@@ -415,13 +428,12 @@
   }
   .card {
     background-color: white;
-    margin: 10px;
+    margin: 0px 10px 10px 10px;
     padding: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     font-size: 12px;
     line-height: 16px;
     color: #000000;
-    overflow: hidden;
     border-radius: 3px;
   }
   .card-content {

@@ -32,6 +32,9 @@
 <style>
 :global(body) {
   font-family: Roboto,'Open Sans','Helvetica Neue',sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 	}
 </style>
 
