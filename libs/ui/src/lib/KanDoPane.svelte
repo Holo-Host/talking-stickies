@@ -268,7 +268,7 @@
                 <div 
                   class="card"
                   class:tilted={draggedItemId == cardId}
-                  class:last-card={i==cardIds.length-1}
+                  class:first-card={i==0}
                   id={cardId}
                   draggable={dragOn}
                   on:dragstart={handleDragStart}
@@ -381,6 +381,7 @@
     display: flex;
     align-items: center;
     flex: 0 1 auto;
+    border-bottom: 1px solid #999;
   }
   .column-title {
     font-weight: bold;
@@ -408,9 +409,6 @@
   .last-column {
     margin-right: 0px !important;
   }
-  .last-card {
-    margin-bottom: 10px !important;
-  }
   .cards {
     display: flex;
     flex-direction: column;
@@ -425,6 +423,9 @@
   .tilted {
     transform: rotate(3deg);
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5) !important;
+  }
+  .first-card {
+    margin-top: 10px !important;
   }
   .card {
     background-color: white;

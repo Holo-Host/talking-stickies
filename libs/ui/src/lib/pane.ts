@@ -54,9 +54,6 @@ export class Pane {
           if (sticky.text != text) {
             changes.push({ type: "update-sticky-text", id: sticky.id, text: text })
           }
-          if (sticky.group != groupId) {
-            changes.push({ type: "update-sticky-group", id: sticky.id, group: groupId  })
-          }
           console.log("sticky.props", sticky.props, "props", props)
           if (!isEqual(sticky.props, props)) {
             changes.push({ type: "update-sticky-props", id: sticky.id, props: cloneDeep(props)})

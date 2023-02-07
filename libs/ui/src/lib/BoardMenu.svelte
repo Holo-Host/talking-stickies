@@ -32,6 +32,10 @@
 
         reader.addEventListener("load", async () => {
             const b = JSON.parse(reader.result as string)
+            if (b.type != boardType) {
+                alert(`This file does not appear to be a ${boardType} board`)
+                return
+            }
             const board = await store.boardList.makeBoard(b)
             selectBoard(board.hashB64())
         }, false);
