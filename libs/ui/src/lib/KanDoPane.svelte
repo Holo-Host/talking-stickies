@@ -341,6 +341,7 @@
     margin-right: 15px;
     margin-top: 15px;
     min-height: 0;
+    overflow-x: auto;
   }
   .top-bar {
     display: flex;
