@@ -43,7 +43,6 @@
     padding-right: 10px;
     padding-top: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #222;
   }
   .logo {
     height: 40px;

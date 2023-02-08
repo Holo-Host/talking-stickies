@@ -319,9 +319,9 @@
           </div>
           {:else}
           <div class="column-item column-footer">
-            <div>Add Card</div>
-            <Button icon on:click={newCard(columnId)}>
-              <Icon size="20px" path={mdiPlusCircleOutline}/>
+            <Button style="padding: 0 5px;" size="small" text on:click={newCard(columnId)}>
+              Add Card
+              <Icon style="margin-left:5px" size="20px" path={mdiPlusCircleOutline}/>
             </Button>
           </div>
           {/if}
@@ -351,7 +351,7 @@
     background-color: #cccccc99;
     padding-left: 10px;
     padding-right: 10px;
-    border-radius: 3px 3px 0 0;
+    border-radius: 3px;
     color: white
   }
   .left-items {
@@ -382,15 +382,14 @@
     display: flex;
     align-items: center;
     flex: 0 1 auto;
-    border-bottom: 1px solid #999;
   }
   .column-title {
     font-weight: bold;
   }
   .column-footer {
     border-top: 1px solid #999;
-    padding: 0 0 0 10px;
-    font-size: 90%;
+    padding: 0 5px;
+    height: 38px;
   }
   .column-wrap {
     display: flex;
@@ -403,7 +402,7 @@
     width: 300px;
     margin-top: 10px;
     margin-right: 5px;
-    border-radius: 5px;
+    border-radius: 3px;
     min-width: 130px;
     min-height: 0;
   }
@@ -414,7 +413,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    min-height: 0;
+    min-height: 38px;
   }
   .glowing {
     outline: none;
@@ -483,6 +482,7 @@
     background-color: rgb(13, 145, 147);
     color: white;
     padding: 0 3px;
+    padding-bottom: 2px;
     margin-right: 4px;
   }
 </style>
