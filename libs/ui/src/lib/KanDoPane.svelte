@@ -10,7 +10,7 @@
   import { Pane } from "./pane";
   import type { v1 as uuidv1 } from "uuid";
   import { type Sticky, BoardType, Group, UngroupedId } from "./board";
-  import { mdiArrowRightThick, mdiCloseBoxOutline, mdiCog, mdiExport, mdiPlusCircleOutline } from "@mdi/js";
+  import { mdiArchive, mdiArchiveCheck, mdiArrowRightThick, mdiCloseBoxOutline, mdiCog, mdiExport, mdiPlusCircleOutline } from "@mdi/js";
   import { Icon, Button } from "svelte-materialify";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import type { Dictionary } from "@holochain-open-dev/core-types";
@@ -54,6 +54,8 @@
   let columns:Dictionary<Group> = {}
   let cardsMap:Dictionary<Sticky> ={}
 
+  let showArchived = false
+
   const sorted = (itemIds, sortFn)=> {
     var items = itemIds.map((id)=>cardsMap[id])
     if (sortOption) {
@@ -96,9 +98,9 @@
     editText = text;
   };
 
-  const countLabels = (props, type) => {
+  const countLabels = (props, type) : number | undefined => {
     if (typeof props["labels"] === 'undefined') {
-      return []
+      return undefined
     }
     return props["labels"].includes(type) ? 1 : 0
   };
@@ -194,6 +196,18 @@
     return (props["labels"]!== undefined) && props["labels"].includes(type)
   }
 
+  $: sortedColumns = () => {
+    if (showArchived) {
+      // make sure the ungrouped group is at the end.
+      let cols = $state.groups.map((group)=> [group.id, $state.grouping[group.id]])
+      const idx = cols.findIndex(([id,_]) => id == UngroupedId)
+      const g = cols.splice(idx,1)
+      return cols.concat(g)
+    } else {
+     return $state.groups.filter(g=> g.id != UngroupedId).map((group)=> [group.id, $state.grouping[group.id]])
+    }
+  }
+
 </script>
 <div class="board">
   {#if editing}
@@ -207,6 +221,11 @@
       <div class="sortby">
         Sort: <SortSelector {setSortOption} {sortOption} />
       </div>
+      <div class="archived">
+        <Button size=small icon on:click={()=>showArchived=!showArchived} title={showArchived ? "Hide Archived Cards" : "Show Archived Cards"}>
+          <Icon path={showArchived ? mdiArchiveCheck : mdiArchive} />
+        </Button>
+      </div>
       <Button size=small icon on:click={()=>editing=true} title="Settings">
         <Icon path={mdiCog} />
       </Button>
@@ -219,13 +238,12 @@
     </div>
   </div>
   {#if $state}
-
     <div class="columns">
-      {#each $state.groups.filter(g=>g.id != UngroupedId).map((group)=> [group.id, $state.grouping[group.id]]) as [columnId, cardIds], i}
+      {#each sortedColumns() as [columnId, cardIds], i}
         <div class="column-wrap">
         <div class="column"
           class:glowing={dragTarget == columnId}
-          class:last-column={i==$state.groups.length-2}
+          class:first-column={i==0}
           id={columnId}
           on:dragenter={handleDragEnter} 
           on:dragleave={handleDragLeave}  
@@ -233,7 +251,7 @@
           on:dragover={handleDragOver}
           >
           <div class="column-item column-title">
-            <div>{columns[columnId].name}</div>
+            <div>{columnId === UngroupedId ? "Archived" : columns[columnId].name}</div>
           </div>
           <div class="cards">
           {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }, i}
@@ -243,7 +261,17 @@
                     pane.updateSticky(items, cardId, clearEdit)
                   }
                   handleDelete={
-                    pane.deleteSticky(cardId, clearEdit)
+                    columnId === UngroupedId ?
+                      pane.deleteSticky(cardId, clearEdit) :
+                      undefined
+                  }
+                  handleArchive={
+                    columnId !== UngroupedId ?
+                    () => {
+                      pane.dispatch("requestChange",[{ type: "update-sticky-group", id:cardId, group:UngroupedId  }])
+                      clearEdit()
+                    } :
+                    undefined
                   }
                   {cancelEdit}
                   text={editText}
@@ -353,6 +381,8 @@
     height: 47px;
     padding-right: 10px;
   }
+  .archived {
+  }
   .columns {
     display: flex;
     flex: 0 1 auto;
@@ -384,13 +414,13 @@
     background-color: #eeeeeecc;
     width: 300px;
     margin-top: 10px;
-    margin-right: 5px;
+    margin-left: 5px;
     border-radius: 3px;
     min-width: 130px;
     min-height: 0;
   }
-  .last-column {
-    margin-right: 0px !important;
+  .first-column {
+    margin-left: 0px !important;
   }
   .cards {
     display: flex;

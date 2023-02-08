@@ -7,10 +7,10 @@
   import { Button, Dialog } from "svelte-materialify"
   import { onMount } from "svelte";
   import type { VoteType } from "./board";
-  import EmojiIcon from "./icons/EmojiIcon.svelte";
 
   export let handleSave
   export let handleDelete = undefined
+  export let handleArchive = undefined
   export let cancelEdit
   export let text = ''
   export let groupId = undefined
@@ -94,8 +94,13 @@
   </div>
   <div class='controls'>
     {#if handleDelete}
-      <Button text size="small" class="red white-text" on:click={handleDelete}>
+      <Button size="small" class="red white-text" on:click={handleDelete}>
         Delete
+      </Button>
+    {/if}
+    {#if handleArchive}
+      <Button size="small" on:click={handleArchive}>
+        Archive
       </Button>
     {/if}
     <Button style="margin-left:5px" size="small"on:click={cancelEdit}>

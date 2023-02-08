@@ -17,7 +17,7 @@
 <Dialog bind:active width={600} >
     <div class="about">
     {#if boardType == BoardType.Stickies}
-        <h5>TalkingStickies: UI v0.3.3 for DNA v0.2.x</h5>
+        <h5>TalkingStickies: UI v0.3.4 for DNA v0.2.x</h5>
         <p>TalkingStickies is a demonstration Holochain app built by Holo.</p>
         <p>
             We use TalkingStickies internally for meetings, agendas, brain-storming sessions and retros.
