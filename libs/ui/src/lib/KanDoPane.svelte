@@ -200,6 +200,11 @@
     dragOrder = undefined
     dragWithSelf = false
   }
+
+  const isLabeled = (props, type: string) :boolean => {
+    return (props["labels"]!== undefined) && props["labels"].includes(type)
+  }
+
 </script>
 <div class="board">
   {#if editing}
@@ -257,6 +262,7 @@
                   props={props}
                   avatars={avatars}
                   active={editingCardId}
+                  labelTypes={$state.voteTypes}
                 />
               {/if}
                 {#if 
@@ -283,27 +289,17 @@
                     {@html Marked.parse(text)}
                   </div>
                   {#if props && props.agents && props.agents.length > 0}
-                    Tagged: 
                     {#each props.agents as agent}
                       <span class="avatar-name" title={agent}>{$avatars[agent] ? $avatars[agent].name : `${agent.substring(0,8)}...`}</span>
                     {/each}
                   {/if}
                   <div class="votes">
                     {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
-                      <div
-                        class="vote"
-                        title={toolTip}
-                        class:voted={myVotes(votes, type) > 0}
-                        on:click|stopPropagation={() => pane.voteOnSticky(tsStore.myAgentPubKey(), items, cardId, type, maxVotes)}
-                      >
-                        <EmojiIcon emoji={emoji} class="vote-icon" />
-                        {countVotes(votes, type)}
-                        <div class="vote-counts">
-                          {#each new Array(myVotes(votes, type)).map((_, i) => i) as index}
-                            <div class="vote-count" />
-                          {/each}
+                      {#if isLabeled(props, type)}
+                        <div title={toolTip}>
+                        <EmojiIcon emoji={emoji} class="vote-icon"/>
                         </div>
-                      </div>
+                      {/if}
                     {/each}
                   </div>
                 </div>
@@ -314,7 +310,7 @@
 
           </div>
           {#if creatingInColumn !==undefined  && creatingInColumn == columnId}
-            <CardEditor handleSave={createCard} {cancelEdit} avatars={avatars} active={creatingInColumn}/>
+            <CardEditor handleSave={createCard} {cancelEdit} avatars={avatars} active={creatingInColumn} labelTypes={$state.voteTypes}/>
           {/if}
           <div class="column-item column-footer">
             <Button style="padding: 0 5px;" size="small" text on:click={newCard(columnId)}>
@@ -339,6 +335,7 @@
     margin-top: 15px;
     min-height: 0;
     overflow-x: auto;
+    padding-bottom: 10px;
   }
   .top-bar {
     display: flex;
@@ -433,6 +430,7 @@
     line-height: 16px;
     color: #000000;
     border-radius: 3px;
+    min-height: 42px;
   }
   .card-content {
     overflow-y: auto;

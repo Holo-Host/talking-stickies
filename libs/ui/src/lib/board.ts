@@ -11,10 +11,10 @@ export const DEFAULT_STICKIE_VOTE_TYPES = [
 ]
 
 export const DEFAULT_KANBAN_VOTE_TYPES = [
-  {type: "1", emoji: "⭐", toolTip: "Important", maxVotes: 1},
-  {type: "2", emoji: "🚩", toolTip: "Flagged", maxVotes: 1},
-  {type: "3", emoji: "❓", toolTip: "Unclear", maxVotes: 1},
-  {type: "4", emoji: "❗", toolTip: "Risky", maxVotes: 1}
+  {type: "1", emoji: "🐞", toolTip: "Bug", maxVotes: 1},
+  {type: "2", emoji: "➕", toolTip: "Feature", maxVotes: 1},
+  {type: "3", emoji: "🚩", toolTip: "Flagged", maxVotes: 1},
+  {type: "5", emoji: "❗", toolTip: "Risky", maxVotes: 1}
 ]
 
 export const enum BoardType {

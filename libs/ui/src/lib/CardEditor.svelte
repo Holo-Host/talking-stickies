@@ -6,6 +6,8 @@
   import type { Readable } from 'svelte/store';
   import { Button, Dialog } from "svelte-materialify"
   import { onMount } from "svelte";
+  import type { VoteType } from "./board";
+  import EmojiIcon from "./icons/EmojiIcon.svelte";
 
   export let handleSave
   export let handleDelete = undefined
@@ -14,10 +16,23 @@
   export let groupId = undefined
   export let props = {color: "white", agents:[]}
   export let avatars: Readable<Dictionary<Avatar>> 
+  export let labelTypes: Array<VoteType>
   export let active = false
 
   let inputElement
-  onMount(() => inputElement.focus())
+  onMount(() => {
+      inputElement.focus()
+      if (props.agents !== undefined) {
+        selectedAvatars = props.agents.map(a=> {return {label: $avatars[a].name ? $avatars[a].name : "unamed", value: a}})
+      }
+      if (props["labels"] !== undefined) {
+        selectedLabels = props["labels"].filter(l=>labelTypes.findIndex(lt=>lt.type==l) >= 0).map(l=> {
+          const idx = labelTypes.findIndex(lt => lt.type==l)
+          const {emoji, toolTip} = labelTypes[idx]
+          return {label: `${emoji} ${toolTip}`, value: l}
+        })
+      }
+  }) 
 
   const colors=["white","#D4F3EE","#E0D7FF","#FFCCE1","#D7EEFF", "#FAFFC7", "red", "green", "yellow", "LightSkyBlue", "grey"]
   const setColor = (color) => {
@@ -25,7 +40,7 @@
     props = props
   }
   const setAgents = () => {
-    props.agents = selected.map(o => o.value)
+    props.agents = selectedAvatars.map(o => o.value)
     props = props
   }
 
@@ -34,7 +49,20 @@
     {return {label: value.name ? value.name:key, value: key}} )
     return options
   }
-  let selected = []
+
+  const labelOptions = () : ObjectOption[] => {
+    const options:ObjectOption[] = labelTypes.map(({type, emoji, toolTip, maxVotes}) => 
+    {return {label: `${emoji} ${toolTip}`, value: type}} )
+    return options
+  }
+
+  const setLabels = () => {
+    props["labels"] = selectedLabels.map(o => o.value)
+    props = props
+  }
+
+  let selectedAvatars = []
+  let selectedLabels = []
 
   const handleKeydown = (e) => {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -44,9 +72,18 @@
       cancelEdit()
     }
   }
+
 </script>
 <Dialog persistent bind:active>
 <div class='card-editor' style:background-color={props.color} on:keydown={handleKeydown}>
+  <div class="multi-select">
+    Labels: <MultiSelect bind:selected={selectedLabels} options={labelOptions()} on:change={(_event)=>setLabels()} />
+  </div>
+  {#if Object.keys($avatars).length > 0}
+  <div class="multi-select">
+    Assigned To: <MultiSelect bind:selected={selectedAvatars} options={avatarNames()} on:change={(_event)=>setAgents()} />
+  </div>
+  {/if}
   <div class="card-elements">
     <textarea class='textarea' bind:value={text} bind:this={inputElement} />
     <div class="color-buttons">
@@ -54,9 +91,6 @@
         <div class="color-button{props.color == color?" selected":""}" on:click={()=>setColor(color)} style:background-color={color}></div>
       {/each}
     </div>
-  </div>
-  <div class="assigned-to">
-    Assigned To: <MultiSelect bind:selected options={avatarNames()} on:change={(_event)=>setAgents()} />
   </div>
   <div class='controls'>
     {#if handleDelete}
@@ -102,7 +136,7 @@
     font-weight: normal;
     padding: 2px;
   }
-  .assigned-to {
+  .multi-select {
     margin: 5px 0;
   }
   .controls {

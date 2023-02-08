@@ -120,7 +120,13 @@
       </DragDropList>
     </div>
     <div class="edit-vote-types unselectable">
-      <div class="title-text">Voting Types:
+      <div class="title-text">
+        {#if boardType == BoardType.Stickies}
+          Voting Types:
+        {:else}
+          Labels:
+        {/if}
+
         <Button icon on:click={() => addVoteType()}>
           <Icon size="20px" path={mdiPlusCircleOutline}/>
         </Button>
@@ -136,9 +142,14 @@
         >
         <div class="vote-type">
           <Icon path={mdiDragVertical}/>
+          {#if boardType == BoardType.Stickies}
           <input class='textarea emoji-input' bind:value={voteTypes[index].emoji} title="emoji"/>
           <input class='textarea num-input' bind:value={voteTypes[index].maxVotes} title="max votes on type per card" />
           <input class='textarea' bind:value={voteTypes[index].toolTip} title="description"/>
+          {:else}
+          <input class='textarea emoji-input' bind:value={voteTypes[index].emoji} title="label emoji"/>
+          <input class='textarea' bind:value={voteTypes[index].toolTip} title="label name"/>
+          {/if}
           <Button icon on:click={deleteVoteType(index)} >
             <Icon path={mdiDelete} />
           </Button>
