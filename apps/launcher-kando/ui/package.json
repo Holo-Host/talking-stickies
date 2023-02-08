@@ -1,6 +1,6 @@
 {
   "name": "kando-app",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "scripts": {
     "build": "npm run build:happ && npm run build:ui",
     "build:happ": "npm run build:dna && hc app pack ../workdir",

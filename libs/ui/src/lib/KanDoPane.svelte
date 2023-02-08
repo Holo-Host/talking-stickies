@@ -41,7 +41,7 @@
   $: state = tsStore.boardList.getReadableBoardState($activeHash);
   $: items = $state ? $state.stickies : undefined;
   $: sortCards = sortOption
-    ? sortBy((sticky: Sticky) => countVotes(sticky.votes, sortOption) * -1)
+    ? sortBy((sticky: Sticky) => countLabels(sticky.props, sortOption) * -1)
     : (items) => items;
 
   $: unused = groupCards(items);
@@ -96,22 +96,11 @@
     editText = text;
   };
 
-  const countVotes = (votes, type) => {
-    if (typeof votes[type] === 'undefined') {
+  const countLabels = (props, type) => {
+    if (typeof props["labels"] === 'undefined') {
       return []
     }
-    const agentKeys = Object.keys(votes[type]);
-    return agentKeys.reduce(
-      (total, agentKey) => total + (votes[type][agentKey] || 0),
-      0
-    );
-  };
-
-  const myVotes = (votes, type) => {
-    if (typeof votes[type] === 'undefined') {
-      return 0
-    }
-    return votes[type][tsStore.myAgentPubKey()] || 0;
+    return props["labels"].includes(type) ? 1 : 0
   };
 
   const closeBoard = () => {
@@ -285,6 +274,15 @@
                   on:click={editCard(cardId, text)} 
                   style:background-color={props && props["color"] ? props["color"] : "white"}
                   >
+                  <div class="labels">
+                    {#each $state.voteTypes as {type, emoji, toolTip}}
+                      {#if isLabeled(props, type)}
+                        <div title={toolTip}>
+                        <EmojiIcon emoji={emoji} class="vote-icon"/>
+                        </div>
+                      {/if}
+                    {/each}
+                  </div>
                   <div class="card-content">
                     {@html Marked.parse(text)}
                   </div>
@@ -293,15 +291,6 @@
                       <span class="avatar-name" title={agent}>{$avatars[agent] ? $avatars[agent].name : `${agent.substring(0,8)}...`}</span>
                     {/each}
                   {/if}
-                  <div class="votes">
-                    {#each $state.voteTypes as {type, emoji, toolTip, maxVotes}}
-                      {#if isLabeled(props, type)}
-                        <div title={toolTip}>
-                        <EmojiIcon emoji={emoji} class="vote-icon"/>
-                        </div>
-                      {/if}
-                    {/each}
-                  </div>
                 </div>
           {/each}
           {#if dragTarget == columnId && dragOrder == $state.grouping[columnId].length}
@@ -430,47 +419,18 @@
     line-height: 16px;
     color: #000000;
     border-radius: 3px;
-    min-height: 42px;
   }
   .card-content {
     overflow-y: auto;
     max-height: 200px;
+    margin-top: 16px;
+    padding: 0 5px;
   }
-  .votes {
+  .labels {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    margin-top: auto;
-  }
-  .vote {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 5px;
-    flex-basis: 26px;
-    height: 25px;
-    padding: 0 5px;
-    border: 1px solid white;
-    position: relative;
-    cursor: pointer;
-  }
-  .voted {
-    border-color: black;
-  }
-  .vote-counts {
-    padding-top: 2px;
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    left: -3px;
-    justify-content: flex-start;
-  }
-  .vote-count {
-    border-radius: 50px;
-    width: 5px;
-    height: 5px;
-    background-color: black;
-    margin-bottom: 2px;
+    margin-top: 5px;
   }
   .avatar-name {
     border-radius: 5px;
