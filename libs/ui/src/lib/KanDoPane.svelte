@@ -82,7 +82,7 @@
   }
 
   const clearEdit = () => {
-    editingCardId = null;
+    editingCardId = undefined;
     editText = "";
   };
 
@@ -256,8 +256,9 @@
                   groupId={columnId}
                   props={props}
                   avatars={avatars}
+                  active={editingCardId}
                 />
-              {:else}
+              {/if}
                 {#if 
                   dragTarget == columnId && 
                   cardId!=draggedItemId && 
@@ -306,7 +307,6 @@
                     {/each}
                   </div>
                 </div>
-              {/if}
           {/each}
           {#if dragTarget == columnId && dragOrder == $state.grouping[columnId].length}
             <div> <Icon path={mdiArrowRightThick} /> </div>
@@ -314,17 +314,14 @@
 
           </div>
           {#if creatingInColumn !==undefined  && creatingInColumn == columnId}
-          <div class="new-card">
-            <CardEditor handleSave={createCard} {cancelEdit} avatars={avatars}/>
-          </div>
-          {:else}
+            <CardEditor handleSave={createCard} {cancelEdit} avatars={avatars} active={creatingInColumn}/>
+          {/if}
           <div class="column-item column-footer">
             <Button style="padding: 0 5px;" size="small" text on:click={newCard(columnId)}>
               Add Card
               <Icon style="margin-left:5px" size="20px" path={mdiPlusCircleOutline}/>
             </Button>
           </div>
-          {/if}
         </div>
         </div>
       {/each}

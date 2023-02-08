@@ -4,7 +4,7 @@
   import type { ObjectOption } from 'svelte-multiselect'
   import type { Avatar } from './boardList';
   import type { Readable } from 'svelte/store';
-  import {Button} from "svelte-materialify"
+  import { Button, Dialog } from "svelte-materialify"
   import { onMount } from "svelte";
 
   export let handleSave
@@ -14,6 +14,7 @@
   export let groupId = undefined
   export let props = {color: "white", agents:[]}
   export let avatars: Readable<Dictionary<Avatar>> 
+  export let active = false
 
   let inputElement
   onMount(() => inputElement.focus())
@@ -44,7 +45,7 @@
     }
   }
 </script>
-
+<Dialog persistent bind:active>
 <div class='card-editor' style:background-color={props.color} on:keydown={handleKeydown}>
   <div class="card-elements">
     <textarea class='textarea' bind:value={text} bind:this={inputElement} />
@@ -54,32 +55,31 @@
       {/each}
     </div>
   </div>
-  <div>
-    Tagged: <MultiSelect bind:selected options={avatarNames()} on:change={(_event)=>setAgents()} />
+  <div class="assigned-to">
+    Assigned To: <MultiSelect bind:selected options={avatarNames()} on:change={(_event)=>setAgents()} />
   </div>
   <div class='controls'>
     {#if handleDelete}
-      <Button text size="x-small" class="red white-text" on:click={handleDelete}>
+      <Button text size="small" class="red white-text" on:click={handleDelete}>
         Delete
       </Button>
     {/if}
-    <Button style="margin-left:5px" size="x-small"on:click={cancelEdit}>
+    <Button style="margin-left:5px" size="small"on:click={cancelEdit}>
       Cancel
     </Button>
-    <Button style="margin-left:5px" size="x-small" class="primary-color" on:click={() => handleSave(text, groupId, props)}>
+    <Button style="margin-left:5px" size="small" class="primary-color" on:click={() => handleSave(text, groupId, props)}>
       Save
     </Button>
   </div>
 </div>
-
+</Dialog>
 <style>
   .card-editor {
     display: flex;
     background-color: #D4F3EE;
     flex-basis: 270px;
-    margin: 10px;
+    margin: 20px;
     padding: 10px;
-    box-shadow: 4px 5px 13px 0px rgba(0,0,0,0.38);
     font-style: normal;
     font-weight: 600;
     font-size: 12px;
@@ -102,13 +102,16 @@
     font-weight: normal;
     padding: 2px;
   }
+  .assigned-to {
+    margin: 5px 0;
+  }
   .controls {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
     padding-left: 7px;
-    padding-top: 5px;
+    padding-top: 10px;
   }
   .color-buttons {
     display: flex;
