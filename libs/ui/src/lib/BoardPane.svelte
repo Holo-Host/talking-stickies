@@ -118,7 +118,8 @@
     tsStore.boardList.closeActiveBoard();
   };
   const groupWidth = (groupId) : string => {
-    const len = Object.keys($state.grouping).length // > 0 ? (stickesCounts[UngroupedId] > 0 ? $state.groups.length : $state.groups.length - 1) : 1
+    let len = Object.keys($state.grouping).length
+    if (len > 1 && $state.grouping[UngroupedId].length == 0) len -= 1
     // TODO: maybe set width dynamically by number of cards in group...
     if (len <= 4) {
       return 100/len+"%"
@@ -388,6 +389,8 @@
     padding-top: 10px;
     max-width: 270px;
     color: white;
+    display: flex;
+    align-items: center;
   }
   .stickies {
     display: flex;
