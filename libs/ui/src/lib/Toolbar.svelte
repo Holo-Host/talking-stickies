@@ -27,13 +27,21 @@
   </div>
   <div class="right-items">
     <Folk></Folk>
-    <Button icon title="Report a problem in our GitHub repo" on:click={()=>window.open("https://github.com/Holo-Host/talking-stickies/issues", '_blank')}>
+    <a class="bug-link" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo" target="_blank">
       <Icon path={mdiBug} style={bugColor} />
-    </Button>
+    </a>
   </div>
 </div>
 
 <style>
+  .bug-link {
+    padding: 8px 8px;
+    display: flex;
+    border-radius: 50%;
+  }
+  a:hover.bug-link {
+    background-color: #ddd;
+  }
   .toolbar {
     display: flex;
     align-items: center;
