@@ -402,7 +402,7 @@
   .column-footer {
     border-top: 1px solid #999;
     padding: 0 5px;
-    height: 38px;
+    min-height: 38px;
   }
   .column-wrap {
     display: flex;
