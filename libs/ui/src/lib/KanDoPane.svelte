@@ -14,6 +14,9 @@
   import { Icon, Button } from "svelte-materialify";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import type { Dictionary } from "@holochain-open-dev/core-types";
+  import AvatarIcon from "./AvatarIcon.svelte";
+  import { decodeHashFromBase64 } from "@holochain/client";
+
   const pane = new Pane();
 
   Marked.setOptions
@@ -317,7 +320,7 @@
                   </div>
                   {#if props && props.agents && props.agents.length > 0}
                     {#each props.agents as agent}
-                      <span class="avatar-name" title={agent}>{$avatars[agent] ? $avatars[agent].name : `${agent.substring(0,8)}...`}</span>
+                      <AvatarIcon size={20} avatar={$avatars[agent]} key={decodeHashFromBase64(agent)}/>
                     {/each}
                   {/if}
                 </div>

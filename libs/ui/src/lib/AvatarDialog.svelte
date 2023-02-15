@@ -23,7 +23,7 @@
       Name: <input class='textarea' bind:value={avatar.name} />
       Image URL: 
       <span class="row">
-        <AvatarIcon avatar={avatar} size={"30px"} style="margin-right:10px"/>
+        <AvatarIcon avatar={avatar} size={30} style="margin-right:10px"/>
         <input class='textarea' bind:value={avatar.url} />
       </span>
       <div class='controls'>
