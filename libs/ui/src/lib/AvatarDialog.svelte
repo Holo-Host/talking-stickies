@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Dialog, Button } from 'svelte-materialify';
-  
+    import AvatarIcon from './AvatarIcon.svelte';
+
     export let active = false;
     export let avatar
     export let handleSave
@@ -18,20 +19,29 @@
 
 <Dialog persistent bind:active>
     <div class="avatar-editor">
-        Name: <input class='textarea' bind:value={avatar.name} />
-
-        <div class='controls'>
-            <Button on:click={()=>active=false} style="margin-left:10px" size="small">
-                Cancel
-            </Button>
-            <Button style="margin-left:10px" size="small" on:click={() => handleSave(avatar)} class="primary-color">
-                Save
-            </Button>
-        </div>
+      <div class="dialog-title">Edit Profile</div>
+      Name: <input class='textarea' bind:value={avatar.name} />
+      Image URL: 
+      <span class="row">
+        <AvatarIcon avatar={avatar} size={"30px"} style="margin-right:10px"/>
+        <input class='textarea' bind:value={avatar.url} />
+      </span>
+      <div class='controls'>
+          <Button on:click={()=>active=false} style="margin-left:10px" size="small">
+              Cancel
+          </Button>
+          <Button style="margin-left:10px" size="small" on:click={() => handleSave(avatar)} class="primary-color">
+              Save
+          </Button>
+      </div>
     </div>
 </Dialog>
 
 <style>
+    .row {
+      display: flex;
+      align-items: center;
+    }
     .avatar-editor {
       display: flex;
       flex-basis: 270px;

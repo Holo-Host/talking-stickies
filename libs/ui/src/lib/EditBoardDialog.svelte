@@ -91,5 +91,5 @@
 
 </script>
 <Dialog persistent bind:active>
-    <BoardEditor handleSave={updateBoard(boardHash)} handleDelete={archiveBoard(boardHash)} cancelEdit={close} boardType={boardType} text={editName} groups={editGroups} voteTypes={editVoteTypes} props={editProps}/>
+    <BoardEditor title="Edit Board" handleSave={updateBoard(boardHash)} handleDelete={archiveBoard(boardHash)} cancelEdit={close} boardType={boardType} text={editName} groups={editGroups} voteTypes={editVoteTypes} props={editProps}/>
 </Dialog>

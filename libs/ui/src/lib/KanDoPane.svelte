@@ -257,6 +257,7 @@
           {#each sorted(cardIds, sortCards) as { id:cardId, text, votes, props }, i}
               {#if editingCardId === cardId}
                 <CardEditor
+                  title="Edit Card"
                   handleSave={
                     pane.updateSticky(items, cardId, clearEdit)
                   }
@@ -327,7 +328,9 @@
 
           </div>
           {#if creatingInColumn !==undefined  && creatingInColumn == columnId}
-            <CardEditor handleSave={createCard} {cancelEdit} avatars={avatars} active={creatingInColumn} labelTypes={$state.voteTypes}/>
+            <CardEditor                   
+              title="New Card"
+              handleSave={createCard} {cancelEdit} avatars={avatars} active={creatingInColumn} labelTypes={$state.voteTypes}/>
           {/if}
           <div class="column-item column-footer">
             <Button style="padding: 0 5px;" size="small" text on:click={newCard(columnId)}>
@@ -342,6 +345,20 @@
   {/if}
 </div>
 <style>
+  :global(.dialog-title) {
+    display: flex;
+    justify-content: space-between;
+    font-size: 110%;
+    font-weight: bold;
+    border-bottom: solid 1px gray;
+    margin-bottom: 12px;
+    margin-left: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-right: -20px;
+    margin-top: -20px;
+    padding-top: 12px;
+  }
   .board {
     display: flex;
     flex-direction: column;

@@ -13,6 +13,7 @@
     export let groups: Array<Group>
     export let voteTypes: Array<VoteType>
     export let boardType: BoardType
+    export let title
 
     let titleElement
     let groupsTitle = "Groups"
@@ -92,6 +93,7 @@
 
 <svelte:window on:keydown={handleKeydown}/>
   <div class='board-editor'>
+    <div class="dialog-title">{title}</div>
     <div class="edit-title">
       <div class="title-text">Title:</div> <input class='textarea' maxlength="60" bind:value={text} bind:this={titleElement} />
     </div>

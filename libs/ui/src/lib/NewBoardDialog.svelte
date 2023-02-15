@@ -22,5 +22,5 @@
 
 </script>
 <Dialog persistent bind:active>
-    <BoardEditor handleSave={addBoard} cancelEdit={()=>active=false} boardType={boardType} voteTypes={editVoteTypes} groups={[]} props={{bgUrl:""}} />
+    <BoardEditor title="New Board" handleSave={addBoard} cancelEdit={()=>active=false} boardType={boardType} voteTypes={editVoteTypes} groups={[]} props={{bgUrl:""}} />
 </Dialog>

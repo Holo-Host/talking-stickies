@@ -1,12 +1,13 @@
 <script lang="ts">
     import { Button, Icon } from 'svelte-materialify';
-    import { mdiAccountGroup, mdiAccount } from '@mdi/js';
+    import { mdiAccountGroup } from '@mdi/js';
     import ParticipantsDialog from './ParticipantsDialog.svelte';
     import type { Avatar } from './boardList';
     import AvatarDialog from './AvatarDialog.svelte';
     import { getContext } from "svelte";
     import type { TalkingStickiesStore } from "./talkingStickiesStore";
     import { cloneDeep } from "lodash";
+    import AvatarIcon from './AvatarIcon.svelte';
 
     const { getStore } :any = getContext('tsStore');
 
@@ -14,6 +15,7 @@
     const myAgentPubKey = store.myAgentPubKey()
     $: avatars = store.boardList.avatars()
     $: myName = $avatars[myAgentPubKey]? $avatars[myAgentPubKey].name : ""
+    $: myAvatar = $avatars[myAgentPubKey]? $avatars[myAgentPubKey] : undefined
     $: participants = store.boardList.participants()
     let showParticipants = false
     let editingAvatar = false
@@ -34,7 +36,7 @@
 </script>
 
 <Button icon on:click={()=>{showParticipants=true}} style="margin-left:10px" title="Show Participants"><Icon path={mdiAccountGroup} />{$participants.active.length }</Button>
-<Button icon on:click={editAvatar} title={myName ? myName:"Edit Avatar"} style="margin-left:10px"><Icon path={mdiAccount} /></Button>
+<Button icon on:click={editAvatar} title={myName ? myName:"Edit Avatar"} style="margin-left:10px"><AvatarIcon avatar={myAvatar} border={false}></AvatarIcon></Button>
 
 {#if showParticipants}
 <ParticipantsDialog bind:active={showParticipants} avatars={$avatars} />

@@ -18,6 +18,7 @@
   export let avatars: Readable<Dictionary<Avatar>> 
   export let labelTypes: Array<VoteType>
   export let active = false
+  export let title
 
   let inputElement
   onMount(() => {
@@ -76,6 +77,8 @@
 </script>
 <Dialog persistent bind:active>
 <div class='card-editor' style:background-color={props.color} on:keydown={handleKeydown}>
+  <div class="dialog-title">{title}</div>
+
   <div class="multi-select">
     Labels: <MultiSelect bind:selected={selectedLabels} options={labelOptions()} on:change={(_event)=>setLabels()} />
   </div>
@@ -118,11 +121,7 @@
     background-color: #D4F3EE;
     flex-basis: 270px;
     margin: 20px;
-    padding: 10px;
     font-style: normal;
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 16px;
     color: #000000;
     justify-content: space-between;
     flex-direction: column;
