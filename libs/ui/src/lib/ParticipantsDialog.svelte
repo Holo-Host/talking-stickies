@@ -25,8 +25,8 @@
 
 <Dialog bind:active>
     <div class="participants">
-        <div class="dialog-title">Players Online</div>
-            <div class="list">
+        <div class="dialog-title">Participants Online</div>
+        <div class="list">
             {#each activeFolk.map(f=>{return {folk:f, folkB64:encodeHashToBase64(f)}}) as {folk, folkB64}}
               <div class="list-item">
                 <AvatarIcon avatar={avatars[folkB64]} key={folk} size={40} />
@@ -36,7 +36,7 @@
                 {:else} <i>no-name</i>
                 {/if}
                 </div>
-            </div>
+              </div>
             {/each}
         </div>
     </div>
