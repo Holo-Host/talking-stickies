@@ -9,7 +9,7 @@
     const handleKeydown = (e) => {
       if (e.key === "Escape") {
         active=false
-      } else if (e.key === "Enter" && e.ctrlKey) {
+      } else if (e.key === "Enter" && e.ctrlKey && avatar.name!=="") {
         handleSave(avatar)
       }
     }
@@ -21,7 +21,7 @@
     <div class="avatar-editor">
       <div class="dialog-title">Edit Profile</div>
       Name: <input class='textarea' bind:value={avatar.name} />
-      Image URL: 
+      Avatar Image URL: 
       <span class="row">
         <AvatarIcon avatar={avatar} size={30} style="margin-right:10px"/>
         <input class='textarea' bind:value={avatar.url} />
@@ -30,7 +30,7 @@
           <Button on:click={()=>active=false} style="margin-left:10px" size="small">
               Cancel
           </Button>
-          <Button style="margin-left:10px" size="small" on:click={() => handleSave(avatar)} class="primary-color">
+          <Button disabled={avatar.name==""} style="margin-left:10px" size="small" on:click={() => handleSave(avatar)} class={avatar.name!=="" ? "primary-color":""}>
               Save
           </Button>
       </div>

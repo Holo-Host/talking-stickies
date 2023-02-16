@@ -41,6 +41,7 @@
     $: boardState = tsStore ? tsStore.boardList.getReadableBoardState($activeBoardHash) :  undefined
     $: bgUrl = boardState ?  ($boardState.props && $boardState.props.bgUrl) ? $boardState.props.bgUrl : (boardType == BoardType.Stickies? DEFAULT_TS_BG_IMG:DEFAULT_KD_BG_IMG ) : NO_BOARD_IMG
     $: bgImage = `background-image: url("`+ bgUrl+`");`
+    $: myAgentPubKey = tsStore ? tsStore.myAgentPubKey() : undefined
 
     async function initialize() : Promise<void> {
       const store = createStore()
@@ -71,42 +72,44 @@
 
     {#if tsStore}
       <Toolbar boardType={boardType}/>
-      {#if boardList && $boardList.boards.length == 0}
-        <div class="welcome-text">
-          <h5>Welcome!</h5>
-          {#if boardType == BoardType.Stickies}
-            <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
-            <p>
-              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
-              You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
-            </p>
-          {:else}
-            <p>KanDo offers real-time collaborative Kanban boards for task and project management. </p>
-            <p>
-              Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
-              You can add columns for your board, customize voting categories and settings, and more in the board creation window.
-            </p>
-          {/if}
-          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
-        </div>
-      {/if}
-      {#if boardList && $boardList.boards.length > 0 && $activeBoardHash === undefined}
-        <div class="welcome-text">
-          <p>Active Boards: {activeBoards.length}, Archived Boards: {archivedBoards.length}</p>
-          {#if boardType == BoardType.Stickies}
-            <p>
-              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
-              You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
-            </p>
-          {:else}
-            <p>
-              Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
-              You can add columns for your board, customize voting categories and settings, and more in the board creation window.
-            </p>
-          {/if}
-          <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
-          <p>Any boards that you have archived will appear under the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiArchiveArrowUp}></Icon> button, and you can un-archive them by selecting them from the list.</p>
-        </div>
+      {#if $boardList.avatars[myAgentPubKey] && $boardList.avatars[myAgentPubKey].name}
+        {#if boardList && $boardList.boards.length == 0}
+          <div class="welcome-text">
+            <h5>Welcome!</h5>
+            {#if boardType == BoardType.Stickies}
+              <p>TalkingStickies offers real-time collaborative sticky-note boards for brain-storming, managing meetings, agendas, etc. </p>
+              <p>
+                Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
+                You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
+              </p>
+            {:else}
+              <p>KanDo offers real-time collaborative Kanban boards for task and project management. </p>
+              <p>
+                Click on the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> above to create your first board.
+                You can add columns for your board, customize voting categories and settings, and more in the board creation window.
+              </p>
+            {/if}
+            <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+          </div>
+        {/if}
+        {#if boardList && $boardList.boards.length > 0 && $activeBoardHash === undefined}
+          <div class="welcome-text">
+            <p>Active Boards: {activeBoards.length}, Archived Boards: {archivedBoards.length}</p>
+            {#if boardType == BoardType.Stickies}
+              <p>
+                Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
+                You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
+              </p>
+            {:else}
+              <p>
+                Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
+                You can add columns for your board, customize voting categories and settings, and more in the board creation window.
+              </p>
+            {/if}
+            <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+            <p>Any boards that you have archived will appear under the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiArchiveArrowUp}></Icon> button, and you can un-archive them by selecting them from the list.</p>
+          </div>
+        {/if}
       {/if}
       {#if $activeBoardHash !== undefined}
         {#if $activeBoardType === BoardType.Stickies}

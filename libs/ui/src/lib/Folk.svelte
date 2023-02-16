@@ -4,7 +4,7 @@
     import ParticipantsDialog from './ParticipantsDialog.svelte';
     import type { Avatar } from './boardList';
     import AvatarDialog from './AvatarDialog.svelte';
-    import { getContext } from "svelte";
+    import { getContext, onMount } from "svelte";
     import type { TalkingStickiesStore } from "./talkingStickiesStore";
     import { cloneDeep } from "lodash";
     import AvatarIcon from './AvatarIcon.svelte';
@@ -20,6 +20,12 @@
     let showParticipants = false
     let editingAvatar = false
     let avatar: Avatar = {name:"", url:""}
+
+    onMount(async () => {
+        if (!myName) {
+            editingAvatar = true
+        }
+	});
 
     const editAvatar = () => {
         const myAvatar = $avatars[store.myAgentPubKey()]
