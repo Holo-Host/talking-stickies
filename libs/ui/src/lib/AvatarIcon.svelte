@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Avatar } from "./realmList";
+  import type { Avatar } from "./boardList";
   import { mdiAccount } from '@mdi/js';
   import { Icon } from "svelte-materialify";
   import { HoloIdenticon } from "@holochain-open-dev/elements";
