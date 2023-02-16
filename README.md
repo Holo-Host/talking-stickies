@@ -38,7 +38,16 @@ for TalkingStickies or:
   ```
 for KanDo!
 
-2. Navigate to [localhost:5000](http://localhost:5000) in your browser. You should see the UI running.
+This will open the hApp in your default browser.  To open them with `hc-launch` type:
+```bash
+npm run launch:ts
+```
+or
+```bash
+npm run launch:kd
+```
+
+1. Navigate to [localhost:5000](http://localhost:5000) in your browser. You should see the UI running.
 
 
 ## Releasing (manual)
@@ -47,6 +56,6 @@ for KanDo!
 
 `npm run package:launcher:ts`
 or
-`npm run package:launcher:ts`
+`npm run package:launcher:kd`
 
 the `*.webhapp` file will be available in the `apps/launcher/workdir` folder.
