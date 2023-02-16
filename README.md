@@ -1,6 +1,6 @@
-# TalkingStickies
+# TalkingStickies & KanDo!
 
-A holochain hApp for collaborative sticky-note boards.  Use it to run your retrospectives or group brainstorming sessions! 
+A holochain hApp for collaborative sticky-note and KanBan boards.
 
 Real-time colloaboration delivered by [syn](https://github.com/holochain/syn).  Inspired by [Ideaboards](https://ideaboardz.com)
 
@@ -17,28 +17,26 @@ or, to install manually with a webhapp file:
 
 ## Dev Environment Setup
 
-1. Install the holochain dev environment (only nix-shell is required): https://developer.holochain.org/docs/install/
-2. Enable Holochain cachix with:
+1. Install the nix package manager following the first step of the [instructions here](https://developer.holochain.org/quick-start/)
+2. Clone this repo and `cd` inside of it.
+3. Enter the nix shell by running this in the root folder of the repository: 
 
 ```bash
-nix-env -iA cachix -f https://cachix.org/api/v1/install
-cachix use holochain-ci
-```
-
-3. Clone this repo and `cd` inside of it.
-4. Enter the nix shell by running this in the root folder of the repository: 
-
-```bash
-nix-shell
+nix develop
 npm install
 ```
 
 ## Dev mode
 
-1. Run the app
+1. Run the app with
   ```bash
-  npm run start
+  npm run start:ts
   ```
+for TalkingStickies or:
+  ```bash
+  npm run start:kd
+  ```
+for KanDo!
 
 2. Navigate to [localhost:5000](http://localhost:5000) in your browser. You should see the UI running.
 
@@ -47,5 +45,8 @@ npm install
 
 ### For Launcher
 
-`npm run package`
+`npm run package:launcher:ts`
+or
+`npm run package:launcher:ts`
+
 the `*.webhapp` file will be available in the `apps/launcher/workdir` folder.
