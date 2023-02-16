@@ -1,6 +1,6 @@
 # TalkingStickies & KanDo!
 
-A holochain hApp for collaborative sticky-note and KanBan boards.
+Holochain hApps for collaborative boards: sticky-notes and KanBan.
 
 Real-time colloaboration delivered by [syn](https://github.com/holochain/syn).  Inspired by [Ideaboards](https://ideaboardz.com)
 
