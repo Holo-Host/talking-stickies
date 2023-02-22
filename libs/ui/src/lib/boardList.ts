@@ -1,10 +1,10 @@
 import { RootStore, type Commit, type SynGrammar, type SynStore, type Workspace, type WorkspaceStore } from "@holochain-syn/core";
-import type { AgentPubKeyB64, Dictionary, EntryHashB64 } from "@holochain-open-dev/core-types";
+import type { Dictionary } from "@holochain-open-dev/core-types";
 import { Board, BoardType, CommitTypeBoard, UngroupedId } from "./board";
 import type { EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
-import { type AgentPubKey, type EntryHash, decodeHashFromBase64 } from "@holochain/client";
+import { type AgentPubKey, type EntryHash, decodeHashFromBase64, type EntryHashB64, type AgentPubKeyB64 } from "@holochain/client";
 
 export const CommitTypeBoardList :string = "board-list"
 

@@ -2,8 +2,7 @@ import { createEventDispatcher } from "svelte";
 import { BoardType, type BoardState, type Sticky } from "./board";
 import { v1 as uuidv1 } from "uuid";
 import { cloneDeep, isEqual } from "lodash";
-import type { AgentPubKeyB64 } from "@holochain-open-dev/core-types";
-import { BoardEditor } from "$lib";
+import type { AgentPubKeyB64 } from "@holochain/client";
 import sanitize from "sanitize-filename";
 
 const download = (filename: string, text: string) => {

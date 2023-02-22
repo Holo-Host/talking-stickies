@@ -37,7 +37,7 @@
     "@holochain-open-dev/elements": "0.1.5",
     "@holochain-open-dev/utils": "0.9.3",
     "@holochain-syn/core": "0.3.0-alpha.7",
-    "@holochain/client": "0.12.0",
+    "@holochain/client": "0.12.2",
     "@mdi/js": "^7.1.96",
     "@ts-stack/markdown": "^1.4.0",
     "lodash": "^4.17.21",
