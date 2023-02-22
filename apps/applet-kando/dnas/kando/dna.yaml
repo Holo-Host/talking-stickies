@@ -1,11 +1,11 @@
 ---
 manifest_version: "1"
-name: talking-stickies
+name: kando
 
 integrity:
   network_seed: ~
-  properties:
-    type: "TalkingStickies"
+  properties: 
+    type: "KanDo"
   uid: 00000000-0000-0000-0000-000000000001
   origin_time: 2023-02-03T23:05:19.470323Z
   zomes:

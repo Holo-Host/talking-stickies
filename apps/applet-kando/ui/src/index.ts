@@ -2,7 +2,7 @@ import type { WeApplet } from '@lightningrodlabs/we-applet';
 import { Controller, BoardType } from '@holo-host/boardz';
 import { AppAgentWebsocket, AppWebsocket } from '@holochain/client';
 
-const talkingStickies: WeApplet = {
+const kando: WeApplet = {
  async appletRenderers(appWebsocket: AppWebsocket, adminWs, weServices, appletInfo) {
 
     const client = await AppAgentWebsocket.connect("", appletInfo[0].appInfo.installed_app_id)
@@ -20,7 +20,7 @@ const talkingStickies: WeApplet = {
           target,
           props: {
             roleName,
-            boardType: BoardType.Stickies,
+            boardType: BoardType.KanDo,
             client,
           }
         });
@@ -30,4 +30,4 @@ const talkingStickies: WeApplet = {
   },
 };
 
-export default talkingStickies;
+export default kando;

@@ -25,6 +25,7 @@
     "build:kd": "npm run build -w \"@holo-host/boardz\" -w kando-app",
     "build:applet": "npm run build -w we-applet",
     "package:applet:ts": "npm run build -w \"@holo-host/boardz\"  -w talking-stickies-we-applet && npm run package -w talking-stickies-we-applet",
+    "package:applet:kd": "npm run build -w \"@holo-host/boardz\"  -w kando-we-applet && npm run package -w kando-we-applet",
     "package:launcher:ts": "npm run build -w \"@holo-host/boardz\" -w talking-stickies-app && npm run package -w talking-stickies-app && hc web-app pack ./apps/launcher/workdir",
     "package:launcher:kd": "npm run build -w \"@holo-host/boardz\" -w kando-app && npm run package -w kando-app && hc web-app pack ./apps/launcher-kando/workdir",
     "check": "svelte-check --tsconfig ./tsconfig.json",

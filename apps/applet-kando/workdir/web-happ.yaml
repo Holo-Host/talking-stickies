@@ -1,0 +1,7 @@
+---
+manifest_version: "1"
+name: kando
+ui:
+  bundled: "../ui/ui.zip"
+happ_manifest:
+  bundled: "./kando.happ"
