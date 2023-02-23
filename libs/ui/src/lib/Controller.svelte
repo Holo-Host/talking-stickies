@@ -66,7 +66,8 @@
   <svelte:head>
     <script src='https://kit.fontawesome.com/80d72fa568.js' crossorigin='anonymous'></script>
   </svelte:head>
-
+  <div class="flex-scrollable-parent">
+    <div class="flex-scrollable-container">
   <MaterialAppMin >
     <div class='app' style={bgImage}>
 
@@ -124,6 +125,7 @@
     {/if}
   </div>
 </MaterialAppMin>
+</div></div>
 <style>
   .app {
     margin: 0;
@@ -133,7 +135,7 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: 100%;
+    height: 100vh;
   }
   :global(:root) {
     --resizeable-height: 200px;
@@ -176,5 +178,25 @@
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+  .flex-scrollable-parent {
+    position: relative;
+    display: flex;
+    flex: 1;
+  }
+  .flex-scrollable-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  .flex-scrollable-x {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .flex-scrollable-y {
+    max-height: 100%;
+    overflow-y: auto;
   }
 </style>

@@ -3,11 +3,13 @@ import { Controller, BoardType } from '@holo-host/boardz';
 import { AppAgentWebsocket, AppWebsocket } from '@holochain/client';
 
 const kando: WeApplet = {
- async appletRenderers(appWebsocket: AppWebsocket, adminWs, weServices, appletInfo) {
+  async appletRenderers(appWebsocket: AppWebsocket, adminWs, weServices, appletInfo) {
 
-    const client = await AppAgentWebsocket.connect("", appletInfo[0].appInfo.installed_app_id)
-    console.log("appletInfo", appletInfo)
-    console.log("appletInfo.cellInfo", appletInfo[0].appInfo.cell_info)
+    const appId = appletInfo[0].appInfo.installed_app_id
+    const client = await AppAgentWebsocket.connect("", "")
+    client.installedAppId = appId
+    client.cachedAppInfo = undefined
+    client.appWebsocket.overrideInstalledAppId = appId
     const roleName = Object.keys(appletInfo[0].appInfo.cell_info)[0]
     console.log("roleName", roleName)
     let controller : Controller
