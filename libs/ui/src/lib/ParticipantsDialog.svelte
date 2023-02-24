@@ -46,10 +46,14 @@
             {#if profilesStore}
                 {#each activeFolk.map(f=>{return {folk:f, profile:getProfile(f)}}) as {folk, profile}}
                     <div class="list-item">
-                        <agent-avatar agentPubKey={folk}></agent-avatar>
-                        <div style="margin-left:10px; font-size:120%">
-                            {profile.nickname}
-                        </div>
+                        {#if profile}
+                            <AvatarIcon avatar={{url:profile.fields.avatar, name:profile.nickname}} key={folk} size={40} />
+                            <div style="margin-left:10px; font-size:120%">
+                                {profile.nickname}
+                            </div>
+                        {:else}
+                            <i>{encodeHashToBase64(folk)}</i>
+                        {/if}
                     </div>
                 {/each}
             {:else}
