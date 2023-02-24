@@ -1,6 +1,8 @@
 import type { WeApplet } from '@lightningrodlabs/we-applet';
 import { Controller, BoardType } from '@holo-host/boardz';
 import { AppAgentWebsocket, AppWebsocket } from '@holochain/client';
+import type { ProfilesStore } from "@holochain-open-dev/profiles";
+import { get } from 'svelte/store';
 
 const talkingStickies: WeApplet = {
  async appletRenderers(appWebsocket: AppWebsocket, adminWs, weServices, appletInfo) {
@@ -22,6 +24,8 @@ const talkingStickies: WeApplet = {
 
     let controller : Controller
 
+    console.log("PS", get(weServices.profilesStore.myProfile))
+
     return {
       full: (rootElement: HTMLElement, registry: CustomElementRegistry) => {
         const target = rootElement.attachShadow({ mode: 'open' });
@@ -32,6 +36,7 @@ const talkingStickies: WeApplet = {
             roleName,
             boardType: BoardType.Stickies,
             client,
+            profilesStore: weServices.profilesStore
           }
         });
       },

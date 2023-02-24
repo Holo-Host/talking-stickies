@@ -9,6 +9,7 @@
     import { BoardType } from './board';
     import { MaterialAppMin, Icon } from 'svelte-materialify';
     import { mdiShapeSquarePlus, mdiCog, mdiArchiveArrowUp } from '@mdi/js';
+    import type { ProfilesStore } from "@holochain-open-dev/profiles";
 
     export let boardType:BoardType
     export let roleName = ""
@@ -17,6 +18,7 @@
     let tsStore: TalkingStickiesStore;
     
     export let client : AppAgentClient
+    export let profilesStore : ProfilesStore|undefined = undefined
 
     $: activeBoardHash = tsStore ? tsStore.boardList.activeBoardHash : undefined
     $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
@@ -72,8 +74,8 @@
     <div class='app' style={bgImage}>
 
     {#if tsStore}
-      <Toolbar boardType={boardType}/>
-      {#if $boardList.avatars[myAgentPubKey] && $boardList.avatars[myAgentPubKey].name}
+      <Toolbar boardType={boardType} profilesStore={profilesStore}/>
+      {#if ($boardList.avatars[myAgentPubKey] && $boardList.avatars[myAgentPubKey].name) || profilesStore}
         {#if boardList && $boardList.boards.length == 0}
           <div class="welcome-text">
             <h5>Welcome!</h5>

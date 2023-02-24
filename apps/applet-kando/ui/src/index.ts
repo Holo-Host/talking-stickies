@@ -13,7 +13,7 @@ const kando: WeApplet = {
     const roleName = Object.keys(appletInfo[0].appInfo.cell_info)[0]
     console.log("roleName", roleName)
     let controller : Controller
-
+    
     return {
       full: (rootElement: HTMLElement, registry: CustomElementRegistry) => {
         const target = rootElement.attachShadow({ mode: 'open' });
@@ -24,6 +24,7 @@ const kando: WeApplet = {
             roleName,
             boardType: BoardType.KanDo,
             client,
+            profilesStore: weServices.profilesStore
           }
         });
       },

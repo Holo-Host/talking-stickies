@@ -7,6 +7,9 @@
   import { Icon, Button } from 'svelte-materialify';
   import { mdiBug } from '@mdi/js';
   import AboutDialog from "./AboutDialog.svelte";
+  import type { ProfilesStore } from "@holochain-open-dev/profiles";
+
+  export let profilesStore: ProfilesStore|undefined
 
   export let boardType: BoardType
   let showAbout = false
@@ -26,7 +29,7 @@
     <BoardMenu boardType={boardType}></BoardMenu>
   </div>
   <div class="right-items">
-    <Folk></Folk>
+    <Folk profilesStore={profilesStore}></Folk>
     <a class="bug-link" href="https://github.com/Holo-Host/talking-stickies/issues" title="Report a problem in our GitHub repo" target="_blank">
       <Icon path={mdiBug} style={bugColor} />
     </a>
