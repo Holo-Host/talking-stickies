@@ -9,7 +9,7 @@
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
     "package": "npm run build:happ && npm run build && cd dist && bestzip ../ui.zip * && cd .. && hc web-app pack ../workdir",
     "demo": "npm run build:happ && npm run build && cross-env HC_PORT=$(port) ADMIN_PORT=$(port) concurrently \"npm run start:happ\" \"wds --config web-dev-server.config.mjs\"",
-    "start:happ": "RUST_LOG=warn echo \"pass\" | hc s --piped -f=$ADMIN_PORT generate ../workdir/talking-stickies.happ --run=$HC_PORT -a talking-stickies network mdns",
+    "start:happ": "RUST_LOG=warn echo \"pass\" | hc s --piped -f=$ADMIN_PORT generate ../workdir/talking-stickies.happ --run=$HC_PORT -a talking-stickies network mem",
     "build:ui": "rimraf dist && rollup -c rollup.config.js",
     "build": "npm run build:happ && npm run build:ui",
     "build:happ": "npm run build:dnas && hc app pack ../workdir",

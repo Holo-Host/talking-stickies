@@ -5,6 +5,7 @@ import type { EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
 import { type AgentPubKey, type EntryHash, decodeHashFromBase64, type EntryHashB64, type AgentPubKeyB64, encodeHashToBase64 } from "@holochain/client";
+import {toPromise} from '@holochain-open-dev/stores'
 
 export const CommitTypeBoardList :string = "board-list"
 
@@ -167,9 +168,10 @@ export class BoardList {
             boardsRootCommit
           );
         const me = new BoardList(rootStore, boardsRootStore);
-        const workspaces: EntryHashMap<Workspace> = get(await rootStore.fetchWorkspaces());
+        const workspaces = await toPromise(rootStore.allWorkspaces);
+
         // if there is no workspace then we have a problem!!
-        me.workspace = await rootStore.joinWorkspace(workspaces.keys()[0]);
+        me.workspace = await rootStore.joinWorkspace(workspaces[0].entryHash);
         return me
     }
     hash() : EntryHash {
