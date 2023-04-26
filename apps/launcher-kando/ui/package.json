@@ -1,6 +1,6 @@
 {
   "name": "kando-app",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "scripts": {
     "build": "npm run build:happ && npm run build:ui",
     "build:happ": "npm run build:dna && hc app pack ../workdir",
@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@holo-host/boardz": "0.1.0",
-    "@holochain/client": "0.12.2",
-    "@holochain-open-dev/utils": "0.9.3",
-    "@holochain-syn/core": "0.3.0-alpha.7",
+    "@holochain/client": "0.13.0",
+    "@holochain-open-dev/utils": "0.13.6",
+    "@holochain-syn/core": "0.4.0",
     "@ts-stack/markdown": "^1.4.0",
     "lodash": "^4.17.21",
     "sirv-cli": "^1.0.0",

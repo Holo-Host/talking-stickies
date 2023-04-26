@@ -4,7 +4,7 @@ import { Board, BoardType, CommitTypeBoard, UngroupedId } from "./board";
 import type { EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
-import { type AgentPubKey, type EntryHash, decodeHashFromBase64, type EntryHashB64, type AgentPubKeyB64 } from "@holochain/client";
+import { type AgentPubKey, type EntryHash, decodeHashFromBase64, type EntryHashB64, type AgentPubKeyB64, encodeHashToBase64 } from "@holochain/client";
 
 export const CommitTypeBoardList :string = "board-list"
 
@@ -22,6 +22,7 @@ export interface Avatar {
 export interface BoardListState {
     avatars: Dictionary<Avatar>;
     boards: BoardRecord[];
+    agentBoards: Dictionary<Array<EntryHashB64>>;
 }
 
 
@@ -51,7 +52,14 @@ export type BoardListDelta =
     type: "set-index";
     hash: EntryHashB64;
     index: number;
-  };
+  }
+//   | {
+//     type: "set-agent-board";
+//     hash: EntryHashB64;
+//     agent: AgentPubKeyB64;
+//     state: boolean;
+//   }
+  ;
 
 export type BoardListGrammar = SynGrammar<
 BoardListDelta,
@@ -62,6 +70,7 @@ export const boardListGrammar: BoardListGrammar = {
     initState(state)  {
         state.avatars = {}
         state.boards = []
+        state.agentBoards = {}
     },
     applyDelta( 
         delta: BoardListDelta,
@@ -101,8 +110,27 @@ export const boardListGrammar: BoardListGrammar = {
               state.boards.splice(index,1)
               state.boards.splice(index, 0, c)
             }
-          }
         }
+        // if (delta.type == "set-agent-board") {
+        //     if (delta.state) {
+        //         if (state.agentBoards[delta.agent] === undefined) {
+        //             state.agentBoards[delta.agent] = [delta.hash]
+        //         } else {
+        //             const index = state.agentBoards[delta.agent].findIndex((hash) => hash === delta.hash)
+        //             if (index == -1) {
+        //                 state.agentBoards[delta.agent].push(delta.hash)
+        //             }
+        //         }
+        //     } else {
+        //         if (state.agentBoards[delta.agent] !== undefined) {
+        //             const index = state.agentBoards[delta.agent].findIndex((hash) => hash === delta.hash)
+        //             if (index >= 0) {
+        //                 state.boards.splice(index,1)
+        //             }
+        //         }
+        //     }             
+        // }
+      }
     }
 
 
@@ -129,12 +157,12 @@ export class BoardList {
     }
     public static async Join(synStore: SynStore, rootCommit: EntryRecord<Commit>, boardsRootCommit: EntryRecord<Commit>) {
         const rootStore = new RootStore(
-            synStore.client,
+            synStore,
             boardListGrammar,
             rootCommit
           );
           const boardsRootStore = new RootStore(
-            synStore.client,
+            synStore,
             boardGrammar,
             boardsRootCommit
           );
@@ -201,6 +229,17 @@ export class BoardList {
         if (hash) {
             board = await this.getBoard(hash)
             if (board) {
+                // const myPubKey = encodeHashToBase64(this.rootStore.synStore.client.client.myPubKey)
+                // const myBoards = this.state().agentBoards[myPubKey]
+                // if (myBoards  && myBoards.findIndex(h=>h === hash) < 0) {
+                //     this.requestChanges([
+                //         {type: "set-agent-board",
+                //         state: true,
+                //         agent: myPubKey,
+                //         hash: hash,
+                //         }
+                //     ])
+                // }
                 this.activeBoardHash.update((n) => {return hash} )
                 this.activeBoardType.update((n)=> {return board.state().type})
             }
@@ -293,7 +332,7 @@ export class BoardList {
             let changes = [{
                 type: "set-state",
                 state: options
-                }
+                },
             ]
             if (changes.length > 0) {
                 workspaceStore.requestChanges(changes)
@@ -305,7 +344,13 @@ export class BoardList {
                 name: board.state().name,
                 hash: boardHash,
                 status: ""
-            }])
+                },
+                {type: "set-agent-board",
+                 state: true,
+                 agent: encodeHashToBase64(this.rootStore.synStore.client.client.myPubKey),
+                 hash: boardHash,
+                }
+            ])
         
         }
         return board

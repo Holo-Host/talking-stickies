@@ -10,6 +10,7 @@
     import { MaterialAppMin, Icon } from 'svelte-materialify';
     import { mdiShapeSquarePlus, mdiCog, mdiArchiveArrowUp } from '@mdi/js';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
+  import { get } from 'svelte/store';
 
     export let boardType:BoardType
     export let roleName = ""
@@ -20,8 +21,8 @@
     export let client : AppAgentClient
     export let profilesStore : ProfilesStore|undefined = undefined
 
-    $: activeBoardHash = tsStore ? tsStore.boardList.activeBoardHash : undefined
-    $: activeBoardType = tsStore ? tsStore.boardList.activeBoardType : undefined
+    $: activeBoardHash = tsStore && tsStore.boardList ? tsStore.boardList.activeBoardHash : undefined
+    $: activeBoardType = tsStore && tsStore.boardList ? tsStore.boardList.activeBoardType : undefined
 
     initialize()
 
@@ -97,20 +98,33 @@
         {/if}
         {#if boardList && $boardList.boards.length > 0 && $activeBoardHash === undefined}
           <div class="welcome-text">
-            <p>Active Boards: {activeBoards.length}, Archived Boards: {archivedBoards.length}</p>
-            {#if boardType == BoardType.Stickies}
-              <p>
-                Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
-                You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
-              </p>
-            {:else}
-              <p>
-                Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
-                You can add columns for your board, customize voting categories and settings, and more in the board creation window.
-              </p>
-            {/if}
-            <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
-            <p>Any boards that you have archived will appear under the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiArchiveArrowUp}></Icon> button, and you can un-archive them by selecting them from the list.</p>
+            <!-- {#if !$boardList.agentBoards[myAgentPubKey]} -->
+              <p>Active Boards: {activeBoards.length}, Archived Boards: {archivedBoards.length}</p>
+              {#if boardType == BoardType.Stickies}
+                <p>
+                  Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
+                  You can add groups for your stickies, customize voting categories and settings, and more in the board creation window.
+                </p>
+              {:else}
+                <p>
+                  Select a board from the dropdown above, or add a new one with the  <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiShapeSquarePlus}></Icon> button.
+                  You can add columns for your board, customize voting categories and settings, and more in the board creation window.
+                </p>
+              {/if}
+              <p>You can always edit these settings with the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiCog}></Icon> button in the upper right when you have a board selected. </p>
+              <p>Any boards that you have archived will appear under the <Icon style="width:20px; color:black; vertical-align: bottom;" path={mdiArchiveArrowUp}></Icon> button, and you can un-archive them by selecting them from the list.</p>
+            <!-- {:else}
+              <h4> My Boards</h4>
+              <div class="my-boards">
+                {#each $boardList.agentBoards[myAgentPubKey] as myBoard}
+                  <div class="my-board"
+                    on:click={()=>tsStore.boardList.setActiveBoard(myBoard)}
+                    >
+                    {get(tsStore.boardList.getReadableBoardState(myBoard)).name}
+                  </div>
+                {/each}
+              </div>
+            {/if} -->
           </div>
         {/if}
       {/if}
@@ -201,4 +215,19 @@
     max-height: 100%;
     overflow-y: auto;
   }
+  /* .my-boards {
+    display: flex;
+  }
+  .my-board {
+    border-radius: 5px;
+    border: 1px solid #222;
+    background-color: lightcyan;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 100px;
+    margin: 5px;
+  } */
 </style>

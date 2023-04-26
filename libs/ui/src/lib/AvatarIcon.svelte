@@ -2,7 +2,7 @@
   import type { Avatar } from "./boardList";
   import { mdiAccount } from '@mdi/js';
   import { Icon } from "svelte-materialify";
-  import { HoloIdenticon } from "@holochain-open-dev/elements";
+  import "@holochain-open-dev/elements/dist/elements/holo-identicon.js";
   import { encodeHashToBase64, type AgentPubKey } from "@holochain/client";
 
   export let border = false
@@ -13,9 +13,6 @@
   $: keyB64 = key ? encodeHashToBase64(key) : undefined
   $: cssVarStyles = `--icon-size:${size}px;`;
   $: avatarName =  avatar && avatar.name ? avatar.name : key? `${keyB64.substring(0,8)}...` : "un-named"
-  if (!customElements.get('holo-identicon')){
-      customElements.define('holo-identicon', HoloIdenticon)
-  }
 </script>
 <div class="wrapper"
     class:bordered={border} style="{cssVarStyles} {style}" title={avatarName}>

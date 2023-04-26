@@ -6,12 +6,12 @@ import {
     type RoleName,
     encodeHashToBase64,
   } from '@holochain/client';
-import type { RecordBag } from '@holochain-open-dev/utils';
+import { RecordBag } from '@holochain-open-dev/utils';
 import { SynStore,  SynClient, type Commit } from '@holochain-syn/core';
-import { get } from "svelte/store";
 import { CommitTypeBoard } from './board';
 import { BoardList, CommitTypeBoardList } from './boardList';
 import { decode } from '@msgpack/msgpack';
+import {toPromise} from '@holochain-open-dev/stores'
 
 const ZOME_NAME = 'syn'
 
@@ -74,19 +74,22 @@ export class TalkingStickiesStore {
         return meta.type
     }
 
-    async findOrMakeRoots(roots: RecordBag<Commit>): Promise<any> {
-        const entries = roots.entryMap.entries()
-        console.log(`Found ${entries.length} root entries`)
-        if (entries.length == 0) { 
+    async findOrMakeRoots(): Promise<any> {
+
+        const roots = await toPromise(this.synStore.allRoots)
+        const records: RecordBag<Commit> = new RecordBag(roots.map(er => er.record))
+        const entries = records.entryMap.entries()
+        console.log(`Found ${records.entryMap.size} root entries`)
+        if (records.entryMap.size == 0) { 
             console.log(`Found no root entries, creating`)
             this.boardList = await BoardList.Create(this.synStore);
         } else {
             let boardListRoot
             let boardsRoot
                     
-            entries.forEach(async ([hash, commit], i) => {
+            Array.from(entries).forEach(async ([hash, commit], i) => {
                 const commitType = this.commitType(commit)
-                const rootCommit = roots.entryRecords[i]
+                const rootCommit = records.entryRecords[i]
                 if (commitType === CommitTypeBoardList) {
                     if (!boardListRoot) {
                         console.log("Found a board list root:", encodeHashToBase64(rootCommit.entryHash))
@@ -116,8 +119,7 @@ export class TalkingStickiesStore {
     async loadBoards() : Promise<any> {
         console.log("fetching all roots...")
         try {
-            const roots = await this.synStore.fetchAllRoots()
-            await this.findOrMakeRoots(get(roots))
+            await this.findOrMakeRoots()
         } catch (e) {
             console.log("Error Fetching Roots:", e)
         }
