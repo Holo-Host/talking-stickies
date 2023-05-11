@@ -2,9 +2,9 @@
   description = "Template for Holochain app development";
 
   inputs = {
-    holochain-nix-versions.url  = "github:holochain/holochain/pr_versions_0_2?dir=versions/0_2";
+    holochain-nix-versions.url  = "github:holochain/holochain/?dir=versions/0_2";
     holochain-flake = {
-      url = "github:holochain/holochain/pr_versions_0_2";
+      url = "github:holochain/holochain/";
       inputs.versions.follows = "holochain-nix-versions";
     };
 

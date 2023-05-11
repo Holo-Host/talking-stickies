@@ -10,7 +10,7 @@
     "envtest2": "echo \"fish $SIGNAL_SRV_PORT\"",
     "launch:ts": "npm run build:ts && SIGNAL_SRV_PORT=$(port) && SIGNAL_SRV_PORT=$SIGNAL_SRV_PORT concurrently \"hc signal-srv --port $SIGNAL_SRV_PORT\" \"npm run launch:happ:ts\"",
     "launch:kd": "npm run build:kd && SIGNAL_SRV_PORT=$(port) && SIGNAL_SRV_PORT=$SIGNAL_SRV_PORT concurrently \"hc signal-srv --port $SIGNAL_SRV_PORT\" \"npm run launch:happ:kd\"",
-    "launch:happ:ts": " RUST_LOG=warn echo \"pass\" | hc launch --piped -n 2 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network webrtc \"wss://127.0.0.1:$SIGNAL_SRV_PORT\"",
+    "launch:happ:ts": " RUST_LOG=warn echo \"pass\" | hc launch --piped -n 2 ./apps/launcher/workdir/talking-stickies.happ -w --ui-path apps/launcher/ui/public network -b https://bootstrap.holo.host  webrtc \"ws://127.0.0.1:$SIGNAL_SRV_PORT\" ",
     "launch:happ:kd": " RUST_LOG=warn hc signal-srv --port $SIGNAL_SRV_PORT && echo \"pass\" | hc launch --piped -n 1 ./apps/launcher-kando/workdir/kando.happ -w --ui-path apps/launcher-kando/ui/public network webrtc \"wss://127.0.0.1:$SIGNAL_SRV_PORT\"",
     "start:ts": "npm run build:ts && npm run start:agent:ts",
     "start:kd": "npm run build:kd && npm run start:agent:kd",
