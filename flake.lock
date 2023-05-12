@@ -223,11 +223,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1683872604,
-        "narHash": "sha256-ya7rZFuFKW6ewnOGqpMuOo04gob8BoJS5jqeZUGWPDg=",
+        "lastModified": 1683902581,
+        "narHash": "sha256-PUyWN6buWixT2ZbdLFWoJb3qxq/zTCDnlPJqVs20xgY=",
         "owner": "holochain",
         "repo": "holochain",
-        "rev": "faca0bb8e035722dbd85fd91ce74b6cd19e8ea24",
+        "rev": "a2969b211a25328bc27ebe08006defa9d7aba844",
         "type": "github"
       },
       "original": {
@@ -245,11 +245,11 @@
       },
       "locked": {
         "dir": "versions/0_2",
-        "lastModified": 1683872604,
-        "narHash": "sha256-ya7rZFuFKW6ewnOGqpMuOo04gob8BoJS5jqeZUGWPDg=",
+        "lastModified": 1683902581,
+        "narHash": "sha256-PUyWN6buWixT2ZbdLFWoJb3qxq/zTCDnlPJqVs20xgY=",
         "owner": "holochain",
         "repo": "holochain",
-        "rev": "faca0bb8e035722dbd85fd91ce74b6cd19e8ea24",
+        "rev": "a2969b211a25328bc27ebe08006defa9d7aba844",
         "type": "github"
       },
       "original": {
