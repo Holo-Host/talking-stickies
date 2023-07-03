@@ -7,6 +7,7 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -41,11 +42,12 @@ export default {
 	input: 'src/main.ts',
 	output: {
 		sourcemap: true,
-		format: 'iife',
+		format: 'es',
 		name: 'app',
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
+	nodeResolve(),
     replace({
       'process.env': JSON.stringify({
         NODE_ENV: process.env.NODE,

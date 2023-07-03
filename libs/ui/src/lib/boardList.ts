@@ -5,6 +5,7 @@ import type { EntryHashMap, EntryRecord } from "@holochain-open-dev/utils";
 import { derived, get, writable, type Readable, type Writable } from "svelte/store";
 import { boardGrammar, type BoardDelta, type BoardGrammar, type BoardState } from "./board";
 import { type AgentPubKey, type EntryHash, decodeHashFromBase64, type EntryHashB64, type AgentPubKeyB64, encodeHashToBase64 } from "@holochain/client";
+import {toPromise} from '@holochain-open-dev/stores'
 
 export const CommitTypeBoardList :string = "board-list"
 
@@ -167,10 +168,20 @@ export class BoardList {
             boardsRootCommit
           );
         const me = new BoardList(rootStore, boardsRootStore);
-        const workspaces: EntryHashMap<Workspace> = get(await rootStore.fetchWorkspaces());
+        console.log("BoardList", me)
+        const workspaces = await toPromise(rootStore.allWorkspaces);
+        console.log("Workspaxces", workspaces)
+
         // if there is no workspace then we have a problem!!
-        me.workspace = await rootStore.joinWorkspace(workspaces.keys()[0]);
-        return me
+        for (let i=0;i<workspaces.length;i+=1) {
+            try {
+                me.workspace = await rootStore.joinWorkspace(workspaces[0].entryHash);
+                return me
+            } catch(e) {
+                console.log("failed to join workspace ",i, "with error",e, " trying next")
+            }
+        }
+        throw("failed to join any workspace")
     }
     hash() : EntryHash {
         return this.rootStore.root.entryHash
@@ -345,11 +356,11 @@ export class BoardList {
                 hash: boardHash,
                 status: ""
                 },
-                {type: "set-agent-board",
-                 state: true,
-                 agent: encodeHashToBase64(this.rootStore.synStore.client.client.myPubKey),
-                 hash: boardHash,
-                }
+                // {type: "set-agent-board",
+                //  state: true,
+                //  agent: encodeHashToBase64(this.rootStore.synStore.client.client.myPubKey),
+                //  hash: boardHash,
+                // }
             ])
         
         }
