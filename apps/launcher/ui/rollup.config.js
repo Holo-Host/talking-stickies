@@ -5,9 +5,8 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
-import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -47,7 +46,6 @@ export default {
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
-	nodeResolve(),
     replace({
       'process.env': JSON.stringify({
         NODE_ENV: process.env.NODE,
@@ -75,9 +73,8 @@ export default {
 			dedupe: ['svelte', 'svelte/transition', 'svelte/internal']
 		}),
 		commonjs(),
-		typescript({
-			sourceMap: !production,
-			inlineSources: !production
+		nodePolyfills({
+			include: ["events", "https", "http", "stream", "url", "zlib", "buffer"]
 		}),
 
 		// In dev mode, call `npm run start` once

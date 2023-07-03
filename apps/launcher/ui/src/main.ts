@@ -1,4 +1,3 @@
-// @ts-ignore
 import App from './App.svelte'
 import "@webcomponents/scoped-custom-element-registry"
 const app = new App({
