@@ -6,7 +6,7 @@ integrity:
   network_seed: ~
   properties:
     type: "TalkingStickies"
-  origin_time: 2022-10-03T23:05:19.470323Z
+  origin_time: 2023-07-03T23:05:19.470323Z
   zomes:
     - name: syn_integrity
       bundled: ../../../../target/wasm32-unknown-unknown/release/syn_integrity.wasm
