@@ -1,6 +1,6 @@
 {
   "name": "talking-stickies-app",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "scripts": {
     "build": "npm run build:happ && npm run build:ui",
     "build:happ": "npm run build:dna && hc app pack ../workdir",
@@ -22,7 +22,6 @@
     "@holochain-syn/core": "0.4.0",
     "@holochain/client": "0.14.1",
     "@ts-stack/markdown": "^1.4.0",
-    "@webcomponents/scoped-custom-element-registry": "^0.0.9",
     "lodash": "^4.17.21",
     "sirv-cli": "^1.0.0",
     "svelte-fa": "^2.2.0",
