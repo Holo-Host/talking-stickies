@@ -38,7 +38,7 @@
     "@holochain-open-dev/profiles": "^0.14.0",
     "@holochain-open-dev/stores": "^0.5.0",
     "@holochain-open-dev/utils": "^0.14.0",
-    "@holochain-syn/core": "^0.5.0",
+    "@holochain-syn/core": "^0.5.1",
     "@holochain/client": "^0.14.1",
     "@mdi/js": "^7.1.96",
     "@ts-stack/markdown": "^1.4.0",
