@@ -306,6 +306,9 @@
                   on:click={editCard(cardId, text)} 
                   style:background-color={props && props["color"] ? props["color"] : "white"}
                   >
+                  <div class="card-content">
+                    {@html Marked.parse(text)}
+                  </div>
                   <div class="labels">
                     {#each $state.voteTypes as {type, emoji, toolTip}}
                       {#if isLabeled(props, type)}
@@ -315,16 +318,13 @@
                       {/if}
                     {/each}
                   </div>
-                  <div class="card-content">
-                    {@html Marked.parse(text)}
-                  </div>
                   {#if props && props.agents && props.agents.length > 0}
                     {#each props.agents as agent}
                       <AvatarIcon size={20} avatar={$avatars[agent]} key={decodeHashFromBase64(agent)}/>
                     {/each}
                   {/if}
                 </div>
-          {/each}
+        {/each}
           {#if dragTarget == columnId && dragOrder == $state.grouping[columnId].length}
             <div> <Icon path={mdiArrowRightThick} /> </div>
           {/if}

@@ -79,14 +79,6 @@
 <div class='card-editor' style:background-color={props.color} on:keydown={handleKeydown}>
   <div class="dialog-title">{title}</div>
 
-  <div class="multi-select">
-    Labels: <MultiSelect bind:selected={selectedLabels} options={labelOptions()} on:change={(_event)=>setLabels()} />
-  </div>
-  {#if Object.keys($avatars).length > 0}
-  <div class="multi-select">
-    Assigned To: <MultiSelect bind:selected={selectedAvatars} options={avatarNames()} on:change={(_event)=>setAgents()} />
-  </div>
-  {/if}
   <div class="card-elements">
     <textarea class='textarea' bind:value={text} bind:this={inputElement} />
     <div class="color-buttons">
@@ -95,6 +87,14 @@
       {/each}
     </div>
   </div>
+  <div class="multi-select">
+    Labels: <MultiSelect bind:selected={selectedLabels} options={labelOptions()} on:change={(_event)=>setLabels()} />
+  </div>
+  {#if Object.keys($avatars).length > 0}
+  <div class="multi-select">
+    Assigned To: <MultiSelect bind:selected={selectedAvatars} options={avatarNames()} on:change={(_event)=>setAgents()} />
+  </div>
+  {/if}
   <div class='controls'>
     {#if handleDelete}
       <Button size="small" class="red white-text" on:click={handleDelete}>
